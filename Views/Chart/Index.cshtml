@@ -1,0 +1,115 @@
+﻿
+@{
+    ViewData["Title"] = "View";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<head>
+<script>
+window.onload = function () {
+
+var dataPoints1 = @Html.Raw(ViewBag.DataPoints1);
+var dataPoints2 = @Html.Raw(ViewBag.DataPoints2);
+
+var chart = new CanvasJS.Chart("chartContainer", {
+	zoomEnabled: true,
+	title: {
+		text: "Reading From Two Sensor"
+	},
+	axisX: {
+		title: "chart updates every 2 secs",
+		crosshair: {
+			enabled: true,
+			snapToDataPoint: true
+		}
+	},
+	axisY: {
+		includeZero: false,
+		crosshair: {
+			enabled: true,
+			snapToDataPoint: true,
+			valueFormatString: "#,##0"
+		}
+	},
+	toolTip: {
+		shared: true
+	},
+	legend: {
+		dockInsidePlotArea: true,
+		verticalAlign: "top",
+		horizontalAlign: "right"
+	},
+	data: [{
+		type: "line",
+		markerType: "none",
+		xValueType: "dateTime",
+		xValueFormatString: "hh:mm:ss TT",
+		name: "Sensor 1",
+		showInLegend: true,
+		dataPoints: dataPoints1
+	},
+	{
+		type: "line",
+		markerType: "none",
+		xValueType: "dateTime",
+		name: "Sensor 2",
+		showInLegend: true,
+		dataPoints: dataPoints2
+	}]
+});
+
+chart.render();
+
+function toggleDataSeries(e) {
+	if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+		e.dataSeries.visible = false;
+	}
+	else {
+		e.dataSeries.visible = true;
+	}
+	chart.render();
+}
+
+var updateInterval = @Html.Raw(ViewBag.UpdateInterval);
+// initial value
+var yValue1 = @Html.Raw(ViewBag.YValue1);
+var yValue2 = @Html.Raw(ViewBag.YValue2);
+
+var time = new Date(@Html.Raw(ViewBag.Time));
+
+function updateChart(count) {
+	count = count || 1;
+	var deltaY1, deltaY2;
+	for (var i = 0; i < count; i++) {
+		time.setTime(time.getTime() + updateInterval);
+		deltaY1 = .5 + Math.random() * (-.5 - .5);
+		deltaY2 = .5 + Math.random() * (-.5 - .5);
+
+		// adding random value and rounding it to two digits.
+		yValue1 = Math.round((yValue1 + deltaY1) * 100) / 100;
+		yValue2 = Math.round((yValue2 + deltaY2) * 100) / 100;
+
+		// pushing the new values
+		dataPoints1.push({
+			x: time.getTime(),
+			y: yValue1
+		});
+		dataPoints2.push({
+			x: time.getTime(),
+			y: yValue2
+		});
+	}
+
+	chart.render();
+}
+
+setInterval(function () { updateChart() }, updateInterval);
+
+}
+    </script>
+</head>
+<body>
+    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+</body>
+
