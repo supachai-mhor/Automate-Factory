@@ -10,70 +10,116 @@
     <title>@ViewData["Title"] - Movie App</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+    <!-- Custom styles for this template -->
+    <link href="~/css/cover.css" rel="stylesheet">
+    <title>Automate Smart Business</title>
+
+    @*<link rel="canonical" href="https://getbootstrap.com/docs/4.4/examples/cover/">*@
+
+    <!-- Bootstrap core CSS -->
+    @*<link href="/docs/4.4/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">*@
+
+    <!-- Favicons -->
+    @*<link rel="apple-touch-icon" href="/docs/4.4/assets/img/favicons/apple-touch-icon.png" sizes="180x180">
+        <link rel="icon" href="/docs/4.4/assets/img/favicons/favicon-32x32.png" sizes="32x32" type="image/png">
+        <link rel="icon" href="/docs/4.4/assets/img/favicons/favicon-16x16.png" sizes="16x16" type="image/png">
+        <link rel="manifest" href="/docs/4.4/assets/img/favicons/manifest.json">
+        <link rel="mask-icon" href="/docs/4.4/assets/img/favicons/safari-pinned-tab.svg" color="#563d7c">
+        <link rel="icon" href="/docs/4.4/assets/img/favicons/favicon.ico">
+        <meta name="msapplication-config" content="/docs/4.4/assets/img/favicons/browserconfig.xml">
+        <meta name="theme-color" content="#563d7c">*@
+
+
+    <style>
+        .bd-placeholder-img {
+            font-size: 1.125rem;
+            text-anchor: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        @@media (min-width: 768px) {
+            .bd-placeholder-img-lg {
+                font-size: 3.5rem;
+            }
+        }
+    </style>
+
+
+
 </head>
 <body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container">
-                <a class="navbar-brand" asp-controller="Movies" asp-action="Index">Movie App</a>
-                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
 
-                    </ul>
+    <div class="cover-container d-flex w-100 h-100 p-3 mx-auto flex-column">
+        <header class="masthead mb-auto">
+            <div class="inner">
+                <img src="~/Img/LOGO.png" class="img-thumbnail" alt="automate logo" style="width:150px;">
+                <nav class="nav nav-masthead justify-content-center">
+                    <a class="nav-link active" asp-controller="Home" asp-action="Index">Home</a>
+                    <a class="nav-link" asp-controller="Home" asp-action="Privacy">Privacy</a>
 
-                </div>
-                <ul class="navbar-nav ml-auto">
-                    @*If the user is signed-in display Logout link*@
                     @if (SignInManager.IsSignedIn(User))
                     {
-                        <li class="nav-item">
+                        <a class="nav-link dropdown-toggle bg-info" id="navbardrop" data-toggle="dropdown">
+                            @User.Identity.Name
+                        </a>
+                        <div class="dropdown-menu">
                             <form method="post" asp-controller="account" asp-action="logout">
                                 <button type="submit" style="width:auto"
-                                        class="nav-link btn btn-link py-0">
-                                    Logout @User.Identity.Name
+                                        class="btn btn-link py-0">
+                                    Logout
                                 </button>
                             </form>
-                        </li>
+                        </div>
                     }
                     else
                     {
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="account" asp-action="register">
+                        <a class="nav-link dropdown-toggle bg-info" id="navbardrop" data-toggle="dropdown">
+                            Accounts
+                        </a>
+                        <div class="dropdown-menu">
+                            <a class="text-dark" asp-controller="account" asp-action="register">
                                 Register
                             </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-controller="account" asp-action="login">
+                            <a class="text-dark" asp-controller="account" asp-action="login">
                                 Login
                             </a>
-                        </li>
+                        </div>
                     }
-
-                 </ul>
+                </nav>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
+        </header>
 
-    <footer class="border-top footer text-muted">
+
         <div class="container">
-            &copy; 2019 - Movie App - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
         </div>
-    </footer>
+
+        <main role="main" class="inner cover">
+            <h1 class="cover-heading">Automate Smart Business</h1>
+            <p class="lead">
+                Our Company provided your smart business. That we allow you builded you owner business.
+                The smart business is including dashboard, organized chart, factory, production, warehouse, machine monitoring and more.
+                Let's join with us. >>>
+
+            </p>
+            <p class="lead">
+                <a href="#" class="btn btn-lg btn-secondary">Learn more</a>
+            </p>
+        </main>
+
+        <footer class="mastfoot mt-auto">
+            <div class="inner">
+                &copy; 2020 - Automate Solution Design Co., Ltd.
+            </div>
+        </footer>
+
+    </div>      
+        
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

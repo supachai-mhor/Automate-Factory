@@ -82,7 +82,7 @@ namespace MvcMovie.Controllers
                 {
                     await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login success on : {DateTime.Now}");
                     
-                    return RedirectToAction("index", "home");
+                    return RedirectToAction("Dashboard", "home");
                 }
                 await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login fail on : {DateTime.Now}");
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
