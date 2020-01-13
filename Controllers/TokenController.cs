@@ -6,22 +6,22 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using MvcMovie.Data;
-using MvcMovie.Models;
+using AutomateBussiness.Data;
+using AutomateBussiness.Models;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.IdentityModel;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace MvcMovie.Controllers
+namespace AutomateBussiness.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
     public class TokenController : Controller
     {
         private readonly IConfiguration _config;
-        private readonly MvcMovieContext _dbContext;
-        public TokenController(IConfiguration config, MvcMovieContext dbContext)
+        private readonly AutomateBussinessContext _dbContext;
+        public TokenController(IConfiguration config, AutomateBussinessContext dbContext)
         {
             _config = config;
             _dbContext = dbContext;

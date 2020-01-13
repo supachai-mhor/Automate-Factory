@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using MvcMovie.Data;
+using AutomateBussiness.Data;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
@@ -11,13 +11,13 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 
-namespace MvcMovie.Hubs
+namespace AutomateBussiness.Hubs
 {
     public class ChatHub:Hub
     {
-        private readonly MvcMovieContext _context;
+        private readonly AutomateBussinessContext _context;
 
-        public ChatHub(MvcMovieContext context)
+        public ChatHub(AutomateBussinessContext context)
         {
             _context = context;
         }

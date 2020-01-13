@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using System.Runtime.Serialization;
 using System.Web;
 
-namespace MvcMovie.Models
+namespace AutomateBussiness.Models
 {
     //DataContract for Serializing Data - required to serve in JSON format
     [DataContract]

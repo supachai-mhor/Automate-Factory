@@ -22,7 +22,7 @@
   },
   "targets": {
     ".NETCoreApp,Version=v3.0": {
-      "MvcMovie/1.0.0": {
+      "AutomateBussiness/1.0.0": {
         "dependencies": {
           "Microsoft.EntityFrameworkCore.SqlServer": "3.0.1",
           "Microsoft.EntityFrameworkCore.Tools": "3.0.1",
@@ -301,10 +301,10 @@
           "WindowsBase": "4.0.0.0"
         },
         "runtime": {
-          "MvcMovie.dll": {}
+          "AutomateBussiness.dll": {}
         },
         "compile": {
-          "MvcMovie.dll": {}
+          "AutomateBussiness.dll": {}
         }
       },
       "Microsoft.AspNetCore.Html.Abstractions/2.2.0": {
@@ -3720,7 +3720,7 @@
     }
   },
   "libraries": {
-    "MvcMovie/1.0.0": {
+    "AutomateBussiness/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

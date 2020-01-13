@@ -4,10 +4,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MvcMovie.Models;
+using AutomateBussiness.Models;
 using Newtonsoft.Json;
 
-namespace MvcMovie.Controllers
+namespace AutomateBussiness.Controllers
 {
 
     public class ChatRoomController : Controller

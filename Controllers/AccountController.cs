@@ -5,10 +5,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using MvcMovie.Hubs;
-using MvcMovie.Models;
+using AutomateBussiness.Hubs;
+using AutomateBussiness.Models;
 
-namespace MvcMovie.Controllers
+namespace AutomateBussiness.Controllers
 {
     public class AccountController : Controller
     {

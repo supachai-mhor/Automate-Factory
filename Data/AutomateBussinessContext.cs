@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutomateBussiness.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using MvcMovie.Models;
 
-namespace MvcMovie.Data
+namespace AutomateBussiness.Data
 {
-    public class MvcMovieContext : IdentityDbContext
+    public class AutomateBussinessContext : IdentityDbContext
     {
-        public MvcMovieContext(DbContextOptions<MvcMovieContext> options)
+        public AutomateBussinessContext(DbContextOptions<AutomateBussinessContext> options)
             : base(options)
         {
         }
@@ -22,6 +22,8 @@ namespace MvcMovie.Data
         public DbSet<Movie> Movie { get; set; }
 
         public DbSet<UserAccount> UserAccounts { get; set; }
+
+        public DbSet<OrganizationModel> Organizations { get; set; }
     }
     //public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     //{

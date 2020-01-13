@@ -8,23 +8,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using MvcMovie.Data;
-using MvcMovie.Models;
-using MvcMovie.Controllers;
-using MvcMovieContext = MvcMovie.Data.MvcMovieContext;
+using AutomateBussiness.Data;
+using AutomateBussiness.Models;
+using AutomateBussiness.Controllers;
+using AutomateBussinessContext = AutomateBussiness.Data.AutomateBussinessContext;
 using Microsoft.AspNetCore.SignalR;
-using MvcMovie.Hubs;
+using AutomateBussiness.Hubs;
 using Newtonsoft.Json;
 
-namespace MvcMovie.Controllers
+namespace AutomateBussiness.Controllers
 {
     public class MoviesController : Controller
     {
-        private readonly MvcMovieContext _context;
+        private readonly AutomateBussinessContext _context;
         private readonly IHubContext<ChatHub> _hubContext;
         public object Claimtype { get; private set; }
 
-        public MoviesController(MvcMovieContext context, IHubContext<ChatHub> hubContext)
+        public MoviesController(AutomateBussinessContext context, IHubContext<ChatHub> hubContext)
         {
             _context = context;
             _hubContext = hubContext;

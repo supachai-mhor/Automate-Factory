@@ -4,12 +4,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MvcMovie.Data;
+using AutomateBussiness.Data;
 
-namespace MvcMovie.Migrations
+namespace AutomateBussiness.Migrations
 {
-    [DbContext(typeof(MvcMovieContext))]
-    partial class MvcMovieContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(AutomateBussinessContext))]
+    partial class AutomateBussinessContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
@@ -215,7 +215,7 @@ namespace MvcMovie.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("MvcMovie.Models.Movie", b =>
+            modelBuilder.Entity("AutomateBussiness.Models.Movie", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -248,7 +248,7 @@ namespace MvcMovie.Migrations
                     b.ToTable("Movie");
                 });
 
-            modelBuilder.Entity("MvcMovie.Models.UserAccount", b =>
+            modelBuilder.Entity("AutomateBussiness.Models.UserAccount", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()

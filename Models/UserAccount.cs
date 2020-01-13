@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace MvcMovie.Models
+namespace AutomateBussiness.Models
 {
     
     public class UserAccount

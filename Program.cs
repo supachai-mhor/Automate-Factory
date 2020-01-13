@@ -2,11 +2,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using MvcMovie.Data;
-using MvcMovie.Models;
+using AutomateBussiness.Data;
+using AutomateBussiness.Models;
 using System;
 
-namespace MvcMovie
+namespace AutomateBussiness
 {
     public class Program
     {

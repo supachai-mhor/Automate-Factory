@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MvcMovie.Data;
+using AutomateBussiness.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -18,10 +18,10 @@ using Microsoft.AspNetCore.Identity;
 using Newtonsoft.Json.Serialization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using MvcMovie.Models;
-using MvcMovie.Hubs;
+using AutomateBussiness.Models;
+using AutomateBussiness.Hubs;
 
-namespace MvcMovie
+namespace AutomateBussiness
 {
     public class Startup
     {
@@ -48,7 +48,7 @@ namespace MvcMovie
             //        options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
 
-            services.AddDbContext<MvcMovieContext>(options =>
+            services.AddDbContext<AutomateBussinessContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
             services.AddAuthentication( x=>
@@ -80,7 +80,7 @@ namespace MvcMovie
                 options.Password.RequireNonAlphanumeric = false;
 
             })
-                .AddEntityFrameworkStores<MvcMovieContext>()
+                .AddEntityFrameworkStores<AutomateBussinessContext>()
                 .AddDefaultTokenProviders();
 
             services.AddControllersWithViews();

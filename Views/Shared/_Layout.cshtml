@@ -62,17 +62,23 @@
 
                     @if (SignInManager.IsSignedIn(User))
                     {
+                        <a class="nav-link" asp-controller="Home" asp-action="Dashboard">
+                            Dashboard
+                        </a>
                         <a class="nav-link dropdown-toggle bg-info" id="navbardrop" data-toggle="dropdown">
                             @User.Identity.Name
                         </a>
                         <div class="dropdown-menu">
+                                                        
                             <form method="post" asp-controller="account" asp-action="logout">
                                 <button type="submit" style="width:auto"
                                         class="btn btn-link py-0">
                                     Logout
                                 </button>
                             </form>
+
                         </div>
+                                               
                     }
                     else
                     {

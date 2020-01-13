@@ -1,6 +1,6 @@
 using System;
 
-namespace MvcMovie.Models
+namespace AutomateBussiness.Models
 {
     public class ErrorViewModel
     {

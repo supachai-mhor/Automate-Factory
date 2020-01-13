@@ -4,11 +4,17 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using MvcMovie.Models;
+using AutomateBussiness.Models;
 
-namespace MvcMovie.Controllers
+
+using System.Data;
+using System.Configuration;
+using System.Data.SqlClient;
+
+namespace AutomateBussiness.Controllers
 {
     public class HomeController : Controller
     {
@@ -20,13 +26,15 @@ namespace MvcMovie.Controllers
         }
 
         public IActionResult Index()
-        {
+        {          
             return View();
         }
+        [Authorize]
         public IActionResult Dashboard()
         {
             return View();
         }
+       
         public IActionResult Privacy()
         {
             return View();

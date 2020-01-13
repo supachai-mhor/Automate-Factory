@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Channels;
 
-namespace MvcMovie.Hubs
+namespace AutomateBussiness.Hubs
 {
     public class StreamHub : Hub
     {

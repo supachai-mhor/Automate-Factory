@@ -15,7 +15,7 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
-    "MvcMovie": {
+    "AutomateBussiness": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

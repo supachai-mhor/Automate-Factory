@@ -5,11 +5,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using MvcMovie.Data;
+using AutomateBussiness.Data;
 
-namespace MvcMovie.Migrations
+namespace AutomateBussiness.Migrations
 {
-    [DbContext(typeof(MvcMovieContext))]
+    [DbContext(typeof(AutomateBussinessContext))]
     [Migration("20191206035158_initialMigration")]
     partial class initialMigration
     {
@@ -21,7 +21,7 @@ namespace MvcMovie.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("MvcMovie.Models.Movie", b =>
+            modelBuilder.Entity("AutomateBussiness.Models.Movie", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -54,7 +54,7 @@ namespace MvcMovie.Migrations
                     b.ToTable("Movie");
                 });
 
-            modelBuilder.Entity("MvcMovie.Models.UserAccount", b =>
+            modelBuilder.Entity("AutomateBussiness.Models.UserAccount", b =>
                 {
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd()
