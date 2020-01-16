@@ -36,6 +36,23 @@ namespace AutomateBussiness.Controllers
             ViewBag.JsonData = JsonConvert.SerializeObject(Organization);
             return View(Organization);
         }
-       
+
+        [HttpPost]
+        public async Task<List<OrganizationModel>> getOrgData()
+        {
+            var All_Organizations = from m in _context.Organizations
+                                    select m;
+
+            List<OrganizationModel> Organization = await All_Organizations.ToListAsync();
+
+            if (Organization == null)
+            {
+                return null;
+            }
+
+            return Organization;
+        }
+             
+
     }
 }

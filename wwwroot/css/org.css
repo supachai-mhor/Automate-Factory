@@ -1,0 +1,13 @@
+﻿.personDescription {
+    background-color: #eeeeee;
+    padding: 6px;
+    border-radius: 6px;
+    margin-top: -4px;
+}
+
+.tooltipBox {
+    background-color: #666666;
+    color: white;
+    border-radius: 4px;
+    padding: 4px;
+}

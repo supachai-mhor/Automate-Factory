@@ -3,8 +3,12 @@
     ViewData["Title"] = "Oganization";
     Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
 }
+<script>
+document.getElementById("HeaderTopic").innerHTML = "Oganization";
+</script>
 
-<h1>Oganization</h1>
+<div id="chartDiv" style="width: 100%; height: 600px; margin: 0px auto; overflow: hidden"></div>
+
 
 <table class="table">
     <thead>
@@ -44,140 +48,26 @@
     </tbody>
 </table>
 
-@*@foreach (var m in Model)
-    {
-    <div>
-        @{
-            var strImg = "~/Img/Emp/" + m.ID.ToString() + ".jpg";
-            <img src="@Url.Content(strImg)" class="img-thumbnail" alt="automate logo" style="width:50px;">
-        }
 
-    </div>
+
+@*<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript" src="~/js/Organized/organize.js"></script>*@
+
+
+
+@*<script type="text/javascript" src="../jsc/jscharting.js"></script>
+    <script type="text/javascript" src="../jsc/modules/types.js"></script>*@
+
+
+
+@*@foreach (var m in Model)
+    {<div>
+            @{
+                var strImg = "~/Img/Emp/" + m.ID.ToString() + ".jpg";
+                <img src="@Url.Content(strImg)" class="img-thumbnail" alt="automate logo" style="width:50px;">
+            }
+
+        </div>
 
     }*@
 
-
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script type="text/javascript">
-
-    
-   
-
-    google.charts.load('current', { packages: ["orgchart"] });
-    google.charts.setOnLoadCallback(drawChart);
-
-    function drawChart() {
-
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'Name');
-        data.addColumn('string', 'Manager');
-        data.addColumn('string', 'ToolTip');
-
-
-        // For each orgchart box, provide the name, manager, and tooltip to show.
-
-        var myObj = JSON.parse(@Model);
-        for (var m in myObj) {
-                   
-        //for (var i = 0; i < JsonData.length; i++) {
-
-            var employeeId = m.ID;
-                        var employeeName = m.Name;
-                        var designation = m.Designation;
-            var reportingManager = m.ReportingManager != null ? m.ReportingManager : '';
-
-            @*var employeeId = @Model[i].ID.toString();
-            var employeeName = @Model[i].ame;
-            var designation = @Model[i][2];
-            var reportingManager = @Model[i][3] != null ? @Model[i][3].toString() : '';*@
-
-            data.addRows([[{
-                v: employeeId,
-                f: employeeName + '<div>(<span>' + designation + '</span>)</div><img src = "~/Img/Emp/' + employeeId + '.jpg") />'
-            }, reportingManager, designation]]);
-        
-                }
-        //data.addRows([
-        //  [{'v':'Mike', 'f':'Mike<div style="color:red; font-style:italic">President</div>'},
-        //   '', 'The President'],
-        //  [{'v':'Jim', 'f':'Jim<div style="color:red; font-style:italic">Vice President</div>'},
-        //   'Mike', 'VP'],
-        //  ['Alice', 'Mike', ''],
-        //  ['Bob', 'Jim', 'Bob Sponge'],
-        //  ['Carol', 'Bob', '']
-        //]);
-
-
-        //var data = new google.visualization.DataTable();
-        //data.addColumn('string', 'Entity');
-        //data.addColumn('string', 'ParentEntity');
-        //data.addColumn('string', 'ToolTip');
-
-
-        @*for (var i = 0; i < dataStr..get; i++) {
-            var employeeId = @Model[i].ID.toString();
-            var employeeName = @Model[i].ame;
-            var designation = @Model[i][2];
-            var reportingManager = @Model[i][3] != null ? @Model[i][3].toString() : '';
-            data.addRows([[{
-                v: employeeId,
-                f: employeeName + '<div>(<span>' + designation + '</span>)</div><img src = "~/Img/Emp/' + employeeId + '.jpg" />'
-            }, reportingManager, designation]]);
-        }*@
-
-
-        // Create the chart.
-        var chart = new google.visualization.OrgChart(document.getElementById('chart_div'));
-        // Draw the chart, setting the allowHtml option to true for the tooltips.
-        chart.draw(data, { 'allowHtml': true });
-
-
-
-
-    }
-</script>
-
-<div id="chart_div"></div>
-
-
-@*<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript">
-        google.load("visualization", "1", { packages: ["orgchart"] });
-        google.setOnLoadCallback(drawChart);
-        function drawChart() {
-            $.ajax({
-                type: "POST",
-                url: "Default.aspx/GetChartData",
-                data: '{}',
-                contentType: "application/json; charset=utf-8",
-                dataType: "json",
-                success: function (r) {
-                    var data = new google.visualization.DataTable();
-                    data.addColumn('string', 'Entity');
-                    data.addColumn('string', 'ParentEntity');
-                    data.addColumn('string', 'ToolTip');
-                    for (var i = 0; i < r.d.length; i++) {
-                        var employeeId = r.d[i][0].toString();
-                        var employeeName = r.d[i][1];
-                        var designation = r.d[i][2];
-                        var reportingManager = r.d[i][3] != null ? r.d[i][3].toString() : '';
-                        data.addRows([[{
-                            v: employeeId,
-                            f: employeeName + '<div>(<span>' + designation + '</span>)</div><img src = "Pictures/' + employeeId + '.jpg" />'
-                        }, reportingManager, designation]]);
-                    }
-                    var chart = new google.visualization.OrgChart($("#chart")[0]);
-                    chart.draw(data, { allowHtml: true });
-                },
-                failure: function (r) {
-                    alert(r.d);
-                },
-                error: function (r) {
-                    alert(r.d);
-                }
-            });
-        }
-    </script>
-    <div id="chart">
-    </div>*@

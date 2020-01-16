@@ -5,15 +5,34 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
+    <meta http-equiv="content-type" content="text-html; charset=utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - Movie App</title>
+    <title>@ViewData["Title"] - Automate Smart Business</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" />
     <!-- Custom styles for this template -->
     <link href="~/css/dashboard.css" rel="stylesheet">
+    @*<link rel="stylesheet" type="text/css" href="~/css/org.css">*@
     <title>Automate Smart Business</title>
-        
+    <script src="https://code.jscharting.com/latest/jscharting.js"></script>
+    <script src="~/js/Organized/org.js"></script>
+
+    <style type="text/css">
+        .personDescription {
+            background-color: #eeeeee;
+            padding: 6px;
+            border-radius: 6px;
+            margin-top: -4px;
+        }
+
+        .tooltipBox {
+            background-color: #666666;
+            color: white;
+            border-radius: 4px;
+            padding: 4px;
+        }
+    </style>
+
     <style>
         .bd-placeholder-img {
             font-size: 1.125rem;
@@ -30,7 +49,7 @@
             }
         }
     </style>
-        
+
 </head>
 <body>
 
@@ -151,7 +170,7 @@
 
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 class="h2">Dashboard</h1>
+                    <h1 id ="HeaderTopic" class="h2">Dashboard</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group mr-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>
