@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AutomateBussiness.Data;
@@ -23,19 +24,35 @@ namespace AutomateBussiness.Controllers
 
         public async Task<IActionResult> Index()
         {
-
-            var All_Organizations = from m in _context.Organizations
-                         select m;
-
-            List<OrganizationModel> Organization = await All_Organizations.ToListAsync();
-                       
-            if (Organization == null)
+            try
             {
-                return NotFound();
+                var All_Organizations = from m in _context.Organizations
+                                       select m;
+            
+                List<OrganizationModel> Organization = await All_Organizations.ToListAsync();
+           
+                if (Organization == null)
+                {
+                    return NotFound();
+                }
+                //convert object to json string.
+                string json = JsonConvert.SerializeObject(Organization);
+
+                string path = @"D:\ASP NET Project\Automate-Factory\wwwroot\json\jsondata.json";
+               // string path = @"~/json/jsondata.json";
+                //export data to json file. 
+                using (TextWriter tw = new StreamWriter(path))
+                {
+                    tw.WriteLine(json);
+                };
+
+                return View(Organization);
+
+            }catch(Exception ex)
+                {
+                    return View("Error" + ex.ToString());
+                }
             }
-            ViewBag.JsonData = JsonConvert.SerializeObject(Organization);
-            return View(Organization);
-        }
 
         [HttpPost]
         public async Task<List<OrganizationModel>> getOrgData()
@@ -49,6 +66,8 @@ namespace AutomateBussiness.Controllers
             {
                 return null;
             }
+
+            
 
             return Organization;
         }

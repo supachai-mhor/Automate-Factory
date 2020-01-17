@@ -4,12 +4,38 @@ var chart, orgList;
 var openedNodeColor = '#e0e0e0', closedNodeColor = '#efefef';
 
 JSC.fetch('csv/orgData.csv').then(function (response) { return response.text(); }).then(function (text) {
-	var data = JSC.csv2Json(text);
-	orgList = makePoints(data);
-	chart = renderChart(orgList);
 
-	//chart = renderChart(makeSeries(data));
+	$.ajax({
+	type: "POST",
+	url: 'Organization/getOrgData',
+	data: '{}',
+	contentType: "application/json; charset=utf-8",
+	dataType: "json",
+	success: OnSuccess_getOrgData,
+	error: OnErrorCall_getOrgData
 });
+function OnSuccess_getOrgData(repo) {
+	var response = repo;
+	//var data = JSC.csv2Json(response);
+	orgList = makePoints(response);
+	chart = renderChart(orgList);
+}
+
+});
+
+//JSC.fetch("/json/jsonData.json")
+//	.then(response => response.json())
+//	.then(json => {
+//		orgList = makePoints(json);
+//		chart = renderChart(orgList);
+//		//Use JSON to populate the chart.
+//	});
+
+
+
+function OnErrorCall_getOrgData() {
+	console.log("Whoops something went wrong :( ");
+}
 
 function renderChart(orgList) {
 	return JSC.chart('chartDiv', {
@@ -72,7 +98,7 @@ function pointClick() {
 			label_text: '<b>%position</b><br/>%name<br/>',
 			color: closedNodeColor
 		});
-		if (point.options('id') == 'md') {
+		if (point.options('id') == "0") {
 			chart.series(0).remove();
 			chart.series.add({ points: [orgList[0]] });
 		}
@@ -111,7 +137,7 @@ function makePoints(data) {
 	var points = JSC.nest().key('name').pointRollup(function (key, val) {
 		var result = {
 			name: key,
-			id: val[0].id,
+			id: val[0].ids,
 			parent: val[0].parent,
 			attributes: {
 				position: val[0].position,
@@ -124,7 +150,7 @@ function makePoints(data) {
 				cooperative: '<chart width=28 height=10 color=' + getColor(val[0].cooperative) + ' type=bar data=' + val[0].cooperative + ' max=5> - Cooperative'
 			}
 		};
-		if (result.id == 'md') {
+		if (result.id == "0") {
 			result.annotation_label_text = '<span style="align:center;font-size:13px;"><img width=70 height=70 align=center margin_bottom=4 src=%photo><br/><span style="font-size:14px;"><b>%position</b></span><br/>%name<br/></span>';
 		}
 		return result;

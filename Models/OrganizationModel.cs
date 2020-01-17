@@ -7,9 +7,18 @@ namespace AutomateBussiness.Models
 {
     public class OrganizationModel
     {
-        public int ID { get; set; }
-        public string Name { get; set; }
-        public string Designation { get; set; }
-        public int? ReportingManager { get; set; }
+        public int id { get; set; }
+        public string ids { get; set; }
+        public string name { get; set; }
+        public string position { get; set; }
+        public string photo { get; set; }
+        public string phone { get; set; }
+        public string address{ get; set; }
+        public string email { get; set; }
+        public string? parent { get; set; }
+        public int? work_quality { get; set; }
+        public int? initiative { get; set; }
+        public int? cooperative { get; set; }
+
     }
 }

@@ -14,36 +14,79 @@ document.getElementById("HeaderTopic").innerHTML = "Oganization";
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model[0].ID)
+                @Html.DisplayNameFor(model => model[0].ids)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model[0].Name)
+                @Html.DisplayNameFor(model => model[0].name)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model[0].Designation)
+                @Html.DisplayNameFor(model => model[0].position)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model[0].ReportingManager)
+                @Html.DisplayNameFor(model => model[0].photo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].phone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].address)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].parent)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].work_quality)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].initiative)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].cooperative)
             </th>
         </tr>
     </thead>
     <tbody>
         @foreach (var item in Model)
         {
-            <tr>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ID)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Designation)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.ReportingManager)
-                </td>
-            </tr>
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.ids)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.position)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.photo)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.phone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.address)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.parent)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.work_quality)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.initiative)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.cooperative)
+            </td>
+            
+        </tr>
         }
     </tbody>
 </table>
