@@ -4,18 +4,18 @@
     Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
 }
 <script>
-document.getElementById("HeaderTopic").innerHTML = "Oganization";
+    document.getElementById("HeaderTopic").innerHTML = "Oganization";
 </script>
 
 <div id="chartDiv" style="width: 100%; height: 600px; margin: 0px auto; overflow: hidden"></div>
 
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
 
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model[0].ids)
-            </th>
             <th>
                 @Html.DisplayNameFor(model => model[0].name)
             </th>
@@ -53,7 +53,9 @@ document.getElementById("HeaderTopic").innerHTML = "Oganization";
         {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.ids)
+                <a asp-action="Edit" asp-route-id="@item.id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.id">Details</a>
+                @*<a asp-action="Delete" asp-route-id="@item.id">Delete</a>*@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.name)
@@ -85,7 +87,7 @@ document.getElementById("HeaderTopic").innerHTML = "Oganization";
             <td>
                 @Html.DisplayFor(modelItem => item.cooperative)
             </td>
-            
+
         </tr>
         }
     </tbody>

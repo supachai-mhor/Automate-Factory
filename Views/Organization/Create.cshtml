@@ -1,0 +1,77 @@
+﻿@model AutomateBussiness.Models.OrganizationModel
+@{
+    ViewData["Title"] = "Oganization";
+    Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
+}
+<script>
+    document.getElementById("HeaderTopic").innerHTML = "Oganization";
+</script>
+
+<h4>Create New Employee</h4>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="name" class="control-label"></label>
+                <input asp-for="name" class="form-control" />
+                <span asp-validation-for="name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="position" class="control-label"></label>
+                <input asp-for="position" class="form-control" />
+                <span asp-validation-for="position" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="photo" class="control-label"></label>
+                <input asp-for="photo" class="form-control" />
+                <span asp-validation-for="photo" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="phone" class="control-label"></label>
+                <input asp-for="phone" class="form-control" />
+                <span asp-validation-for="phone" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="address" class="control-label"></label>
+                <input asp-for="address" class="form-control" />
+                <span asp-validation-for="address" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="email" class="control-label"></label>
+                <input asp-for="email" class="form-control" />
+                <span asp-validation-for="email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="parent" class="control-label"></label>
+                <input asp-for="parent" class="form-control" />
+                <span asp-validation-for="parent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="work_quality" class="control-label"></label>
+                <input asp-for="work_quality" class="form-control" />
+                <span asp-validation-for="work_quality" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="initiative" class="control-label"></label>
+                <input asp-for="initiative" class="form-control" />
+                <span asp-validation-for="initiative" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="cooperative" class="control-label"></label>
+                <input asp-for="cooperative" class="form-control" />
+                <span asp-validation-for="cooperative" class="text-danger"></span>
+            </div>
+                   <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back</a>
+</div>
+

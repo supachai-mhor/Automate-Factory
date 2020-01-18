@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -8,16 +9,40 @@ namespace AutomateBussiness.Models
     public class OrganizationModel
     {
         public int id { get; set; }
-        public string ids { get; set; }
+        [Required]
+        [Display(Name = "Name")]
         public string name { get; set; }
+        [Required]
+        [Display(Name = "Position")]
         public string position { get; set; }
+        [Required]
+        [Display(Name = "Photo Number")]
+        [RegularExpression(@"^(0|[1-9]\d*)$")]
         public string photo { get; set; }
+        [Required]
+        [Phone]
+        [Display(Name = "Phone")]
         public string phone { get; set; }
+        [Required]
+        [Display(Name = "Address")]
         public string address{ get; set; }
+        [Required]
+        [EmailAddress]
+        [Display(Name = "Email")]
         public string email { get; set; }
+
+        //[RegularExpression(@"^(0|[1-9]\d*)$")]
+        [RegularExpression(@"^(0|[1-9]\d*)$")]
+        [Display(Name = "Leader ID")]
         public string? parent { get; set; }
+        [Range(0, 5)]
+        [Display(Name = "Work Quality")]
         public int? work_quality { get; set; }
+        [Range(0, 5)]
+        [Display(Name = "Initiative")]
         public int? initiative { get; set; }
+        [Range(0, 5)]
+        [Display(Name = "Cooperative")]
         public int? cooperative { get; set; }
 
     }

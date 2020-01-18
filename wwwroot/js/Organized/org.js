@@ -98,23 +98,23 @@ function pointClick() {
 			label_text: '<b>%position</b><br/>%name<br/>',
 			color: closedNodeColor
 		});
-		if (point.options('id') == "0") {
+		if (point.options('id') == 61) {
 			chart.series(0).remove();
 			chart.series.add({ points: [orgList[0]] });
 		}
 		else {
 			var childrenID = getAllChildren(point).reverse()
 			childrenID.forEach(function (val, i) {
-				chart.series(0).points(function (p) { return p.options('id') === val }).remove();
+				chart.series(0).points(function (p) { return p.options('id') == val }).remove();
 			})
 		}
 	}
 
 	function getAllChildren(point) {
-		var childrenID = chart.series(0).points(function (p) { return p.options('parent') === point.id; }).map(function (a) { return a.id });
+		var childrenID = chart.series(0).points(function (p) { return p.options('parent') == point.id; }).map(function (a) { return a.id });
 
 		childrenID.forEach(function (val) {
-			childrenID = childrenID.concat(getAllChildren(chart.series(0).points(function (p) { return p.options('id') === val; }).items[0]));
+			childrenID = childrenID.concat(getAllChildren(chart.series(0).points(function (p) { return p.options('id') == val; }).items[0]));
 		})
 		return childrenID;
 	}
@@ -137,7 +137,7 @@ function makePoints(data) {
 	var points = JSC.nest().key('name').pointRollup(function (key, val) {
 		var result = {
 			name: key,
-			id: val[0].ids,
+			id: val[0].id,
 			parent: val[0].parent,
 			attributes: {
 				position: val[0].position,
@@ -150,7 +150,7 @@ function makePoints(data) {
 				cooperative: '<chart width=28 height=10 color=' + getColor(val[0].cooperative) + ' type=bar data=' + val[0].cooperative + ' max=5> - Cooperative'
 			}
 		};
-		if (result.id == "0") {
+		if (result.id == 61) {
 			result.annotation_label_text = '<span style="align:center;font-size:13px;"><img width=70 height=70 align=center margin_bottom=4 src=%photo><br/><span style="font-size:14px;"><b>%position</b></span><br/>%name<br/></span>';
 		}
 		return result;
