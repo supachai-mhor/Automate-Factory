@@ -12,12 +12,12 @@ namespace AutomateBussiness.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> userManager;
-        private readonly SignInManager<IdentityUser> signInManager;
+        private readonly UserManager<FactoryAccount> userManager;
+        private readonly SignInManager<FactoryAccount> signInManager;
         private readonly IHubContext<ChatHub> _hubContext;
 
-        public AccountController(UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager, IHubContext<ChatHub> hubContext)
+        public AccountController(UserManager<FactoryAccount> userManager,
+            SignInManager<FactoryAccount> signInManager, IHubContext<ChatHub> hubContext)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -36,10 +36,12 @@ namespace AutomateBussiness.Controllers
             if (ModelState.IsValid)
             {
                 // Copy data from RegisterViewModel to IdentityUser
-                var user = new IdentityUser
+                var user = new FactoryAccount
                 {
                     UserName = model.Email,
-                    Email = model.Email
+                    Email = model.Email,
+                    FactoryName = model.FactoryName,
+                    FactoryDescription = model.FactoryDescription
                 };
 
                 // Store user data in AspNetUsers database table
@@ -81,14 +83,11 @@ namespace AutomateBussiness.Controllers
                 if (result.Succeeded)
                 {
                     await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login success on : {DateTime.Now}");
-                    
-                    return RedirectToAction("Dashboard", "home");
+                    return RedirectToAction("Dashboard", "home");          
                 }
                 await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login fail on : {DateTime.Now}");
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
             }
-
-
 
             return View(model);
         }

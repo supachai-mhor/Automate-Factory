@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AutomateBussiness.Data
 {
-    public class AutomateBussinessContext : IdentityDbContext
+    public class AutomateBussinessContext : IdentityDbContext<FactoryAccount>
     {
         public AutomateBussinessContext(DbContextOptions<AutomateBussinessContext> options)
             : base(options)
@@ -21,21 +21,10 @@ namespace AutomateBussiness.Data
         }
         public DbSet<Movie> Movie { get; set; }
 
-        public DbSet<UserAccount> UserAccounts { get; set; }
+        public DbSet<FactoryAccount> FactoryAccounts { get; set; }
 
         public DbSet<OrganizationModel> Organizations { get; set; }
     }
-    //public class ApplicationDbContext : IdentityDbContext<IdentityUser>
-    //{
-    //    public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
-    //        : base(options)
-    //    {
-    //    }
-    //    protected override void OnModelCreating(ModelBuilder builder)
-    //    {
-    //        base.OnModelCreating(builder);
-    //    }
         
-    //}
 
 }

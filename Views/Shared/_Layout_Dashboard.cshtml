@@ -1,6 +1,7 @@
 ﻿
 @using Microsoft.AspNetCore.Identity;
-@inject SignInManager<IdentityUser> SignInManager;
+@inject SignInManager<FactoryAccount> SignInManager;
+@inject UserManager<FactoryAccount> UserManager;
 
 <!DOCTYPE html>
 <html lang="en">
@@ -15,7 +16,6 @@
     @*<link rel="stylesheet" type="text/css" href="~/css/org.css">*@
     <title>Automate Smart Business</title>
     <script src="https://code.jscharting.com/latest/jscharting.js"></script>
-    <script src="~/js/Organized/org.js"></script>
 
     <style type="text/css">
         .personDescription {
@@ -55,7 +55,7 @@
 
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-sm-3 col-md-2 mr-0" href="#" id="companyName">Company name</a>
+        <a class="navbar-brand col-sm-4 col-md-3 mr-0" href="#" id="companyName">@UserManager.Users.First().FactoryName</a>
 
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
         @if (SignInManager.IsSignedIn(User))
@@ -74,7 +74,7 @@
                 </form>
             </li>
         </ul>
-        
+
     </nav>
 
     <div class="container-fluid">
@@ -124,7 +124,7 @@
                                 Reports
                             </a>
                         </li>
-                        
+
                     </ul>
 
                     <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">
@@ -170,7 +170,7 @@
 
             <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-4">
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                    <h1 id ="HeaderTopic" class="h2">Dashboard</h1>
+                    <h1 id="HeaderTopic" class="h2">Dashboard</h1>
                     <div class="btn-toolbar mb-2 mb-md-0">
                         <div class="btn-group mr-2">
                             <button type="button" class="btn btn-sm btn-outline-secondary">Share</button>

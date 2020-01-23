@@ -13,6 +13,11 @@ namespace AutomateBussiness.Models
     {
         //[Key]
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+
+        [Required]
+        [Display(Name = "Company or Bussiness Name")]
+        public string FactoryName { get; set; }
+       
         [Required]
         [EmailAddress]
         public string Email { get; set; }
@@ -25,6 +30,9 @@ namespace AutomateBussiness.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "Password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        [Display(Name = "Bussiness Description")]
+        public string? FactoryDescription { get; set; }
 
     }
 }

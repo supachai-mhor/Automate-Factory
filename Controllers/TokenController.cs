@@ -16,7 +16,7 @@ using System.IdentityModel.Tokens.Jwt;
 namespace AutomateBussiness.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    //[Route("admin/[controller]")]
     public class TokenController : Controller
     {
         private readonly IConfiguration _config;
@@ -28,10 +28,10 @@ namespace AutomateBussiness.Controllers
         }
 
         [HttpPost("/api/adminJob")]
-        public async Task<IActionResult> CreateUser(UserAccount model)
+        public async Task<IActionResult> CreateUser(FactoryAccount model)
         {
-            model.HashedPassword = EncryptPassword(model.HashedPassword);
-            _dbContext.UserAccounts.Add(model);
+            model.PasswordHash = EncryptPassword(model.PasswordHash);
+            _dbContext.FactoryAccounts.Add(model);
             await _dbContext.SaveChangesAsync();
             return Ok(model);
         }
@@ -55,18 +55,18 @@ namespace AutomateBussiness.Controllers
             return response;
         }
 
-        private string BuildToken(UserAccount user)
+        private string BuildToken(FactoryAccount user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
-    {
-        new Claim(ClaimTypes.NameIdentifier, user.UserName),
-        new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName),
-        new Claim(ClaimTypes.Version, "1.0"),
-        new Claim(ClaimTypes.Role, "USER")
-    };
+            {
+            new Claim(ClaimTypes.NameIdentifier, user.FactoryName),
+            new Claim(ClaimTypes.Name, user.FactoryName + " " + user.Email),
+            new Claim(ClaimTypes.Version, "1.0"),
+            new Claim(ClaimTypes.Role, "USER")
+            };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
               _config["Jwt:Issuer"],
@@ -79,11 +79,11 @@ namespace AutomateBussiness.Controllers
           
         }
 
-        private UserAccount Authenticate(LoginCredential login)
+        private FactoryAccount Authenticate(LoginCredential login)
         {
             var hashPassword = EncryptPassword(login.ClientSecret);
-            var client = _dbContext.UserAccounts.FirstOrDefault
-                (c => c.UserName == login.ClientId && c.HashedPassword == hashPassword);
+            var client = _dbContext.FactoryAccounts.FirstOrDefault
+                (c => c.FactoryName == login.FactoryId && c.PasswordHash == hashPassword);
             return client;
         }
         private string EncryptPassword(string clearPassword)
@@ -97,7 +97,7 @@ namespace AutomateBussiness.Controllers
         }
         public class LoginCredential
         {
-            public string ClientId { get; set; }
+            public string FactoryId { get; set; }
             public string ClientSecret { get; set; }
         }
 

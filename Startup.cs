@@ -73,7 +73,7 @@ namespace AutomateBussiness
                     };
                 });
 
-            services.AddIdentity<IdentityUser, IdentityRole>(options => {
+            services.AddIdentity<FactoryAccount, IdentityRole>(options => {
                 //password option >>> services.Configure<IdentityOptions>(options =>
                 options.Password.RequiredLength = 10;
                 options.Password.RequiredUniqueChars = 3;

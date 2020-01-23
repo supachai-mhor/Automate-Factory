@@ -19,21 +19,35 @@ namespace AutomateBussiness.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly UserManager<FactoryAccount> userManager;
+        private readonly SignInManager<FactoryAccount> signInManager;
+        public HomeController(ILogger<HomeController> logger, UserManager<FactoryAccount> userManager,
+            SignInManager<FactoryAccount> signInManager)
         {
+            this.userManager = userManager;
+            this.signInManager = signInManager;
             _logger = logger;
         }
 
         public IActionResult Index()
-        {          
-            return View();
+        {
+            if (signInManager.IsSignedIn(User))
+            {
+                return RedirectToAction("Dashboard");
+            }
+            else
+            {
+                return View();
+            }
+            
         }
         [Authorize]
         public IActionResult Dashboard()
         {
+            
             return View();
         }
+
        
         public IActionResult Privacy()
         {

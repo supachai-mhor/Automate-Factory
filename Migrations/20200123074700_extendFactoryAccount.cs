@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AutomateBussiness.Migrations
 {
-    public partial class updateOrganization : Migration
+    public partial class extendFactoryAccount : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -39,7 +39,9 @@ namespace AutomateBussiness.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    FactoryName = table.Column<string>(nullable: true),
+                    FactoryDescription = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -69,13 +71,12 @@ namespace AutomateBussiness.Migrations
                 {
                     id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    ids = table.Column<string>(nullable: true),
-                    name = table.Column<string>(nullable: true),
-                    position = table.Column<string>(nullable: true),
-                    photo = table.Column<string>(nullable: true),
-                    phone = table.Column<string>(nullable: true),
-                    address = table.Column<string>(nullable: true),
-                    email = table.Column<string>(nullable: true),
+                    name = table.Column<string>(nullable: false),
+                    position = table.Column<string>(nullable: false),
+                    photo = table.Column<string>(nullable: false),
+                    phone = table.Column<string>(nullable: false),
+                    address = table.Column<string>(nullable: false),
+                    email = table.Column<string>(nullable: false),
                     parent = table.Column<string>(nullable: true),
                     work_quality = table.Column<int>(nullable: true),
                     initiative = table.Column<int>(nullable: true),
@@ -84,22 +85,6 @@ namespace AutomateBussiness.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Organizations", x => x.id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "UserAccounts",
-                columns: table => new
-                {
-                    ID = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserName = table.Column<string>(nullable: true),
-                    HashedPassword = table.Column<string>(nullable: true),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserAccounts", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -270,9 +255,6 @@ namespace AutomateBussiness.Migrations
 
             migrationBuilder.DropTable(
                 name: "Organizations");
-
-            migrationBuilder.DropTable(
-                name: "UserAccounts");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

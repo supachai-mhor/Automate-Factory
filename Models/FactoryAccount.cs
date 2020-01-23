@@ -10,15 +10,13 @@ using System.Threading.Tasks;
 namespace AutomateBussiness.Models
 {
     
-    public class UserAccount
+    public class FactoryAccount:IdentityUser
     {
         //[Key]
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int ID { get; set; }
-        public string UserName { get; set; }
-        public string HashedPassword { get; set; }
-        public string FirstName { get; set; }
-        public string LastName { get; set; }
 
+        public string? FactoryName { get; set; }
+        public string? FactoryDescription { get; set; }
+        
     }
 }
