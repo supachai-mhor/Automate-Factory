@@ -1,7 +1,7 @@
 ﻿
 @using Microsoft.AspNetCore.Identity;
-@inject SignInManager<FactoryAccount> SignInManager;
-@inject UserManager<FactoryAccount> UserManager;
+@inject SignInManager<AccountViewModel> SignInManager;
+@inject UserManager<AccountViewModel> UserManager;
 
 <!DOCTYPE html>
 <html lang="en">
@@ -55,8 +55,8 @@
 
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-sm-4 col-md-3 mr-0" href="#" id="companyName">@UserManager.Users.First().FactoryName</a>
-
+        @*<a class="navbar-brand col-sm-4 col-md-3 mr-0" href="#" id="companyName">@UserManager.FindByNameAsync(User.Identity.Name).Result.FactoryName</a>*@
+        <a class="navbar-brand col-sm-4 col-md-3 mr-0" href="#" id="companyName">FactoryName</a>
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
         @if (SignInManager.IsSignedIn(User))
         {

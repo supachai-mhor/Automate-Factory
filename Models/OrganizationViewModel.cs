@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace AutomateBussiness.Models
 {
-    public class OrganizationModel
+    public class OrganizationViewModel
     {
         public int id { get; set; }
         [Required]
@@ -32,8 +32,8 @@ namespace AutomateBussiness.Models
         public string email { get; set; }
 
         //[RegularExpression(@"^(0|[1-9]\d*)$")]
-        [RegularExpression(@"^(0|[1-9]\d*)$")]
-        [Display(Name = "Leader ID")]
+        
+        [Display(Name = "Leader Name")]
         public string? parent { get; set; }
         [Range(0, 5)]
         [Display(Name = "Work Quality")]
@@ -45,5 +45,8 @@ namespace AutomateBussiness.Models
         [Display(Name = "Cooperative")]
         public int? cooperative { get; set; }
 
+        [Required]
+        [Display(Name = "FactoryID")]
+        public int factoryID { get; set; }
     }
 }

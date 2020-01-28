@@ -98,7 +98,7 @@ function pointClick() {
 			label_text: '<b>%position</b><br/>%name<br/>',
 			color: closedNodeColor
 		});
-		if (point.options('id') == 61) {
+		if (point.options('parent') == undefined) {
 			chart.series(0).remove();
 			chart.series.add({ points: [orgList[0]] });
 		}
@@ -150,7 +150,7 @@ function makePoints(data) {
 				cooperative: '<chart width=28 height=10 color=' + getColor(val[0].cooperative) + ' type=bar data=' + val[0].cooperative + ' max=5> - Cooperative'
 			}
 		};
-		if (result.id == 61) {
+		if (result.parent == undefined) {
 			result.annotation_label_text = '<span style="align:center;font-size:13px;"><img width=70 height=70 align=center margin_bottom=4 src=%photo><br/><span style="font-size:14px;"><b>%position</b></span><br/>%name<br/></span>';
 		}
 		return result;

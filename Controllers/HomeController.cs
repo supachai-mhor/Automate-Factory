@@ -13,16 +13,17 @@ using AutomateBussiness.Models;
 using System.Data;
 using System.Configuration;
 using System.Data.SqlClient;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace AutomateBussiness.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly UserManager<FactoryAccount> userManager;
-        private readonly SignInManager<FactoryAccount> signInManager;
-        public HomeController(ILogger<HomeController> logger, UserManager<FactoryAccount> userManager,
-            SignInManager<FactoryAccount> signInManager)
+        private readonly UserManager<AccountViewModel> userManager;
+        private readonly SignInManager<AccountViewModel> signInManager;
+        public HomeController(ILogger<HomeController> logger, UserManager<AccountViewModel> userManager,
+            SignInManager<AccountViewModel> signInManager)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
@@ -41,7 +42,7 @@ namespace AutomateBussiness.Controllers
             }
             
         }
-        [Authorize]
+        [Authorize]//(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         public IActionResult Dashboard()
         {
             

@@ -20,11 +20,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using AutomateBussiness.Models;
 using AutomateBussiness.Hubs;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 
 namespace AutomateBussiness
 {
     public class Startup
     {
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -36,63 +41,98 @@ namespace AutomateBussiness
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddCors();
-
+            
 
             var appSettingSection = Configuration.GetSection("AppSettings");
             var appSettings = appSettingSection.Get<AppSettings>();
             //AppSetting is Model
             services.Configure<AppSettings>(appSettingSection);
-
-
-            //services.AddDbContext<ApplicationDbContext>(options =>
-            //        options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
-
+    
             services.AddDbContext<AutomateBussinessContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddAuthentication( x=>
+
+            //services.AddAuthorization(options =>
+            //{
+            //    var defaultAuthorizationPolicyBuilder = new AuthorizationPolicyBuilder(
+            //        CookieAuthenticationDefaults.AuthenticationScheme,
+            //        JwtBearerDefaults.AuthenticationScheme);
+            //    defaultAuthorizationPolicyBuilder =
+            //        defaultAuthorizationPolicyBuilder.RequireAuthenticatedUser();
+            //    options.DefaultPolicy = defaultAuthorizationPolicyBuilder.Build();
+            //});
+
+
+            services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                //x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(options =>
-            {
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
+                //.AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+                //services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = Configuration["Jwt:Issuer"],
-                    ValidAudience = Configuration["Jwt:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(Configuration["Jwt:Key"])),
-                    ClockSkew = TimeSpan.Zero
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = Configuration["Jwt:Issuer"],
+                        ValidAudience = Configuration["Jwt:Issuer"],
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(Configuration["Jwt:Key"])),
+                        ClockSkew = TimeSpan.Zero
                     };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = context =>
+                        {
+                            var accessToken = context.Request.Query["access_token"];
+
+                            // If the request is for our hub...
+                            var path = context.HttpContext.Request.Path;
+                            if (!string.IsNullOrEmpty(accessToken) &&
+                                (path.StartsWithSegments("/ChatHub")))
+                            {
+                                // Read the token out of the query string
+                                context.Token = accessToken;
+                            }
+                            return Task.CompletedTask;
+                        }
+                    };
+                               
                 });
 
-            services.AddIdentity<FactoryAccount, IdentityRole>(options => {
+            services.AddIdentity<AccountViewModel, IdentityRole>(options => {
                 //password option >>> services.Configure<IdentityOptions>(options =>
-                options.Password.RequiredLength = 10;
-                options.Password.RequiredUniqueChars = 3;
-                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 7;
+                options.Password.RequiredUniqueChars = 1;
+                options.Password.RequireNonAlphanumeric = true;
 
             })
                 .AddEntityFrameworkStores<AutomateBussinessContext>()
                 .AddDefaultTokenProviders();
 
+
+            //services.ConfigureApplicationCookie(options =>
+            //{
+            //    //options.LoginPath = "/login";
+            //    //options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+            //});
+
             services.AddControllersWithViews();
             services.AddMvc()
                 .AddJsonOptions(options =>
-               {
-                   options.JsonSerializerOptions.IgnoreNullValues = true;
-                   options.JsonSerializerOptions.WriteIndented = true;
-                   options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-                   options.JsonSerializerOptions.AllowTrailingCommas = true;
+                {
+                    options.JsonSerializerOptions.IgnoreNullValues = true;
+                    options.JsonSerializerOptions.WriteIndented = true;
+                    options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
+                    options.JsonSerializerOptions.AllowTrailingCommas = true;
 
-               })
+                })
                 .AddNewtonsoftJson(options =>
                 {
                     options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
@@ -100,13 +140,15 @@ namespace AutomateBussiness
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
             services.AddSignalR();
-                //.AddMessagePackProtocol(options =>
-                //{
-                //    options.FormatterResolvers = new List<MessagePack.IFormatterResolver>()
-                //    {
-                //        MessagePack.Resolvers.StandardResolver.Instance
-                //    };
-                //});
+
+
+            //.AddMessagePackProtocol(options =>
+            //{
+            //    options.FormatterResolvers = new List<MessagePack.IFormatterResolver>()
+            //    {
+            //        MessagePack.Resolvers.StandardResolver.Instance
+            //    };
+            //});
 
         }
 
@@ -133,8 +175,23 @@ namespace AutomateBussiness
                 x.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader());
-
+              
             app.UseAuthentication();
+
+            //app.Use(async (context, next) =>
+            //{
+            //    await next();
+            //    var bearerAuth = context.Request.Headers["Authorization"]
+            //        .FirstOrDefault()?.StartsWith("Bearer ") ?? false;
+            //    if (context.Response.StatusCode == 401
+            //        && !context.User.Identity.IsAuthenticated
+            //        && !bearerAuth)
+            //    {
+            //        await context.ChallengeAsync("oidc");
+            //    }
+            //});
+
+
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
             {

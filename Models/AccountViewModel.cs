@@ -10,13 +10,12 @@ using System.Threading.Tasks;
 namespace AutomateBussiness.Models
 {
     
-    public class FactoryAccount:IdentityUser
+    public class AccountViewModel : IdentityUser
     {
         //[Key]
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 
-        public string? FactoryName { get; set; }
-        public string? FactoryDescription { get; set; }
+        public string FactoryName { get; set; }
         
     }
 }

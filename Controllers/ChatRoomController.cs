@@ -12,7 +12,7 @@ namespace AutomateBussiness.Controllers
 
     public class ChatRoomController : Controller
     {
-        //[Authorize]
+        [Authorize]
         [Route("chat")]
         public IActionResult Index()
         {

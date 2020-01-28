@@ -1,7 +1,8 @@
-﻿@model AutomateBussiness.Models.OrganizationModel
+﻿@model AutomateBussiness.Models.OrganizationViewModel
 @{
     ViewData["Title"] = "Oganization";
     Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
+    var LeaderModel = ViewBag.LeaderModel;
 }
 <script>
     document.getElementById("HeaderTopic").innerHTML = "Oganization";
@@ -46,7 +47,9 @@
             </div>
             <div class="form-group">
                 <label asp-for="parent" class="control-label"></label>
-                <input asp-for="parent" class="form-control" />
+                <select asp-for="parent" asp-items="LeaderModel" class="form-control">
+                    <option value=""></option>
+                </select>                        
                 <span asp-validation-for="parent" class="text-danger"></span>
             </div>
             <div class="form-group">

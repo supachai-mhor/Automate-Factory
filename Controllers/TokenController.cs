@@ -28,10 +28,10 @@ namespace AutomateBussiness.Controllers
         }
 
         [HttpPost("/api/adminJob")]
-        public async Task<IActionResult> CreateUser(FactoryAccount model)
+        public async Task<IActionResult> CreateUser(AccountViewModel model)
         {
             model.PasswordHash = EncryptPassword(model.PasswordHash);
-            _dbContext.FactoryAccounts.Add(model);
+            _dbContext.AccountsTable.Add(model);
             await _dbContext.SaveChangesAsync();
             return Ok(model);
         }
@@ -55,7 +55,7 @@ namespace AutomateBussiness.Controllers
             return response;
         }
 
-        private string BuildToken(FactoryAccount user)
+        private string BuildToken(AccountViewModel user)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -79,11 +79,11 @@ namespace AutomateBussiness.Controllers
           
         }
 
-        private FactoryAccount Authenticate(LoginCredential login)
+        private AccountViewModel Authenticate(LoginCredential login)
         {
-            var hashPassword = EncryptPassword(login.ClientSecret);
-            var client = _dbContext.FactoryAccounts.FirstOrDefault
-                (c => c.FactoryName == login.FactoryId && c.PasswordHash == hashPassword);
+            var hashPassword = EncryptPassword(login.password);
+            var client = _dbContext.AccountsTable.FirstOrDefault
+                (c => c.FactoryName == login.username && c.PasswordHash == hashPassword);
             return client;
         }
         private string EncryptPassword(string clearPassword)
@@ -97,8 +97,8 @@ namespace AutomateBussiness.Controllers
         }
         public class LoginCredential
         {
-            public string FactoryId { get; set; }
-            public string ClientSecret { get; set; }
+            public string username { get; set; }
+            public string password { get; set; }
         }
 
     }

@@ -6,7 +6,9 @@ using System.Threading.Tasks;
 using AutomateBussiness.Data;
 using AutomateBussiness.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -15,38 +17,56 @@ namespace AutomateBussiness.Controllers
     [Authorize]
     public class OrganizationController : Controller
     {
-        public List<OrganizationModel> Organization { get; set; }
+        private readonly UserManager<AccountViewModel> userManager;
+        private readonly SignInManager<AccountViewModel> signInManager;
         private readonly AutomateBussinessContext _context;
         public object Claimtype { get; private set; }
-
-        public OrganizationController(AutomateBussinessContext context)
+        private List<OrganizationViewModel> Organization { get; set; }
+        public int facID = 0;
+        public OrganizationController(AutomateBussinessContext context,
+            UserManager<AccountViewModel> userManager,
+            SignInManager<AccountViewModel> signInManager)
         {
+            this.userManager = userManager;
+            this.signInManager = signInManager;
             _context = context;
-        }
 
+        }
+        private  void getFacID()
+        {
+            var facName = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().FactoryName;
+            var factory = _context.FactoryTable.Where(m => m.factoryName == facName);
+            if (factory.Count() > 0)
+            {
+                facID = factory.First().id;
+            }
+        }
+       
         public async Task<IActionResult> Index()
         {
             try
             {
-                var All_Organizations = from m in _context.Organizations
+                getFacID();
+                var All_Organizations = from m in _context.OrganizationTable
                                        select m;
-            
-                List<OrganizationModel> Organization = await All_Organizations.ToListAsync();
-           
-                if (Organization == null)
-                {
-                    return NotFound();
-                }
-                //convert object to json string.
-                string json = JsonConvert.SerializeObject(Organization);
+                All_Organizations = All_Organizations.Where(x => x.factoryID == facID);
 
-                string path = @"D:\ASP NET Project\Automate-Factory\wwwroot\json\jsondata.json";
+                List<OrganizationViewModel> Organization = await All_Organizations.ToListAsync();
+           
+                //if (Organization == null)
+                //{
+                //    return NotFound();
+                //}
+                //convert object to json string.
+                //string json = JsonConvert.SerializeObject(Organization);
+
+                //string path = @"D:\ASP NET Project\Automate-Factory\wwwroot\json\jsondata.json";
                // string path = @"~/json/jsondata.json";
                 //export data to json file. 
-                using (TextWriter tw = new StreamWriter(path))
-                {
-                    tw.WriteLine(json);
-                };
+                //using (TextWriter tw = new StreamWriter(path))
+                //{
+                //    tw.WriteLine(json);
+                //};
 
                 return View(Organization);
 
@@ -57,12 +77,14 @@ namespace AutomateBussiness.Controllers
             }
 
         [HttpPost]
-        public async Task<List<OrganizationModel>> getOrgData()
+        public async Task<List<OrganizationViewModel>> getOrgData()
         {
-            var All_Organizations = from m in _context.Organizations
+            getFacID();
+            var All_Organizations = from m in _context.OrganizationTable
                                     select m;
+            All_Organizations = All_Organizations.Where(x => x.factoryID == facID);
 
-            List<OrganizationModel> Organization = await All_Organizations.ToListAsync();
+            List<OrganizationViewModel> Organization = await All_Organizations.ToListAsync();
 
             if (Organization == null)
             {
@@ -74,16 +96,43 @@ namespace AutomateBussiness.Controllers
             return Organization;
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            getFacID();
+            // Use LINQ to get list of genres.
+            IQueryable<string> ListLeader = from m in _context.OrganizationTable
+                                            where m.factoryID == facID
+                                            orderby m.name
+                                            select m.name;
+
+            var LeaderModel = new SelectList(await ListLeader.Distinct().ToListAsync());
+            ViewBag.LeaderModel = LeaderModel;
             return View();
         }
+        private async Task<string> getParentID(string nameParent)
+        {
+               var All_Organizations = from m in _context.OrganizationTable
+                                    where (m.factoryID == facID && m.name == nameParent)
+                                    select m;
+
+           return  All_Organizations.First().id.ToString();
+                       
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id,name,position,photo,phone,address,email,parent,work_quality,initiative,cooperative")] OrganizationModel Organization)
+        public async Task<IActionResult> Create([Bind("id,name,position,photo,phone,address,email,parent,work_quality,initiative,cooperative")] OrganizationViewModel Organization)
         {
             if (ModelState.IsValid)
             {
+                getFacID();
+
+                if(Organization.parent != null)
+                {
+                    Organization.parent = await getParentID(Organization.parent);
+                }
+                Organization.factoryID = facID;
+
                 _context.Add(Organization);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -98,7 +147,7 @@ namespace AutomateBussiness.Controllers
                 return NotFound();
             }
 
-            var Organization = await _context.Organizations.FindAsync(id);
+            var Organization = await _context.OrganizationTable.FindAsync(id);
             if (Organization == null)
             {
                 return NotFound();
@@ -108,7 +157,7 @@ namespace AutomateBussiness.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("id,name,position,photo,phone,address,email,parent,work_quality,initiative,cooperative")] OrganizationModel Organization)
+        public async Task<IActionResult> Edit(int id, [Bind("id,name,position,photo,phone,address,email,parent,work_quality,initiative,cooperative")] OrganizationViewModel Organization)
         {
             if (id != Organization.id)
             {
@@ -145,7 +194,7 @@ namespace AutomateBussiness.Controllers
                 return NotFound();
             }
 
-            var Organization = await _context.Organizations
+            var Organization = await _context.OrganizationTable
                 .FirstOrDefaultAsync(m => m.id == id);
             if (Organization == null)
             {
@@ -157,10 +206,7 @@ namespace AutomateBussiness.Controllers
 
         private bool OrganizationExists(int id)
         {
-            return _context.Organizations.Any(e => e.id == id);
+            return _context.OrganizationTable.Any(e => e.id == id);
         }
-
-
-
     }
 }

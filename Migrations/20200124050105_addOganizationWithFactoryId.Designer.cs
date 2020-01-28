@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutomateBussiness.Migrations
 {
     [DbContext(typeof(AutomateBussinessContext))]
-    [Migration("20200123074700_extendFactoryAccount")]
-    partial class extendFactoryAccount
+    [Migration("20200124050105_addOganizationWithFactoryId")]
+    partial class addOganizationWithFactoryId
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -21,7 +21,7 @@ namespace AutomateBussiness.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-            modelBuilder.Entity("AutomateBussiness.Models.FactoryAccount", b =>
+            modelBuilder.Entity("AutomateBussiness.Models.AccountViewModel", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -39,9 +39,6 @@ namespace AutomateBussiness.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("FactoryDescription")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FactoryName")
                         .HasColumnType("nvarchar(max)");
@@ -92,6 +89,187 @@ namespace AutomateBussiness.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("AutomateBussiness.Models.FactoryViewModel", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("businessArea")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("capitalRegister")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("factoryDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("factoryName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("fax")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("foundDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("founder")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("mobile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("phone")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("taxId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("website")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("FactoryTable");
+                });
+
+            modelBuilder.Entity("AutomateBussiness.Models.MachineDailyViewModel", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("breaktime")
+                        .HasColumnType("int");
+
+                    b.Property<int>("downtime")
+                        .HasColumnType("int");
+
+                    b.Property<int>("factoryID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("idletime")
+                        .HasColumnType("int");
+
+                    b.Property<string>("job_number")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("machine_id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("record_date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("runningtime")
+                        .HasColumnType("int");
+
+                    b.Property<int>("total_input")
+                        .HasColumnType("int");
+
+                    b.Property<int>("total_reject")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.ToTable("MachineDailyTable");
+                });
+
+            modelBuilder.Entity("AutomateBussiness.Models.MachineErrorViewModel", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("errorType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("factoryID")
+                        .HasColumnType("int");
+
+                    b.Property<string>("informby")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("job_number")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("machine_id")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("record_date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("solve")
+                        .HasColumnType("int");
+
+                    b.Property<string>("solvedby")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("MachineErrorTable");
+                });
+
+            modelBuilder.Entity("AutomateBussiness.Models.MachineViewModel", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("factoryID")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("installed_date")
+                        .IsRequired()
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("line")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("plant")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("supervisor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("vendor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("MachineTable");
+                });
+
             modelBuilder.Entity("AutomateBussiness.Models.Movie", b =>
                 {
                     b.Property<int>("Id")
@@ -125,7 +303,7 @@ namespace AutomateBussiness.Migrations
                     b.ToTable("Movie");
                 });
 
-            modelBuilder.Entity("AutomateBussiness.Models.OrganizationModel", b =>
+            modelBuilder.Entity("AutomateBussiness.Models.OrganizationViewModel", b =>
                 {
                     b.Property<int>("id")
                         .ValueGeneratedOnAdd()
@@ -142,6 +320,9 @@ namespace AutomateBussiness.Migrations
                     b.Property<string>("email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("factoryID")
+                        .HasColumnType("int");
 
                     b.Property<int?>("initiative")
                         .HasColumnType("int");
@@ -170,7 +351,7 @@ namespace AutomateBussiness.Migrations
 
                     b.HasKey("id");
 
-                    b.ToTable("Organizations");
+                    b.ToTable("OrganizationTable");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -315,7 +496,7 @@ namespace AutomateBussiness.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
                 {
-                    b.HasOne("AutomateBussiness.Models.FactoryAccount", null)
+                    b.HasOne("AutomateBussiness.Models.AccountViewModel", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -324,7 +505,7 @@ namespace AutomateBussiness.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
-                    b.HasOne("AutomateBussiness.Models.FactoryAccount", null)
+                    b.HasOne("AutomateBussiness.Models.AccountViewModel", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -339,7 +520,7 @@ namespace AutomateBussiness.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("AutomateBussiness.Models.FactoryAccount", null)
+                    b.HasOne("AutomateBussiness.Models.AccountViewModel", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -348,7 +529,7 @@ namespace AutomateBussiness.Migrations
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
                 {
-                    b.HasOne("AutomateBussiness.Models.FactoryAccount", null)
+                    b.HasOne("AutomateBussiness.Models.AccountViewModel", null)
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)

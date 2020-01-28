@@ -6,7 +6,17 @@ using System.Threading.Tasks;
 
 namespace AutomateBussiness.Models
 {
-    public class MachineModel
+    public enum ErrorType
+    {
+        MachineError,
+        ToolError,
+        ProgramError,
+        SetupAndAdjustmentError,
+        MaterialError,
+        HumanError,
+        Etc
+    }
+    public class MachineViewModel
     {
         public int id { get; set; }
         [Required]
@@ -37,8 +47,12 @@ namespace AutomateBussiness.Models
         [Display(Name = "Installed Date")]
         public DateTime? installed_date { get; set; }
 
+        [Required]
+        [Display(Name = "FactoryID")]
+        public int factoryID { get; set; }
+
     }
-    public class MachineDailyModel
+    public class MachineDailyViewModel
     {
         public int id { get; set; }
 
@@ -77,21 +91,12 @@ namespace AutomateBussiness.Models
         [Required]
         [Display(Name = "BreakTime(s)")]
         public int breaktime { get; set; }
-        
-    }
-    public enum ErrorType
-    {
-        MachineError,
-        ToolError,
-        ProgramError,
-        SetupAndAdjustmentError,
-        MaterialError,
-        HumanError,
-        Etc
-    }
 
-
-    public class MachineErrorRecordModel
+        [Required]
+        [Display(Name = "FactoryID")]
+        public int factoryID { get; set; }
+        }
+    public class MachineErrorViewModel
     {
         public int id { get; set; }
 
@@ -127,6 +132,8 @@ namespace AutomateBussiness.Models
         [Display(Name = "SolvedBy")]
         public string solvedby { get; set; }
 
-       
+        [Required]
+        [Display(Name = "FactoryID")]
+        public int factoryID { get; set; }
     }
 }
