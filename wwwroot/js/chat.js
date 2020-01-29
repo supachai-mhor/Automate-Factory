@@ -1,6 +1,8 @@
 ﻿
 "use strict";
-var loginToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI5YjlmYjlhYi0wN2RhLTQwOTYtODlkZi1lZWI5NjEyZmZlMWMiLCJzdWIiOiJtaG9yLmZpYm83QGdtYWlsLmNvbSIsImVtYWlsIjoibWhvci5maWJvN0BnbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJNYWNoaW5lIiwiRmFjdG9yeU5hbWUiOiJUYW5qYWkgRGVsaXZlcnkiLCJuYmYiOjE1ODAxOTMwNjksImV4cCI6MTU4ODA1NTQ2OSwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzNzcvIiwiYXVkIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NDQzNzcvIn0.u6uIdJ-aTNtPyNgRrdeQG2qw81pB8_9tFEe0Ihxkd8k";
+
+
+var loginToken = document.getElementById("tokenData").value;
 var connection = new signalR.HubConnectionBuilder()
     .withUrl("/chatHub", { accessTokenFactory: () => this.loginToken })
     .withAutomaticReconnect()

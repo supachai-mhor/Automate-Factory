@@ -88,7 +88,8 @@ namespace AutomateBussiness.Hubs
                 {
                     string json = JsonConvert.SerializeObject(movie);
                     //await Clients.All.SendAsync("ReceiveData", movie.Price, json);
-                    await Clients.Group(groupName).SendAsync("ReceiveData", movie.Price, json);
+                    await Clients.Group(groupName).SendAsync("ReceiveData", movie.Price.ToString(), json);
+                    await Clients.Group(groupName).SendAsync("ReceiveMessage", decimal.ToDouble(movie.Price), json);
                 }
             }
             

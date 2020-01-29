@@ -19,6 +19,10 @@ function OnSuccess_getOrgData(repo) {
 	//var data = JSC.csv2Json(response);
 	orgList = makePoints(response);
 	chart = renderChart(orgList);
+	}
+
+function OnErrorCall_getOrgData() {
+	console.log("Whoops something went wrong :( ");
 }
 
 });
@@ -32,10 +36,6 @@ function OnSuccess_getOrgData(repo) {
 //	});
 
 
-
-function OnErrorCall_getOrgData() {
-	console.log("Whoops something went wrong :( ");
-}
 
 function renderChart(orgList) {
 	return JSC.chart('chartDiv', {
