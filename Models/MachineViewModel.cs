@@ -136,4 +136,39 @@ namespace AutomateBussiness.Models
         [Display(Name = "FactoryID")]
         public int factoryID { get; set; }
     }
+    public class PlaningViewModel
+    {
+        public int id { get; set; }
+        public string job_number { get; set; }
+        public int planQty { get; set; }
+        public int expectRatio { get; set; }
+        public int qtyPerInput { get; set; }
+        public string job_detail { get; set; }
+
+    }
+    public enum MachineState
+    {
+        isRunning,
+        isDowntime,
+        isIdle,
+        isSetting
+    }
+    public class MachineData
+    {
+        public MachineState machineState;
+        public double runningtimes;
+        public double downTimetimes;
+        public double settingtimes;
+        public double idletimes;
+
+        public int input;
+        public int pass;
+        public double yield;
+        public double oee;
+
+        public string operatorName;
+        public TimeSpan startTime;
+        public TimeSpan endTime;
+
+    }
 }

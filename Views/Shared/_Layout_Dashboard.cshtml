@@ -48,6 +48,66 @@
                 font-size: 3.5rem;
             }
         }
+
+        @@keyframes blinkDisconnecting {
+            0% {
+                background-color: white;
+            }
+
+            100% {
+                background-color: darkgrey;
+            }
+        }
+
+        @@keyframes blinkConnecting {
+            0% {
+                background-color: white;
+            }
+
+            100% {
+                background-color:darkgreen;
+            }
+        }
+
+        @@keyframes blinkSetting {
+            0% {
+                background-color: white;
+            }
+
+            100% {
+                background-color: DeepSkyBlue;
+            }
+        }
+
+        @@keyframes blinkIdle {
+            0% {
+                background-color: white;
+            }
+
+            100% {
+                background-color: Orange;
+            }
+        }
+
+        @@keyframes blinkDowntime {
+            0% {
+                background-color: white;
+            }
+
+            100% {
+                background-color: red;
+            }
+        }
+
+        @@keyframes blinkRunning {
+            0% {
+                background-color: white;
+            }
+
+            100% {
+                background-color: lime;
+            }
+        }
     </style>
 
 </head>
@@ -55,8 +115,7 @@
 
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        @*<a class="navbar-brand col-sm-4 col-md-3 mr-0" href="#" id="companyName">@UserManager.FindByNameAsync(User.Identity.Name).Result.FactoryName</a>*@
-        <a class="navbar-brand col-sm-4 col-md-3 mr-0" href="#" id="companyName">FactoryName</a>
+        <a class="navbar-brand col-sm-4 col-md-3 mr-0" href="#" id="companyName">@UserManager.FindByNameAsync(User.Identity.Name).Result.FactoryName</a>
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
         @if (SignInManager.IsSignedIn(User))
         {
@@ -135,7 +194,7 @@
                     </h6>
                     <ul class="nav flex-column mb-2">
                         <li class="nav-item">
-                            <a class="nav-link" href="#">
+                            <a class="nav-link" asp-controller="ChatRoom" asp-action="Index">
                                 <span data-feather="file-text"></span>
                                 Monitoring
                             </a>

@@ -34,9 +34,14 @@ namespace AutomateBussiness.Hubs
             this.signInManager = signInManager;
             _context = context;
         }
-        
+        public class UserList
+        {
+            public string id;
+            public string factoryName;
+            public string machineName;
+        }
         #region---Data Members---
-        static List<string> listUserID = new List<string>();
+        static List<UserList> listUserID = new List<UserList>();
         #endregion
 
         public override async Task OnConnectedAsync()
@@ -44,14 +49,23 @@ namespace AutomateBussiness.Hubs
             // var facName = userManager.Users.Where(m => m.UserName == Context.UserIdentifier).First().FactoryName;
 
             var claims = Context.User.Claims;
-            var name = claims.Where(c => c.Type == "FactoryName")
+            var facName = claims.Where(c => c.Type == "FactoryName")
+                   .Select(c => c.Value).SingleOrDefault();
+            var mcName = claims.Where(c => c.Type == "MachineName")
                    .Select(c => c.Value).SingleOrDefault();
 
-            var factory = _context.FactoryTable.Where(m => m.factoryName == name);
+            var factory = _context.FactoryTable.Where(m => m.factoryName == facName);
             if (factory.Count() > 0)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, name);
-                listUserID.Add(Context.ConnectionId);
+                await Groups.AddToGroupAsync(Context.ConnectionId, facName);
+                var currentUser = new UserList
+                {
+                    id = Context.ConnectionId,
+                    factoryName = facName,
+                    machineName = mcName,
+                };
+
+                listUserID.Add(currentUser);
             }
             await base.OnConnectedAsync();
 
@@ -66,8 +80,10 @@ namespace AutomateBussiness.Hubs
             var factory = _context.FactoryTable.Where(m => m.factoryName == name);
             if (factory.Count() > 0)
             {
+                await Clients.Group(name).SendAsync("ReceiveStatusData", -2);
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, name);
-                listUserID.RemoveAt(listUserID.IndexOf(Context.ConnectionId));
+                var indexUser = listUserID.FindIndex(x => x.id == Context.ConnectionId);
+                listUserID.RemoveAt(indexUser);
             }
             
             await base.OnDisconnectedAsync(exception);
@@ -100,11 +116,60 @@ namespace AutomateBussiness.Hubs
             //await Clients.All.SendAsync("ReceiveData", user, message);
 
         }
-       // [HubMethodName("SendMessageToUser")]
+        public async Task GetJobDetail(string jobName)
+        {
+            var planingViewModel = new PlaningViewModel
+            {
+                job_number = jobName,
+                planQty = 20000,
+                expectRatio = 98,
+                qtyPerInput = 100,
+            };
+
+
+            string json = JsonConvert.SerializeObject(planingViewModel);
+            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveJobDetail", json);
+           // await Clients.Client(Context.ConnectionId).SendAsync("ServerRequest", true);
+
+        }
+        public async Task SendMachineData(string data)
+        {
+            var machineData = JsonConvert.DeserializeObject<MachineData>(data);
+            var claims = Context.User.Claims;
+            var groupName = claims.Where(c => c.Type == "FactoryName")
+                   .Select(c => c.Value).SingleOrDefault();
+
+            if (groupName != null)
+            {
+                await Clients.Group(groupName).SendAsync("ReceiveRealTimeData", data);
+                await Clients.Group(groupName).SendAsync("ReceiveStatusData", machineData.machineState);
+            }
+
+        }
+
+        public async Task TrigerRealTimeMachine(string machineName, string factoryName, bool action,int everyTimes=60)
+        {
+
+            var indexUser = listUserID.FindIndex(x => x.factoryName == factoryName && x.machineName == machineName);
+            if (indexUser != -1)
+            {
+                await Clients.Client(listUserID[indexUser].id).SendAsync("ServerRequestRealTime", action, everyTimes);
+                
+                if(!action) await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2);
+                else await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -1);
+
+            }
+            else
+            {
+                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2);
+            }
+        }
+
+        // [HubMethodName("SendMessageToUser")]
         public Task SendPrivateMessage(string user, string message)
         {
             //return Clients.User(Context.ConnectionId).SendAsync("ReceiveMessage", message);
-            return Clients.Client(listUserID[0]).SendAsync("ReceiveMessage", user, message);
+            return Clients.Client(listUserID[0].id).SendAsync("ReceiveMessage", user, message);
             //return Clients.Caller.SendAsync("ReceiveMessage", message);
         }
         public async Task AddToGroup(string groupName)

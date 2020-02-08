@@ -38,7 +38,7 @@ namespace AutomateBussiness.Controllers
         }
 
         [Authorize]
-        [Route("chat")]
+        //[Route("chat")]
         public IActionResult Index()
         {
             Random random = new Random();
@@ -55,7 +55,7 @@ namespace AutomateBussiness.Controllers
             DateTime dateNow = DateTime.Now;
             DateTime date = new DateTime(dateNow.Year, dateNow.Month, dateNow.Day, 9, 30, 00);
             time = ((DateTimeOffset)date).ToUnixTimeSeconds() * 1000;
-            //addData(1);
+            addData(50);
 
             ViewBag.DataPoints1 = JsonConvert.SerializeObject(dataPoints1);
             ViewBag.DataPoints2 = JsonConvert.SerializeObject(dataPoints2);
@@ -109,7 +109,8 @@ namespace AutomateBussiness.Controllers
                 new Claim(JwtRegisteredClaimNames.Sub,user.Email),
                 new Claim(JwtRegisteredClaimNames.Email,user.Email),
                 new Claim(ClaimTypes.Role,"Machine"),
-                new Claim("FactoryName",user.FactoryName)
+                new Claim("FactoryName",user.FactoryName),
+                new Claim("MachineName","Viewer")
 
                 //new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };

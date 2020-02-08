@@ -1,160 +1,222 @@
 ﻿@model AutomateBussiness.Models.Movie
 
 @{
-    ViewData["Title"] = "ChatViewPage";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewData["Title"] = "Monitoring";
+	Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
+	
 }
+
+<script>
+	document.getElementById("HeaderTopic").innerHTML = "Monitoring";
+</script>
+
 <head>
-    <script>
-window.onload = function () {
 
-var dataPoints1 = @Html.Raw(ViewBag.DataPoints1);
-var dataPoints2 = @Html.Raw(ViewBag.DataPoints2);
+	<script>
 
-var chart = new CanvasJS.Chart("chartContainer", {
-	zoomEnabled: true,
-	title: {
-		text: "Reading From Two Sensor"
-	},
-	axisX: {
-		title: "chart updates every 2 secs",
-		crosshair: {
-			enabled: true,
-			snapToDataPoint: true
+		window.onload = function () {
+
+		// initial value
+		var yValue1 = @Html.Raw(ViewBag.YValue1);
+		var yValue2 = @Html.Raw(ViewBag.YValue2);
+		var time = new Date(@Html.Raw(ViewBag.Time));
+		var updateInterval = @Html.Raw(ViewBag.UpdateInterval);
+
+
+		var dataPoints1 = @Html.Raw(ViewBag.DataPoints1);
+		var dataPoints2 = @Html.Raw(ViewBag.DataPoints2);
+
+		var chart = new CanvasJS.Chart("chartContainer", {
+			zoomEnabled: true,
+			title: {
+				text: "Reading From Two Sensor"
+			},
+			axisX: {
+				title: "chart updates every 2 secs",
+				crosshair: {
+					enabled: true,
+					snapToDataPoint: true
+				}
+			},
+			axisY: {
+				includeZero: false,
+				crosshair: {
+					enabled: true,
+					snapToDataPoint: true,
+					valueFormatString: "#,##0"
+				}
+			},
+			toolTip: {
+				shared: true
+			},
+			legend: {
+				dockInsidePlotArea: true,
+				verticalAlign: "top",
+				horizontalAlign: "right"
+			},
+			data: [{
+				type: "line",
+				markerType: "none",
+				xValueType: "dateTime",
+				xValueFormatString: "hh:mm:ss TT",
+				name: "Sensor 1",
+				showInLegend: true,
+				dataPoints: dataPoints1
+			},
+			{
+				type: "line",
+				markerType: "none",
+				xValueType: "dateTime",
+				name: "Sensor 2",
+				showInLegend: true,
+				dataPoints: dataPoints2
+			}]
+		});
+
+		chart.render();
+
+		function toggleDataSeries(e) {
+			if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+				e.dataSeries.visible = false;
+			}
+			else {
+				e.dataSeries.visible = true;
+			}
+			chart.render();
 		}
-	},
-	axisY: {
-		includeZero: false,
-		crosshair: {
-			enabled: true,
-			snapToDataPoint: true,
-			valueFormatString: "#,##0"
-		}
-	},
-	toolTip: {
-		shared: true
-	},
-	legend: {
-		dockInsidePlotArea: true,
-		verticalAlign: "top",
-		horizontalAlign: "right"
-	},
-	data: [{
-		type: "line",
-		markerType: "none",
-		xValueType: "dateTime",
-		xValueFormatString: "hh:mm:ss TT",
-		name: "Sensor 1",
-		showInLegend: true,
-		dataPoints: dataPoints1
-	},
-	{
-		type: "line",
-		markerType: "none",
-		xValueType: "dateTime",
-		name: "Sensor 2",
-		showInLegend: true,
-		dataPoints: dataPoints2
-	}]
-});
 
-chart.render();
+		var updateInterval = @Html.Raw(ViewBag.UpdateInterval);
+		// initial value
+		var yValue1 = @Html.Raw(ViewBag.YValue1);
+		var yValue2 = @Html.Raw(ViewBag.YValue2);
 
-function toggleDataSeries(e) {
-	if (typeof (e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
-		e.dataSeries.visible = false;
-	}
-	else {
-		e.dataSeries.visible = true;
-	}
-	chart.render();
-}
+		var time = new Date(@Html.Raw(ViewBag.Time));
 
-var updateInterval = @Html.Raw(ViewBag.UpdateInterval);
-// initial value
-var yValue1 = @Html.Raw(ViewBag.YValue1);
-var yValue2 = @Html.Raw(ViewBag.YValue2);
+		function updateChart(count) {
+			count = count || 1;
+			var deltaY1, deltaY2;
+			for (var i = 0; i < count; i++) {
+                time.setTime(time.getTime() + updateInterval);
 
-var time = new Date(@Html.Raw(ViewBag.Time));
+				var dataSensorFromClienct = Number(document.getElementById("inputCount").innerHTML);
+				if (!Number.isNaN(dataSensorFromClienct)) {
+					deltaY1 = dataSensorFromClienct;
+				} else {
+					deltaY1 = 0;
+                }
 
-function updateChart(count) {
-	count = count || 1;
-	var deltaY1, deltaY2;
-	for (var i = 0; i < count; i++) {
-        time.setTime(time.getTime() + updateInterval);
-        var dataSensorFromClienct = Number(document.getElementById("demo").innerHTML);
-        if (!Number.isNaN(dataSensorFromClienct)) {
-            deltaY1 = dataSensorFromClienct;
-            deltaY2 = dataSensorFromClienct + 10 ;
-        } else {
-            deltaY1 = 0;//.5 + Math.random() * (-.5 - .5);
-            deltaY2 = 0;
+				var dataSensorFromClienct2 = Number(document.getElementById("passCount").innerHTML);
+				if (!Number.isNaN(dataSensorFromClienct2)) {
+					deltaY2 = dataSensorFromClienct2;
+				} else {
+					deltaY2 = 0;
+				}
+
+				// adding random value and rounding it to two digits.
+				yValue1 = Math.round((deltaY1) * 100) / 100;
+				yValue2 = Math.round((deltaY2) * 100) / 100;
+
+				// pushing the new values
+				dataPoints1.push({
+					x: time.getTime(),
+					y: yValue1
+                });
+				dataPoints2.push({
+					x: time.getTime(),
+					y: yValue2
+                });
+
+                dataPoints1.shift();
+				dataPoints2.shift();
+			}
+
+			chart.render();
+            }
+
+
+        //setInterval(function () {
+
+        //    updateChart()
+			
+
+        //}, updateInterval);
+
+            
+            
         }
-        //deltaY2 =.5 + Math.random() * (-.5 - .5);
 
-		// adding random value and rounding it to two digits.
-		yValue1 = Math.round((deltaY1) * 100) / 100;
-		yValue2 = Math.round((deltaY2) * 100) / 100;
-
-		// pushing the new values
-		dataPoints1.push({
-			x: time.getTime(),
-			y: yValue1
-		});
-		dataPoints2.push({
-			x: time.getTime(),
-			y: yValue2
-		});
-	}
-
-	chart.render();
-}
-
-setInterval(function () { updateChart() }, updateInterval);
-
-}
-    </script>
+	</script>
 </head>
 
 <input type="hidden" value="@ViewBag.token" id="tokenData" />
 
-<h1>ChatViewPage</h1>
-<div class="container">
-    <div class="row">&nbsp;</div>
-    <div class="row">
-        <div class="col-2">User</div>
-        <div class="col-4"><input type="text" id="userInput" /></div>
-    </div>
-    <div class="row">
-        <div class="col-2">Message</div>
-        <div class="col-4"><input type="text" id="messageInput" /></div>
-    </div>
-    <div class="row">&nbsp;</div>
-    <div class="row">
-        <div class="col-6">
-            <input type="button" id="sendButton" value="Send Message" />
-        </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-12">
-        <hr />
-    </div>
-</div>
-<div class="row">
-    <div class="col-6">
-        <ul id="messagesList"></ul>
-    </div>
-</div>
-
 <div>
-    <p id="demo"></p>
+	<p id="inputCount"></p>
+	<p id="passCount"></p>
+	<p id="demo"></p>
 </div>
 
-<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+<div >
+	<p id="monitoringStatus" style="background-color: darkgrey; padding: 10px; text-align: center; font-size: 30px; animation: blinkDisconnecting 2s infinite;">Monitoring Status</p>
+</div>
 
-<script src="~/js/signalr/dist/browser/signalr.js"></script>
-<script src="~/js/chat.js"></script>
-<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+@*<h1>ChatViewPage</h1>*@
+
+<div class="row">
+	<div class="col-2">Machine</div>
+	<div class="col-4"><input type="text" value="ME-2001-2993" id="machineName" /></div>
+	<select id="SelectTiggerTimes">
+		<option value="60" selected>every 1 min</option>
+		<option value="180">every 3 min</option>
+		<option value="300">every 5 min</option>
+		<option value="600">every 10 min</option>
+		<option value="900">every 15 min</option>
+		<option value="1800">every 30 min</option>
+	</select>
+	<input type="button" id="startRealtime" value="Start" />
+	<input type="button" id="stopRealtime" value="Stop" />
+</div>
+			@*<div class="row">&nbsp;</div>
+			<div class="row">
+				<div class="col-6">
+
+				</div>
+			</div>
+			<div class="row">
+				<div class="col-6">
+
+				</div>
+			</div>
+		</div>
+		<div class="row">
+			<div class="col-12">
+				<hr />
+			</div>
+		</div>*@
+
+
+	<div id="chartDiv" style="width: 50%; height: 600px; margin-left:0px ; overflow: hidden"></div>
+	<div id="chartDiv2" style="width: 100%; height: 600px; margin:auto ; overflow: hidden"></div>
+
+	<div class="row">
+		<div class="col-6">
+			<ul id="messagesList"></ul>
+		</div>
+	</div>
+	<div class="container">
+		<div class="row">&nbsp;</div>
+		<div class="row">
+			<div class="col-2">User</div>
+			<div class="col-4"><input type="text" id="userInput" /></div>
+		</div>
+	</div>
+	<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+
+
+	<script src="~/js/signalr/dist/browser/signalr.js"></script>
+	<script src="~/js/chat.js"></script>
+
+
+	<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 
 
