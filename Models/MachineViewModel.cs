@@ -161,11 +161,22 @@ namespace AutomateBussiness.Models
         public double settingtimes;
         public double idletimes;
 
+        public TimeSpan RunningTimeSpan;
+        public TimeSpan DownTimeSpan;
+        public TimeSpan SettingTimeSpan;
+        public TimeSpan IdleTimeSpan;
+
+        public int totalInput;
+        public int totalPass;
+
         public int input;
         public int pass;
         public double yield;
         public double oee;
 
+        public string machineName;
+        public string jobNumber;
+        public string supervisorName;
         public string operatorName;
         public TimeSpan startTime;
         public TimeSpan endTime;

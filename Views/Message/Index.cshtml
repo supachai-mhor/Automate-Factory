@@ -1,0 +1,93 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
+}
+
+<script>
+    document.getElementById("HeaderTopic").innerHTML = "Meeting";
+</script>
+
+<input type="hidden" value="@ViewBag.token" id="tokenData" />
+<script>
+    // On mouse-over, execute myFunction
+    function myFunction() {
+        document.getElementById("Chat").click(); // Click on the checkbox
+    }
+      function showMessageBox1() {
+          var divToHide = $('div#msgtopic');
+          var divToShow = $('div#topic');
+
+          divToShow.hide();
+          divToHide.show();
+          
+    }
+    function showMessageBox2() {
+          var divToHide = $('div#msgtopic');
+          var divToShow = $('div#topic');
+
+          divToShow.show();
+          divToHide.hide();
+          
+    }
+</script>
+<div class="row">
+
+    <nav class="col-sm-1 bg-light sidebar-sticky">
+        <ul class="nav flex-column">
+            <li class="nav-item" id="Chat" onclick="showMessageBox2()">
+                <a class="nav-link active" href="#" >
+                    <span data-feather="shopping-cart"></span>
+                    Chat
+                </a>
+            </li>
+            <li class="nav-item"  id="Profile">
+                <a class="nav-link" href="#">
+                    <span data-feather="home"></span>
+                    Profile
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span data-feather="file"></span>
+                    Friends
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span data-feather="users"></span>
+                    Groups
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <span data-feather="users"></span>
+                    Setting
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+    <div class="col-sm-7 bg-light" id="topic">
+        <input class="form-control form-control-dark" type="text" placeholder="Search for message or users" aria-label="Search">
+        <ul class="nav flex-column">
+            <li class="nav-item" id="ChatNow" onclick="showMessageBox1()">
+                <a class="nav-link active" href="#">
+                    <span data-feather="shopping-cart"></span>
+                    ChatNow
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div class="col-sm-10 bg-light sidebar-sticky" id="msgtopic">
+    
+        <div style="width: 100%;height: calc(100% - 150px);box-sizing: border-box; background-color:aquamarine; overflow-y:scroll;">
+
+        </div>
+        <div class="sidebar-sticky" style="width: 100%;height: 150px;box-sizing: border-box;background-color:navajowhite;">
+
+        </div>
+
+    </div>
+
+</div>

@@ -19,14 +19,14 @@ using Microsoft.Extensions.Configuration;
 namespace AutomateBussiness.Controllers
 {
 
-    public class ChatRoomController : Controller
+    public class MonitoringController : Controller
     {
         private readonly UserManager<AccountViewModel> userManager;
         private readonly SignInManager<AccountViewModel> signInManager;
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly AutomateBussinessContext _context;
         private readonly IConfiguration _config;
-        public ChatRoomController(UserManager<AccountViewModel> userManager,
+        public MonitoringController(UserManager<AccountViewModel> userManager,
             SignInManager<AccountViewModel> signInManager, IHubContext<ChatHub> hubContext,
             AutomateBussinessContext context, IConfiguration config)
         {
@@ -108,7 +108,7 @@ namespace AutomateBussiness.Controllers
                 new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Sub,user.Email),
                 new Claim(JwtRegisteredClaimNames.Email,user.Email),
-                new Claim(ClaimTypes.Role,"Machine"),
+                new Claim(ClaimTypes.Role,"User"),
                 new Claim("FactoryName",user.FactoryName),
                 new Claim("MachineName","Viewer")
 

@@ -37,8 +37,10 @@ namespace AutomateBussiness.Hubs
         public class UserList
         {
             public string id;
+            public string email;
             public string factoryName;
             public string machineName;
+            public string role;
         }
         #region---Data Members---
         static List<UserList> listUserID = new List<UserList>();
@@ -53,18 +55,28 @@ namespace AutomateBussiness.Hubs
                    .Select(c => c.Value).SingleOrDefault();
             var mcName = claims.Where(c => c.Type == "MachineName")
                    .Select(c => c.Value).SingleOrDefault();
+            var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
+                   .Select(c => c.Value).SingleOrDefault();
+            var roleType= claims.Where(c => c.Type == ClaimTypes.Role)
+                   .Select(c => c.Value).SingleOrDefault();
 
             var factory = _context.FactoryTable.Where(m => m.factoryName == facName);
-            if (factory.Count() > 0)
+            if (factory.Count() > 0 && mcName != null)
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, facName);
                 var currentUser = new UserList
                 {
                     id = Context.ConnectionId,
+                    email = emailAddress,
                     factoryName = facName,
                     machineName = mcName,
+                    role = roleType
                 };
-
+                if(mcName != "Viewer")
+                {
+                    await Clients.Client(Context.ConnectionId).SendAsync("ServerRequestRealTime", true, 60);
+                }
+               
                 listUserID.Add(currentUser);
             }
             await base.OnConnectedAsync();
@@ -74,14 +86,21 @@ namespace AutomateBussiness.Hubs
         {
 
             var claims = Context.User.Claims;
-            var name = claims.Where(c => c.Type == "FactoryName")
+            var facName = claims.Where(c => c.Type == "FactoryName")
+                   .Select(c => c.Value).SingleOrDefault();
+            var mcName = claims.Where(c => c.Type == "MachineName")
                    .Select(c => c.Value).SingleOrDefault();
 
-            var factory = _context.FactoryTable.Where(m => m.factoryName == name);
-            if (factory.Count() > 0)
+            var factory = _context.FactoryTable.Where(m => m.factoryName == facName);
+
+            if (factory.Count() > 0 && mcName != null)
             {
-                await Clients.Group(name).SendAsync("ReceiveStatusData", -2);
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, name);
+                if (mcName != "Viewer")
+                {
+                    await Clients.Group(facName).SendAsync("ReceiveStatusData", -2, mcName);
+                }
+
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, facName);
                 var indexUser = listUserID.FindIndex(x => x.id == Context.ConnectionId);
                 listUserID.RemoveAt(indexUser);
             }
@@ -136,17 +155,63 @@ namespace AutomateBussiness.Hubs
         {
             var machineData = JsonConvert.DeserializeObject<MachineData>(data);
             var claims = Context.User.Claims;
-            var groupName = claims.Where(c => c.Type == "FactoryName")
+            var facName = claims.Where(c => c.Type == "FactoryName")
+                  .Select(c => c.Value).SingleOrDefault();
+            var mcName = claims.Where(c => c.Type == "MachineName")
                    .Select(c => c.Value).SingleOrDefault();
 
-            if (groupName != null)
+            if (facName != null && mcName != null)
             {
-                await Clients.Group(groupName).SendAsync("ReceiveRealTimeData", data);
-                await Clients.Group(groupName).SendAsync("ReceiveStatusData", machineData.machineState);
+                await Clients.Group(facName).SendAsync("ReceiveRealTimeData", data);
+                if (mcName != "Viewer")
+                {
+                    await Clients.Group(facName).SendAsync("ReceiveStatusData", machineData.machineState, mcName);
+                }
+                
             }
 
         }
+        public async Task SendMachineError(string timeError, string errorMsg, string desc)
+        {
+            var claims = Context.User.Claims;
+            var facName = claims.Where(c => c.Type == "FactoryName")
+                  .Select(c => c.Value).SingleOrDefault();
+            var mcName = claims.Where(c => c.Type == "MachineName")
+                   .Select(c => c.Value).SingleOrDefault();
 
+            if (facName != null && mcName != null)
+            {
+                if(desc!="") await Clients.Group(facName).SendAsync("ReceiveRealTimeErrorData", timeError + " >> " + errorMsg + "(" + desc + ")", mcName);
+                else await Clients.Group(facName).SendAsync("ReceiveRealTimeErrorData", timeError + " >> " + errorMsg, mcName);
+            }
+
+        }
+        public async Task SendMessageToSupervisor(string msg, string timeError,string supEmail)
+        {
+            var claims = Context.User.Claims;
+            var facName = claims.Where(c => c.Type == "FactoryName")
+                  .Select(c => c.Value).SingleOrDefault();
+            var mcName = claims.Where(c => c.Type == "MachineName")
+                   .Select(c => c.Value).SingleOrDefault();
+
+
+
+            if (facName != null && mcName != null)
+            {
+                var indexUser = listUserID.FindIndex(x => x.factoryName == facName && x.machineName == mcName && x.email == supEmail && x.role == "User");
+                if (indexUser != -1)
+                {
+                    await Clients.Client(listUserID[indexUser].id).SendAsync("SendMessagToSupervisorUser", msg, mcName);
+                }
+                else
+                {
+                    //Save then Send to User when online
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessagFromSupervisor", "Your supervisor is offline now!!!");
+                }
+            }
+     
+
+        }
         public async Task TrigerRealTimeMachine(string machineName, string factoryName, bool action,int everyTimes=60)
         {
 
@@ -155,23 +220,23 @@ namespace AutomateBussiness.Hubs
             {
                 await Clients.Client(listUserID[indexUser].id).SendAsync("ServerRequestRealTime", action, everyTimes);
                 
-                if(!action) await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2);
-                else await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -1);
+                if(!action) await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2, machineName);
+                else await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -1, machineName);
 
             }
             else
             {
-                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2);
+                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2, machineName);
             }
         }
 
-        // [HubMethodName("SendMessageToUser")]
-        public Task SendPrivateMessage(string user, string message)
-        {
-            //return Clients.User(Context.ConnectionId).SendAsync("ReceiveMessage", message);
-            return Clients.Client(listUserID[0].id).SendAsync("ReceiveMessage", user, message);
-            //return Clients.Caller.SendAsync("ReceiveMessage", message);
-        }
+        //// [HubMethodName("SendMessageToUser")]
+        //public Task SendPrivateMessage(string user, string message)
+        //{
+        //    //return Clients.User(Context.ConnectionId).SendAsync("ReceiveMessage", message);
+        //    return Clients.Client(listUserID[0].id).SendAsync("ReceiveMessage", user, message);
+        //    //return Clients.Caller.SendAsync("ReceiveMessage", message);
+        //}
         public async Task AddToGroup(string groupName)
         {
             await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
