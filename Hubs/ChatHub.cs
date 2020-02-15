@@ -75,8 +75,14 @@ namespace AutomateBussiness.Hubs
                 if(mcName != "Viewer")
                 {
                     await Clients.Client(Context.ConnectionId).SendAsync("ServerRequestRealTime", true, 60);
+                    await Clients.Group(facName).SendAsync("ReceiveUserOnline", mcName);
                 }
-               
+                else
+                {
+                    await Clients.Group(facName).SendAsync("ReceiveUserOnline", emailAddress);
+                }
+
+                
                 listUserID.Add(currentUser);
             }
             await base.OnConnectedAsync();
@@ -90,6 +96,8 @@ namespace AutomateBussiness.Hubs
                    .Select(c => c.Value).SingleOrDefault();
             var mcName = claims.Where(c => c.Type == "MachineName")
                    .Select(c => c.Value).SingleOrDefault();
+            var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
+                  .Select(c => c.Value).SingleOrDefault();
 
             var factory = _context.FactoryTable.Where(m => m.factoryName == facName);
 
@@ -98,8 +106,13 @@ namespace AutomateBussiness.Hubs
                 if (mcName != "Viewer")
                 {
                     await Clients.Group(facName).SendAsync("ReceiveStatusData", -2, mcName);
+                    await Clients.Group(facName).SendAsync("ReceiveUserOffline", mcName);
                 }
-
+                else
+                {
+                     await Clients.Group(facName).SendAsync("ReceiveUserOffline", emailAddress);
+                }
+               
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, facName);
                 var indexUser = listUserID.FindIndex(x => x.id == Context.ConnectionId);
                 listUserID.RemoveAt(indexUser);
@@ -171,6 +184,33 @@ namespace AutomateBussiness.Hubs
             }
 
         }
+
+        public async Task SendGetOnlineAllUser()
+        {
+            var claims = Context.User.Claims;
+            var facName = claims.Where(c => c.Type == "FactoryName")
+                  .Select(c => c.Value).SingleOrDefault();
+
+            if (facName != null)
+            {
+                var indexUser = listUserID.Where(x => x.factoryName == facName);
+                if (indexUser.Count() > 0)
+                {
+                    foreach (var element in indexUser)
+                    {
+                        if (element.role == "Machine")
+                        {
+                            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveUserOnline", element.machineName);
+                        }
+                        else
+                        {
+                            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveUserOnline", element.email);
+                        }
+                    }
+                }
+            }
+        }
+
         public async Task SendMachineError(string timeError, string errorMsg, string desc)
         {
             var claims = Context.User.Claims;
@@ -186,7 +226,28 @@ namespace AutomateBussiness.Hubs
             }
 
         }
-        public async Task SendMessageToSupervisor(string msg, string timeError,string supEmail)
+        public async Task SendMessageToMachine(string msg, string time,string machineName)
+        {
+            var claims = Context.User.Claims;
+            var facName = claims.Where(c => c.Type == "FactoryName")
+                  .Select(c => c.Value).SingleOrDefault();
+
+            if (facName != null)
+            {
+                var indexUser = listUserID.FindIndex(x => x.factoryName == facName && x.machineName == machineName && x.role == "Machine");
+                if (indexUser != -1)
+                {
+                    await Clients.Client(listUserID[indexUser].id).SendAsync("ReceiveMessagFromSupervisor", msg);
+                }
+                else
+                {
+                    //Save then Send to User when online
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessageConference", machineName, "I'm offine now !!");
+                }
+            }
+
+        }
+        public async Task SendMessageToSupervisor(string msg, string time, string supEmail)
         {
             var claims = Context.User.Claims;
             var facName = claims.Where(c => c.Type == "FactoryName")
@@ -194,22 +255,19 @@ namespace AutomateBussiness.Hubs
             var mcName = claims.Where(c => c.Type == "MachineName")
                    .Select(c => c.Value).SingleOrDefault();
 
-
-
-            if (facName != null && mcName != null)
+            if (facName != null)
             {
-                var indexUser = listUserID.FindIndex(x => x.factoryName == facName && x.machineName == mcName && x.email == supEmail && x.role == "User");
+                var indexUser = listUserID.FindIndex(x => x.factoryName == facName && x.email == supEmail && x.role == "User");
                 if (indexUser != -1)
                 {
-                    await Clients.Client(listUserID[indexUser].id).SendAsync("SendMessagToSupervisorUser", msg, mcName);
+                    await Clients.Client(listUserID[indexUser].id).SendAsync("ReceiveMessageConference", mcName, msg);
                 }
                 else
                 {
                     //Save then Send to User when online
-                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessagFromSupervisor", "Your supervisor is offline now!!!");
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessagFromSupervisor", "I'm offline now !!");
                 }
             }
-     
 
         }
         public async Task TrigerRealTimeMachine(string machineName, string factoryName, bool action,int everyTimes=60)
