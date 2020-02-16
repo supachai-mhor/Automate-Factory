@@ -84,11 +84,12 @@
             height: 500px;
             border-radius: 15px !important;
             background-color: rgba(0,0,0,0.4) !important;
+            overflow:auto;
         }
 
         .contacts_body {
             padding: 0.75rem 0 !important;
-            overflow-y: auto;
+            /*overflow-y: auto;*/
             white-space: nowrap;
         }
 
@@ -97,8 +98,9 @@
         }
 
         .card-header {
-            border-radius: 15px 15px 0 0 !important;
+            /*border-radius: 15px 15px 0 0 !important;*/
             border-bottom: 0 !important;
+            font-size: medium;
         }
 
         .card-footer {
@@ -170,7 +172,7 @@
                 margin-bottom: 15px !important;
             }
 
-        .active {
+        .contacts .active {
             background-color: rgba(0,0,0,0.3);
         }
 
@@ -515,9 +517,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Conference" asp-action="Index">
+                            <a id="ConferenceMenu" class="nav-link" asp-controller="Conference" asp-action="Index">
                                 <span data-feather="file-text"></span>
                                 Conference
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <span data-feather="file-text"></span>
+                                Files Manager
                             </a>
                         </li>
                         <li class="nav-item">

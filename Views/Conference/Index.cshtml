@@ -42,13 +42,15 @@
     connection.on("ReceiveUserOffline", (user) => OnReceiveUserOffline(user));
 
     connection.start().then(function () {
+
         getOnlineAllUser();
+
     }).catch(function (err) {
         return console.error(err.toString());
     });
 
     function OnReceiveUserOnline(user) {
-
+        
         var allMessageList = document.getElementById("contactListId");
         const liList = allMessageList.querySelectorAll('li');
 
@@ -71,6 +73,23 @@
             }
 		}
 
+    }
+    function AddBadgesSpan(count) {
+
+        var conferenceMenu = document.getElementById("ConferenceMenu");
+        var getCurrentSpan = conferenceMenu.getElementsByClassName("badge");
+
+        if (getCurrentSpan.length > 0) {
+            count += Number(getCurrentSpan[0].innerHTML);
+            getCurrentSpan[0].innerHTML = count;
+        }
+        else {
+
+            var newSpan = document.createElement("SPAN");
+            newSpan.className = "badge badge-danger";
+            newSpan.innerHTML = count;
+            conferenceMenu.appendChild(newSpan)
+        }  
     }
     function OnReceiveUserOffline(user) {
                 var allMessageList = document.getElementById("contactListId");
@@ -98,13 +117,45 @@
 
     function OnReceiveMessageConference(user, data) {
         console.log(user + ":" + data);
-
-        //user = "Khalid";
-
         if (currentChatWithName == user) {
-             ReceivedMessage(data, "")
+            ReceivedMessage(data, "");
+        }
+        else {
+
+            
+            AddBadgesSpan(1);
+
+
+            var allMessageList = document.getElementById("contactListId");
+            const liList = allMessageList.querySelectorAll('li');
+           
+
+            for (var i = 0, iLen = 1; i < iLen; i++) {
+
+                var getUserInfo = liList[i].getElementsByClassName("user_info");
+                var getUserNameList = getUserInfo[0].getElementsByTagName("span");
+                var getUserName = getUserNameList[0].innerHTML;
+
+                if (user == getUserName) {
+
+                    var getCurrentSpan = getUserInfo[0].getElementsByClassName("badge");
+
+                    if (getCurrentSpan.length > 0) {
+                        var countcurrent = Number(getCurrentSpan[0].innerHTML) +1 ;
+                        getCurrentSpan[0].innerHTML = countcurrent;
+                    }
+                    else {
+                        var newSpan = document.createElement("SPAN");
+                        newSpan.className = "badge badge-danger";
+                        newSpan.innerHTML = 1;
+                        var getBefore = getUserInfo[0].getElementsByTagName("p");
+                        getUserInfo[0].insertBefore(newSpan, getBefore[0]);
+                    }
+                }
+		    }
         }
     }
+
     function sentMessageToHub() {
 
         var text = document.getElementById("SendTextArea").value;
@@ -146,6 +197,7 @@
         e = e || window.event;
         return e.target || e.srcElement;
     }
+
     function onclickUlContact(event) {
 
         //var allMessageList = document.getElementById("divMessageList");
@@ -164,9 +216,44 @@
         var target = getEventTarget(event);
         var indexLi = target.parentElement.closest("li");
         if (indexLi != null) {
-            //console.log(indexLi);
 
+            //remove and add active list
+            var removeActiveId = document.getElementById("contactListId");
+            var queryActive = removeActiveId.getElementsByClassName('active');
+            if (queryActive.length > 0) {
+                queryActive[0].classList.remove('active');
+            }
+            indexLi.classList.add('active');
+            
+
+            // remove badge
             var getImgConstList = indexLi.getElementsByClassName("img_cont");
+            var getCurrentSpan = indexLi.getElementsByClassName("badge");
+
+            if (getCurrentSpan.length > 0) {
+
+                var deleteCountAll = Number(getCurrentSpan[0].innerHTML);
+
+                var conferenceMenu = document.getElementById("ConferenceMenu");
+                var getCurrentSpanAll = conferenceMenu.getElementsByClassName("badge");
+
+                if (getCurrentSpanAll.length > 0) {
+
+                    var countCurrentAllBadge = Number(getCurrentSpanAll[0].innerHTML);
+                    countCurrentAllBadge -= deleteCountAll;
+
+                    if (countCurrentAllBadge == 0) {
+                         getCurrentSpanAll[0].parentElement.removeChild(getCurrentSpanAll[0]);
+                    }
+                    else {
+                        getCurrentSpanAll[0].innerHTML = countCurrentAllBadge;
+                    }
+                   
+                }
+                getCurrentSpan[0].parentElement.removeChild(getCurrentSpan[0]);
+            }
+
+            
             //console.log(getImgConstList);
 
             const img = getImgConstList[0].querySelector('img');
@@ -188,6 +275,7 @@
             document.getElementById("totalMessageChat").innerHTML = @totalMessage + ' Messages';
 
             currentChatWithName = getUserName;
+
         }
 
     }
@@ -331,10 +419,10 @@
         </ul>
 
         <!-- Tab panes -->
-        <div class="tab-content col-md-4 " id="ChatListPage">
+        <div class="tab-content col-md-4" id="ChatListPage">
             <div class="tab-pane container active" id="TabChat" style="background:none">
                 <div>
-                    <div class="card contacts_card">
+                    <div class="card"  id="accordion">
                         <div class="card-header">
                             <div class="input-group">
                                 <input type="text" placeholder="Search..." name="" class="form-control search">
@@ -343,74 +431,130 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="card-body contacts_body">
-                            <ul class="contacts" id="contactListId" onclick="onclickUlContact(event)">
-                                <li class="active">
-                                    <div class="d-flex bd-highlight">
-                                        <div class="img_cont">
-                                            <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
-                                            <span class="online_icon offline"></span>
-                                        </div>
-                                        <div class="user_info">
-                                            <span>ME-2001-2993</span>
-                                            <p>ME-2001-2993 is offline</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="d-flex bd-highlight">
-                                        <div class="img_cont">
-                                            <img src="https://2.bp.blogspot.com/-8ytYF7cfPkQ/WkPe1-rtrcI/AAAAAAAAGqU/FGfTDVgkcIwmOTtjLka51vineFBExJuSACLcBGAs/s320/31.jpg" class="rounded-circle user_img">
-                                            <span class="online_icon offline"></span>
-                                        </div>
-                                        <div class="user_info">
-                                            <span>Taherah Big</span>
-                                            <p>Taherah left 7 mins ago</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="d-flex bd-highlight">
-                                        <div class="img_cont">
-                                            <img src="https://i.pinimg.com/originals/ac/b9/90/acb990190ca1ddbb9b20db303375bb58.jpg" class="rounded-circle user_img">
-                                            <span class="online_icon"></span>
-                                        </div>
-                                        <div class="user_info">
-                                            <span>Sami Rafi</span>
-                                            <p>Sami is online</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="d-flex bd-highlight">
-                                        <div class="img_cont">
-                                            <img src="https://2.bp.blogspot.com/-8ytYF7cfPkQ/WkPe1-rtrcI/AAAAAAAAGqU/FGfTDVgkcIwmOTtjLka51vineFBExJuSACLcBGAs/s320/31.jpg" class="rounded-circle user_img">
-                                            <span class="online_icon offline"></span>
-                                        </div>
-                                        <div class="user_info">
-                                            <span>Nargis Hawa</span>
-                                            <p>Nargis left 30 mins ago</p>
-                                        </div>
-                                    </div>
-                                </li>
-                                <li>
-                                    <div class="d-flex bd-highlight">
-                                        <div class="img_cont">
-                                            <img src="https://static.turbosquid.com/Preview/001214/650/2V/boy-cartoon-3D-model_D.jpg" class="rounded-circle user_img">
-                                            <span class="online_icon offline"></span>
-                                        </div>
-                                        <div class="user_info">
-                                            <span>Rashid Samim</span>
-                                            <p>Rashid left 50 mins ago</p>
-                                        </div>
-                                    </div>
-                                </li>
-                            </ul>
+
+                        <!--Machine-->
+                        <div class="card-header">
+                            <a class="card-link"  style="color: white;" data-toggle="collapse" href="#collapseMachines">
+                                Machines
+                            </a>
                         </div>
-                        <div class="card-footer"></div>
+                        <div id="collapseMachines" class="collapse contacts_body" data-parent="#accordion">
+                            <div class="card-body">
+                                <ul class="contacts" id="contactListId" onclick="onclickUlContact(event)">
+                                    <li>
+                                        <div class="d-flex bd-highlight">
+                                            <div class="img_cont">
+                                                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                                                <span class="online_icon offline"></span>
+                                            </div>
+                                            <div class="user_info">
+                                                <span>ME-2001-2993</span>
+                                                <p>ME-2001-2993 is offline</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="d-flex bd-highlight">
+                                            <div class="img_cont">
+                                                <img src="https://2.bp.blogspot.com/-8ytYF7cfPkQ/WkPe1-rtrcI/AAAAAAAAGqU/FGfTDVgkcIwmOTtjLka51vineFBExJuSACLcBGAs/s320/31.jpg" class="rounded-circle user_img">
+                                                <span class="online_icon offline"></span>
+                                            </div>
+                                            <div class="user_info">
+                                                <span>Taherah Big</span>
+                                                <p>Taherah left 7 mins ago</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="d-flex bd-highlight">
+                                            <div class="img_cont">
+                                                <img src="https://i.pinimg.com/originals/ac/b9/90/acb990190ca1ddbb9b20db303375bb58.jpg" class="rounded-circle user_img">
+                                                <span class="online_icon"></span>
+                                            </div>
+                                            <div class="user_info">
+                                                <span>Sami Rafi</span>
+                                                <p>Sami is online</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="d-flex bd-highlight">
+                                            <div class="img_cont">
+                                                <img src="https://2.bp.blogspot.com/-8ytYF7cfPkQ/WkPe1-rtrcI/AAAAAAAAGqU/FGfTDVgkcIwmOTtjLka51vineFBExJuSACLcBGAs/s320/31.jpg" class="rounded-circle user_img">
+                                                <span class="online_icon offline"></span>
+                                            </div>
+                                            <div class="user_info">
+                                                <span>Nargis Hawa</span>
+                                                <p>Nargis left 30 mins ago</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="d-flex bd-highlight">
+                                            <div class="img_cont">
+                                                <img src="https://static.turbosquid.com/Preview/001214/650/2V/boy-cartoon-3D-model_D.jpg" class="rounded-circle user_img">
+                                                <span class="online_icon offline"></span>
+                                            </div>
+                                            <div class="user_info">
+                                                <span>Rashid Samim</span>
+                                                <p>Rashid left 50 mins ago</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!--Groups-->
+                        <div class="card-header">
+                            <a class="card-link"   style="color: white;" data-toggle="collapse" href="#collapseGroups">
+                                Groups
+                            </a>
+                        </div>
+                        <div id="collapseGroups" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                            </div>
+                        </div>
+
+                        <!--Friends-->
+                        <div class="card-header">
+                            <a class="card-link"   style="color: white;" data-toggle="collapse" href="#collapseFriends">
+                                Friends
+                            </a>
+                        </div>
+                        <div id="collapseFriends" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                            </div>
+                        </div>
+
+                        <!--Customers-->
+                        <div class="card-header">
+                            <a class="card-link"   style="color: white;" data-toggle="collapse" href="#collapseCustomers">
+                                Customers
+                            </a>
+                        </div>
+                        <div id="collapseCustomers" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                            </div>
+                        </div>
+
+                        <!--Vendors-->
+                        <div class="card-header">
+                            <a class="card-link"   style="color: white;" data-toggle="collapse" href="#collapseVendors">
+                                Vendors
+                            </a>
+                        </div>
+                        <div id="collapseVendors" class="collapse" data-parent="#accordion">
+                            <div class="card-body">
+                            </div>
+                        </div>
+
                     </div>
+
+                    <div class="card-footer"></div>
                 </div>
             </div>
+
             <div class="tab-pane container fade" id="TabProfile" style="background:none">
                 <div>
                     <div class="card contacts_card">
@@ -447,6 +591,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
         <div class="col-md-7" id="ChatMessagePage">
