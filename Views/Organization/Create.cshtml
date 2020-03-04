@@ -46,10 +46,15 @@
                 <span asp-validation-for="email" class="text-danger"></span>
             </div>
             <div class="form-group">
+                <label asp-for="defaultPassword" class="control-label">defaultPassword(abcd@1234)</label>
+                <input asp-for="defaultPassword" value="abcd@1234" class="form-control" />
+                <span asp-validation-for="defaultPassword" class="text-danger"></span>
+            </div>
+            <div class="form-group">
                 <label asp-for="parent" class="control-label"></label>
                 <select asp-for="parent" asp-items="LeaderModel" class="form-control">
                     <option value=""></option>
-                </select>                        
+                </select>
                 <span asp-validation-for="parent" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -67,8 +72,17 @@
                 <input asp-for="cooperative" class="form-control" />
                 <span asp-validation-for="cooperative" class="text-danger"></span>
             </div>
-                   <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+            <div class="form-group">
+                <label asp-for="cooperative" class="control-label"></label>
+                <input asp-for="cooperative" class="form-control" />
+                <span asp-validation-for="cooperative" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="accessType" class="control-label"></label>
+                <select asp-for="accessType" asp-items="Html.GetEnumSelectList(typeof(AccessType))" class="form-control">
+                    <option value=""></option>
+                </select>
+                <span asp-validation-for="accessType" class="text-danger"></span>
             </div>
         </form>
     </div>

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutomateBussiness.Migrations
 {
     [DbContext(typeof(AutomateBussinessContext))]
-    [Migration("20200124050105_addOganizationWithFactoryId")]
-    partial class addOganizationWithFactoryId
+    [Migration("20200217085720_addnewemp")]
+    partial class addnewemp
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -89,6 +89,97 @@ namespace AutomateBussiness.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("AutomateBussiness.Models.ConferenceModels.ChatGroups", b =>
+                {
+                    b.Property<long>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("createDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("groupID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("groupImage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("groupName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("ChatGroupsTable");
+                });
+
+            modelBuilder.Entity("AutomateBussiness.Models.ConferenceModels.ChatHistorys", b =>
+                {
+                    b.Property<decimal>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("decimal(20,0)");
+
+                    b.Property<string>("message")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("messageDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("messageStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("messageType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("receiverId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("senderId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("ChatHistorysTable");
+                });
+
+            modelBuilder.Entity("AutomateBussiness.Models.ConferenceModels.Relationships", b =>
+                {
+                    b.Property<long>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<bool>("isFavorites")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("relationDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("relationStatus")
+                        .HasColumnType("int");
+
+                    b.Property<int>("relationType")
+                        .HasColumnType("int");
+
+                    b.Property<string>("requestById")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("requestId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("responedId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("id");
+
+                    b.ToTable("RelationshipsTable");
+                });
+
             modelBuilder.Entity("AutomateBussiness.Models.FactoryViewModel", b =>
                 {
                     b.Property<int>("id")
@@ -122,6 +213,9 @@ namespace AutomateBussiness.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("founder")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("imgLogo")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("mobile")
@@ -249,6 +343,13 @@ namespace AutomateBussiness.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("machineHashID")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("machineImage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -317,6 +418,10 @@ namespace AutomateBussiness.Migrations
                     b.Property<int?>("cooperative")
                         .HasColumnType("int");
 
+                    b.Property<string>("defaultPassword")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -329,6 +434,9 @@ namespace AutomateBussiness.Migrations
 
                     b.Property<string>("name")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("nickName")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("parent")

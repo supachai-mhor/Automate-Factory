@@ -56,5 +56,10 @@ namespace AutomateBussiness.Models
         [Display(Name = "TaxID")]
         public string taxId { get; set; }
 
+        [Display(Name = "Logo")]
+        public string imgLogo { get; set; }
+
+        //public string factoryHashID { get; set; }
+
     }
 }

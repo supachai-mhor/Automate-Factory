@@ -1,0 +1,121 @@
+﻿@model AutomateBussiness.Models.MachineViewModel
+@{
+    ViewData["Title"] = "Machine";
+    Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
+    var ListPlantModel = ViewBag.ListPlantModel;
+    var ListProcessModel = ViewBag.ListProcessModel;
+    var ListLineModel = ViewBag.ListLineModel;
+}
+<script>
+    document.getElementById("HeaderTopic").innerHTML = "Machine";
+</script>
+
+<h4>Create New Machine</h4>
+<hr />
+
+<div class="row">
+    <div class="col-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="name" class="control-label"></label>
+                <input asp-for="name" class="form-control" />
+                <span asp-validation-for="name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="plant" class="control-label"></label>
+                <select id="plantID" asp-for="plant" asp-items="ListPlantModel" class="form-control">
+                </select>
+                <span asp-validation-for="plant" class="text-danger"></span>
+            </div>
+            <div class="form-group col-2">
+                <a class="btn btn-light" onclick="addPlant()">Add Plant</a>
+            </div>
+            <div class="form-group">
+                <label asp-for="process" class="control-label"></label>
+                <select id="processID" asp-for="process" asp-items="ListProcessModel" class="form-control">
+                </select>
+
+                <span asp-validation-for="process" class="text-danger"></span>
+            </div>
+            <div class="form-group col-2">
+                <a class="btn btn-light" onclick="addProcess()">Add Process</a>
+            </div>
+            <div class="form-group">
+                <label asp-for="line" class="control-label"></label>
+                <select id="lineID" asp-for="line" asp-items="ListLineModel" class="form-control">
+                </select>
+                <span asp-validation-for="line" class="text-danger"></span>
+            </div>
+            <div class="form-group col-2">
+                <a class="btn btn-light" onclick="addLine()">Add Line</a>
+            </div>
+            <div class="form-group">
+                <label asp-for="description" class="control-label"></label>
+                <textarea rows="5" maxlength="255" asp-for="description" class="form-control"></textarea>
+                <span asp-validation-for="description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="vendor" class="control-label"></label>
+                <input asp-for="vendor" class="form-control" />
+                <span asp-validation-for="vendor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="supervisor" class="control-label"></label>
+                <input asp-for="supervisor" class="form-control" />
+                <span asp-validation-for="supervisor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="installed_date" class="control-label"></label>
+                <input asp-for="installed_date" class="form-control" />
+                <span asp-validation-for="installed_date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="machineImage" class="control-label"></label>
+                <input asp-for="machineImage" class="form-control" />
+                <span asp-validation-for="machineImage" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back</a>
+</div>
+<script>
+
+    function addPlant() {
+        var person = prompt("Please enter Plant name:", "Plant A");
+        if (person != null && person != "") {
+            var x = document.getElementById("plantID");
+            var option = document.createElement("option");
+            option.text = person;
+            x.add(option);
+        }
+    }
+
+    function addProcess() {
+        var person = prompt("Please enter Process name:", "Process A");
+        if (person != null && person != "") {
+            var x = document.getElementById("processID");
+            var option = document.createElement("option");
+            option.text = person;
+            x.add(option);
+        }
+    }
+
+    function addLine() {
+        var person = prompt("Please enter Line name:", "Line A");
+        if (person != null && person != "") {
+            var x = document.getElementById("lineID");
+            var option = document.createElement("option");
+            option.text = person;
+            x.add(option);
+        }
+    }
+
+</script>
+

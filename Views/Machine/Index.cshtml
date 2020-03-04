@@ -1,0 +1,110 @@
+﻿@model List<MachineViewModel>
+@{
+    ViewData["Title"] = "Machine";
+    Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
+}
+<script>
+    document.getElementById("HeaderTopic").innerHTML = "Machine";
+</script>
+
+<p>
+    <a class="btn btn-primary" asp-action="Create">Create New Machine</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model[0].name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].plant)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].process)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].line)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].description)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].vendor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].supervisor)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].installed_date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].machineImage)
+            </th>
+
+
+
+        </tr>
+    </thead>
+    @*public int id
+    public string name
+    public string plant
+    public string line
+    public string description
+    public string vendor
+    public string supervisor
+    public DateTime? installed_date
+    public int factoryID
+    public string machineImage*@
+    <tbody>
+        @foreach (var item in Model)
+        {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.plant)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.process)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.line)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.description)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.vendor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.supervisor)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.installed_date)
+            </td>
+            <td>
+                <img src="~/@Html.DisplayFor(modelItem => item.machineImage)" alt="" height=75 width=75>
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.id">Details</a>
+                @*<a asp-action="Delete" asp-route-id="@item.id">Delete</a>*@
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+@*@foreach (var m in Model)
+    {<div>
+            @{
+                var strImg = "~/Img/Emp/" + m.ID.ToString() + ".jpg";
+                <img src="@Url.Content(strImg)" class="img-thumbnail" alt="automate logo" style="width:50px;">
+            }
+
+        </div>
+
+    }*@
+

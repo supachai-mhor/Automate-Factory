@@ -1,0 +1,77 @@
+﻿@model AutomateBussiness.Models.MachineViewModel
+@{
+    ViewData["Title"] = "Machine";
+    Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
+}
+<script>
+    document.getElementById("HeaderTopic").innerHTML = "Machine";
+</script>
+
+<h4>Edit Machine</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="id" />
+            <div class="form-group">
+                <label asp-for="name" class="control-label"></label>
+                <input asp-for="name" class="form-control" />
+                <span asp-validation-for="name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="plant" class="control-label"></label>
+                <input asp-for="plant" class="form-control" />
+                <span asp-validation-for="plant" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="process" class="control-label"></label>
+                <input asp-for="process" class="form-control" />
+                <span asp-validation-for="process" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="line" class="control-label"></label>
+                <input asp-for="line" class="form-control" />
+                <span asp-validation-for="line" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="description" class="control-label"></label>
+                <textarea rows="5" maxlength="255" asp-for="description" class="form-control"></textarea>
+                <span asp-validation-for="description" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="vendor" class="control-label"></label>
+                <input asp-for="vendor" class="form-control" />
+                <span asp-validation-for="vendor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="supervisor" class="control-label"></label>
+                <input asp-for="supervisor" class="form-control" />
+                <span asp-validation-for="supervisor" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="installed_date" class="control-label"></label>
+                <input asp-for="installed_date" class="form-control" />
+                <span asp-validation-for="installed_date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="machineImage" class="control-label"></label>
+                <input asp-for="machineImage" class="form-control" />
+                <span asp-validation-for="machineImage" class="text-danger"></span>
+            </div>
+            @*<div class="form-group">
+                <label asp-for="machineHashID" class="control-label"></label>
+                <input asp-for="machineHashID" class="form-control" />
+                <span asp-validation-for="machineHashID" class="text-danger"></span>
+            </div>*@
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back</a>
+</div>
+

@@ -4,7 +4,9 @@ var chart, orgList;
 var openedNodeColor = '#e0e0e0', closedNodeColor = '#efefef';
 
 JSC.fetch('csv/orgData.csv').then(function (response) { return response.text(); }).then(function (text) {
-
+	//var data = JSC.csv2Json(text);
+	//orgList = makePoints(data);
+	//chart = renderChart(orgList);
 	$.ajax({
 	type: "POST",
 	url: 'Organization/getOrgData',
@@ -78,7 +80,7 @@ function renderChart(orgList) {
 			outline_width: 0,
 			color: closedNodeColor
 		},
-		series: [{ points: orgList.slice(0, 6) }]
+		series: [{ points: orgList.slice(0, 4) }]
 	});
 }
 
@@ -86,7 +88,7 @@ function pointClick() {
 	var point = this;
 	if (point.options('color') == closedNodeColor) {
 		point.options({
-			label_text: '<b>%position</b><br/>%name<br/>',
+			//label_text: '<b>%position</b><br/>%name<br/>',
 			color: openedNodeColor
 		});
 		orgList.forEach(function (val, i) {
@@ -95,7 +97,7 @@ function pointClick() {
 		point.zoomTo()
 	} else {
 		point.options({
-			label_text: '<b>%position</b><br/>%name<br/>',
+			//label_text: '<b>%position</b><br/>%name<br/>',
 			color: closedNodeColor
 		});
 		if (point.options('parent') == undefined) {
@@ -144,7 +146,7 @@ function makePoints(data) {
 				phone: val[0].phone,
 				address: val[0].address,
 				email: val[0].email,
-				photo: 'Img/Emp/' + val[0].photo + '.jpg',
+				photo: val[0].photo,
 				quality: '<chart width=28 height=10 color=' + getColor(val[0].work_quality) + ' type=bar data=' + val[0].work_quality + ' max=5> - Quality of work',
 				initiative: '<chart width=28 height=10 color=' + getColor(val[0].initiative) + ' type=bar data=' + val[0].initiative + ' max=5> - Initiative',
 				cooperative: '<chart width=28 height=10 color=' + getColor(val[0].cooperative) + ' type=bar data=' + val[0].cooperative + ' max=5> - Cooperative'
@@ -160,7 +162,7 @@ function makePoints(data) {
 		if (i > 0) {
 			arr.forEach(function (val2, j) {
 				if (j > 0 && val1.id == val2.parent) {
-					val1.label_text = '<b>%position</b><br/>%name<br/>';
+					//val1.label_text = '<b>%position</b><br/>%name<br/>';
 					val1.events_click = pointClick;
 				}
 			})

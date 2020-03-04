@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -18,6 +19,8 @@ namespace AutomateBussiness.Models
     }
     public class MachineViewModel
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         [Required]
         [Display(Name = "Name")]
@@ -26,6 +29,10 @@ namespace AutomateBussiness.Models
         [Required]
         [Display(Name = "Plant")]
         public string plant { get; set; }
+
+        [Required]
+        [Display(Name = "Process")]
+        public string process { get; set; }
 
         [Required]
         [Display(Name = "Line")]
@@ -40,16 +47,22 @@ namespace AutomateBussiness.Models
         public string vendor{ get; set; }
 
         [Required]
-        [Display(Name = "Supervisor")]
+        [Display(Name = "SupervisorEmail")]
         public string supervisor { get; set; }
 
         [Required]
         [Display(Name = "Installed Date")]
-        public DateTime? installed_date { get; set; }
+        public DateTime installed_date { get; set; }
 
         [Required]
         [Display(Name = "FactoryID")]
         public int factoryID { get; set; }
+
+        [Required]
+        [Display(Name = "Image")]
+        public string machineImage { get; set; }
+
+        public string machineHashID { get; set; }
 
     }
     public class MachineDailyViewModel

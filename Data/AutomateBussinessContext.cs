@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutomateBussiness.Models;
+using AutomateBussiness.Models.ConferenceModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -29,6 +30,11 @@ namespace AutomateBussiness.Data
         public DbSet<MachineViewModel> MachineTable { get; set; }
         public DbSet<MachineDailyViewModel> MachineDailyTable { get; set; }
         public DbSet<MachineErrorViewModel> MachineErrorTable { get; set; }
+
+        public DbSet<Relationships> RelationshipsTable { get; set; }
+        public DbSet<ChatHistorys> ChatHistorysTable { get; set; }
+        public DbSet<ChatGroups> ChatGroupsTable { get; set; }
+
     }
         
 

@@ -132,6 +132,7 @@ namespace AutomateBussiness.Controllers
 
             return View(model);
         }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpGet]
         [Route("admin/gettoken")]

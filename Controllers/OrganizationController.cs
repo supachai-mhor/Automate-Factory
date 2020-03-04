@@ -47,9 +47,10 @@ namespace AutomateBussiness.Controllers
             try
             {
                 getFacID();
-                var All_Organizations = from m in _context.OrganizationTable
+                var All_Organizations = from m in _context.OrganizationTable where m.factoryID== facID
+                                        orderby m.parent
                                        select m;
-                All_Organizations = All_Organizations.Where(x => x.factoryID == facID);
+                //All_Organizations = All_Organizations.Where(x => x.factoryID == facID);
 
                 List<OrganizationViewModel> Organization = await All_Organizations.ToListAsync();
            
@@ -81,8 +82,10 @@ namespace AutomateBussiness.Controllers
         {
             getFacID();
             var All_Organizations = from m in _context.OrganizationTable
+                                    where m.factoryID == facID
+                                    orderby m.parent
                                     select m;
-            All_Organizations = All_Organizations.Where(x => x.factoryID == facID);
+            //All_Organizations = All_Organizations.Where(x => x.factoryID == facID);
 
             List<OrganizationViewModel> Organization = await All_Organizations.ToListAsync();
 
@@ -90,8 +93,6 @@ namespace AutomateBussiness.Controllers
             {
                 return null;
             }
-
-            
 
             return Organization;
         }
@@ -121,7 +122,7 @@ namespace AutomateBussiness.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id,name,position,photo,phone,address,email,parent,work_quality,initiative,cooperative")] OrganizationViewModel Organization)
+        public async Task<IActionResult> Create([Bind("id,name,position,photo,phone,address,email,parent,work_quality,initiative,cooperative,defaultPassword,accessType")] OrganizationViewModel Organization)
         {
             if (ModelState.IsValid)
             {
@@ -133,9 +134,39 @@ namespace AutomateBussiness.Controllers
                 }
                 Organization.factoryID = facID;
 
-                _context.Add(Organization);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                //add new user also
+                var factory = _context.FactoryTable.Where(m => m.id == facID);
+                if (factory.Count() == 1)
+                {
+                    
+                    // Copy data from RegisterViewModel to IdentityUser
+                    var user = new AccountViewModel
+                    {
+                        UserName = Organization.email,
+                        Email = Organization.email,
+                        PhoneNumber = Organization.phone,
+                        FactoryName = factory.First().factoryName
+                    };
+
+                    // Store user data in AspNetUsers database table
+                    var result = await userManager.CreateAsync(user, Organization.defaultPassword);
+
+                    // If user is successfully created, sign-in the user using
+                    // SignInManager and redirect to index action of HomeController
+                    if (result.Succeeded) {
+                         _context.Add(Organization);
+                        await _context.SaveChangesAsync();
+                        return RedirectToAction(nameof(Index));
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("Email", "can't add this email because already has in system ");
+                    }
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, "Not found your company id");
+                }
             }
             return View(Organization);
         }
@@ -147,6 +178,16 @@ namespace AutomateBussiness.Controllers
                 return NotFound();
             }
 
+            getFacID();
+            // Use LINQ to get list of genres.
+            IQueryable<string> ListLeader = from m in _context.OrganizationTable
+                                            where m.factoryID == facID
+                                            orderby m.name
+                                            select m.name;
+
+            var LeaderModel = new SelectList(await ListLeader.Distinct().ToListAsync());
+            ViewBag.LeaderModel = LeaderModel;
+
             var Organization = await _context.OrganizationTable.FindAsync(id);
             if (Organization == null)
             {
@@ -157,7 +198,7 @@ namespace AutomateBussiness.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("id,name,position,photo,phone,address,email,parent,work_quality,initiative,cooperative")] OrganizationViewModel Organization)
+        public async Task<IActionResult> Edit(int id, [Bind("id,name,position,photo,phone,address,email,parent,work_quality,initiative,cooperative,defaultPassword,accessType")] OrganizationViewModel Organization)
         {
             if (id != Organization.id)
             {
@@ -166,6 +207,14 @@ namespace AutomateBussiness.Controllers
 
             if (ModelState.IsValid)
             {
+                getFacID();
+
+                if (Organization.parent != null)
+                {
+                    Organization.parent = await getParentID(Organization.parent);
+                }
+                Organization.factoryID = facID;
+
                 try
                 {
                     _context.Update(Organization);

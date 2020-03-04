@@ -4,14 +4,16 @@ using AutomateBussiness.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace AutomateBussiness.Migrations
 {
     [DbContext(typeof(AutomateBussinessContext))]
-    partial class AutomateBussinessContextModelSnapshot : ModelSnapshot
+    [Migration("20200217105520_addnewempwithAccess")]
+    partial class addnewempwithAccess
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -353,10 +355,6 @@ namespace AutomateBussiness.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("plant")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("process")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

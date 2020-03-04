@@ -15,9 +15,10 @@ namespace AutomateBussiness.Models
         [Required]
         [Display(Name = "Position")]
         public string position { get; set; }
+
         [Required]
-        [Display(Name = "Photo Number")]
-        [RegularExpression(@"^(0|[1-9]\d*)$")]
+        [Display(Name = "Photo")]
+        //[RegularExpression(@"^(0|[1-9]\d*)$")]
         public string photo { get; set; }
         [Required]
         [Phone]
@@ -26,6 +27,7 @@ namespace AutomateBussiness.Models
         [Required]
         [Display(Name = "Address")]
         public string address{ get; set; }
+
         [Required]
         [EmailAddress]
         [Display(Name = "Email")]
@@ -48,5 +50,24 @@ namespace AutomateBussiness.Models
         [Required]
         [Display(Name = "FactoryID")]
         public int factoryID { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        [Display(Name = "DefaultPassword")]
+        public string defaultPassword { get; set; }
+
+        [Display(Name = "NickName")]
+        public string nickName { get; set; }
+
+        [Display(Name = "AccessType")]
+        public AccessType accessType { get; set; }
+    }
+    public enum AccessType
+    {
+        Admin,
+        CEO,
+        Manager,
+        Supervisor,
+        Operator
     }
 }

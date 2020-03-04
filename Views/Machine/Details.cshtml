@@ -1,0 +1,81 @@
+﻿@model AutomateBussiness.Models.MachineViewModel
+@{
+    ViewData["Title"] = "Machine";
+    Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
+}
+<script>
+    document.getElementById("HeaderTopic").innerHTML = "Machine";
+</script>
+
+<h4>Machine Detail</h4>
+
+<div>
+    <h4>Movie</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.name)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.name)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.plant)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.plant)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.process)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.process)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.line)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.line)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.vendor)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.vendor)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.supervisor)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.supervisor)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.installed_date)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.installed_date)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.machineHashID)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.machineHashID)
+        </dd>
+        @*<dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.machineImage)
+        </dt>*@
+        <dd class="col-sm-10">
+            <img src="~/@Html.DisplayFor(model => model.machineImage)" alt="" height=200 width=200>
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.id">Edit</a> |
+    <a asp-action="Index">Back</a>
+</div>

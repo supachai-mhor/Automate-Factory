@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace AutomateBussiness.Models
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 
         public string FactoryName { get; set; }
-        
+
+
     }
 }

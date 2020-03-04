@@ -432,11 +432,11 @@
 
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-sm-4 col-md-3 mr-0" href="#" id="companyName">@UserManager.FindByNameAsync(User.Identity.Name).Result.FactoryName</a>
+        <a class="navbar-brand col-sm-4 col-md-3 mr-0 text-nowrap" href="#" id="companyName">@UserManager.FindByNameAsync(User.Identity.Name).Result.FactoryName</a>
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
         @if (SignInManager.IsSignedIn(User))
         {
-            <a class="nav-link bg-info">
+            <a class="nav-link bg-info text-nowrap">
                 @User.Identity.Name
             </a>
         }
@@ -465,9 +465,9 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" asp-controller="Home" asp-action="Dashboard">
-                                <span data-feather="file"></span>
-                                Business Info
+                            <a class="nav-link" asp-controller="Factory" asp-action="Index">
+                                <span data-feather="users"></span>
+                                Factory
                             </a>
                         </li>
                         <li class="nav-item">
@@ -477,21 +477,28 @@
                             </a>
                         </li>
                         <li class="nav-item">
+                            <a class="nav-link" asp-controller="Machine" asp-action="Index">
+                                <span data-feather="shopping-cart"></span>
+                                Machines
+                            </a>
+                        </li>
+                        <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <span data-feather="users"></span>
                                 Products
                             </a>
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <span data-feather="users"></span>
-                                Factory
+                                Customers
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#">
                                 <span data-feather="users"></span>
-                                Customers
+                                Supplier
                             </a>
                         </li>
                         <li class="nav-item">
