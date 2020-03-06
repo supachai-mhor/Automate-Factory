@@ -27,6 +27,72 @@
     <script src="https://code.jscharting.com/latest/jscharting.js"></script>
 
     <style type="text/css">
+        /*add style radio*/
+        /* The container */
+        .containerRadio {
+          display: inline-block;
+          position: relative;
+          padding-left: 25px;
+          padding-right: 25px;
+          cursor: pointer;
+          font-size: 1em;
+          color:white;
+          -webkit-user-select: none;
+          -moz-user-select: none;
+          -ms-user-select: none;
+          user-select: none;
+        }
+
+        /* Hide the browser's default radio button */
+        .containerRadio input {
+          position: absolute;
+          opacity: 0;
+          cursor: pointer;
+        }
+
+        /* Create a custom radio button */
+        .checkmark {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 20px;
+          width: 20px;
+          background-color: #eee;
+          border-radius: 50%;
+        }
+
+        /* On mouse-over, add a grey background color */
+        .containerRadio:hover input ~ .checkmark {
+          background-color: #ccc;
+        }
+
+        /* When the radio button is checked, add a blue background */
+        .containerRadio input:checked ~ .checkmark {
+          background-color: #2196F3;
+        }
+
+        /* Create the indicator (the dot/circle - hidden when not checked) */
+        .checkmark:after {
+          content: "";
+          position: absolute;
+          display: none;
+        }
+
+        /* Show the indicator (dot/circle) when checked */
+        .containerRadio input:checked ~ .checkmark:after {
+          display: block;
+        }
+
+        /* Style the indicator (dot/circle) */
+        .containerRadio .checkmark:after {
+            top: 6px;
+            left: 7px;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: white;
+        }
+
 
 
         .received_msg {
@@ -84,7 +150,7 @@
             height: 500px;
             border-radius: 15px !important;
             background-color: rgba(0,0,0,0.4) !important;
-            overflow:auto;
+            overflow: auto;
         }
 
         .contacts_body {
@@ -177,26 +243,26 @@
         }
 
         .user_img {
-            height: 70px;
-            width: 70px;
+            height: 50px;
+            width: 50px;
             border: 1.5px solid #f5f6fa;
         }
 
         .user_img_msg {
-            height: 40px;
-            width: 40px;
+            height: 30px;
+            width: 30px;
             border: 1.5px solid #f5f6fa;
         }
 
         .img_cont {
             position: relative;
-            height: 70px;
-            width: 70px;
+            height: 50px;
+            width: 50px;
         }
 
         .img_cont_msg {
-            height: 40px;
-            width: 40px;
+            height: 30px;
+            width: 30px;
         }
 
         .online_icon {
@@ -221,7 +287,7 @@
         }
 
             .user_info span {
-                font-size: 20px;
+                font-size: 15px;
                 color: white;
             }
 
@@ -432,7 +498,7 @@
 
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-sm-4 col-md-3 mr-0 text-nowrap" href="#" id="companyName">@UserManager.FindByNameAsync(User.Identity.Name).Result.FactoryName</a>
+        <a class="navbar-brand col-sm-4 col-md-3 mr-0 text-nowrap" href="#" id="companyName">@UserManager.FindByNameAsync(User.Identity.Name).Result.factoryID</a>
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
         @if (SignInManager.IsSignedIn(User))
         {

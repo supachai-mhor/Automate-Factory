@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -21,8 +22,9 @@ namespace AutomateBussiness.Models.ConferenceModels
     }
     public class ChatHistorys
     {
-        public UInt64 id { get; set; }
-
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.None)]
+        public string id { get; set; }
         [Required]
         public DateTime messageDate { get; set; }
 

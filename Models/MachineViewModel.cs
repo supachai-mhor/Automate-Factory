@@ -56,7 +56,7 @@ namespace AutomateBussiness.Models
 
         [Required]
         [Display(Name = "FactoryID")]
-        public int factoryID { get; set; }
+        public string factoryID { get; set; }
 
         [Required]
         [Display(Name = "Image")]
@@ -67,6 +67,8 @@ namespace AutomateBussiness.Models
     }
     public class MachineDailyViewModel
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
 
         [Required]
@@ -107,10 +109,12 @@ namespace AutomateBussiness.Models
 
         [Required]
         [Display(Name = "FactoryID")]
-        public int factoryID { get; set; }
+        public string factoryID { get; set; }
         }
     public class MachineErrorViewModel
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
 
         [Required]
@@ -147,10 +151,12 @@ namespace AutomateBussiness.Models
 
         [Required]
         [Display(Name = "FactoryID")]
-        public int factoryID { get; set; }
+        public string factoryID { get; set; }
     }
     public class PlaningViewModel
     {
+        [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int id { get; set; }
         public string job_number { get; set; }
         public int planQty { get; set; }

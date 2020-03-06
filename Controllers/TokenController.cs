@@ -62,8 +62,8 @@ namespace AutomateBussiness.Controllers
 
             var claims = new List<Claim>
             {
-            new Claim(ClaimTypes.NameIdentifier, user.FactoryName),
-            new Claim(ClaimTypes.Name, user.FactoryName + " " + user.Email),
+            new Claim(ClaimTypes.NameIdentifier, user.factoryID),
+            new Claim(ClaimTypes.Name, user.factoryID + " " + user.Email),
             new Claim(ClaimTypes.Version, "1.0"),
             new Claim(ClaimTypes.Role, "USER")
             };
@@ -83,7 +83,7 @@ namespace AutomateBussiness.Controllers
         {
             var hashPassword = EncryptPassword(login.password);
             var client = _dbContext.AccountsTable.FirstOrDefault
-                (c => c.FactoryName == login.username && c.PasswordHash == hashPassword);
+                (c => c.factoryID == login.username && c.PasswordHash == hashPassword);
             return client;
         }
         private string EncryptPassword(string clearPassword)

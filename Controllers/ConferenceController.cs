@@ -39,13 +39,13 @@ namespace AutomateBussiness.Controllers
         }
         public async Task<IActionResult> Index()
         {
-            var facName = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().FactoryName;
+            var facID= userManager.Users.Where(m => m.UserName == User.Identity.Name).First().factoryID;
 
             var user = new AccountViewModel
             {
                 UserName = User.Identity.Name,
                 Email = User.Identity.Name,
-                FactoryName = facName
+                factoryID = facID
             };
 
             var tokenString =  await BuildToken(user);
@@ -78,7 +78,7 @@ namespace AutomateBussiness.Controllers
             OrganizationViewModel _user = _context.OrganizationTable.Where(r => r.email == user.Email).First();
 
             // find chat Relationships
-            IEnumerable<Relationships> _relationships = _context.RelationshipsTable.Where(r => r.requestId == user.Id || r.responedId == user.Id);
+            IEnumerable<Relationship> _relationships = _context.RelationshipsTable.Where(r => r.requestId == user.Id || r.responedId == user.Id);
 
             //get all my groups
             var genreGroupId = from r in _relationships where r.relationType == RelationType.groups
@@ -123,7 +123,7 @@ namespace AutomateBussiness.Controllers
 
         private async Task<string> BuildToken(AccountViewModel user)
         {
-
+      
             var key = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var claims = new[]
@@ -132,7 +132,7 @@ namespace AutomateBussiness.Controllers
                 new Claim(JwtRegisteredClaimNames.Sub,user.Email),
                 new Claim(JwtRegisteredClaimNames.Email,user.Email),
                 new Claim(ClaimTypes.Role,"User"),
-                new Claim("FactoryName",user.FactoryName),
+                new Claim("FactoryID",user.factoryID),
                 new Claim("MachineName","Viewer")
 
                 //new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
@@ -150,15 +150,6 @@ namespace AutomateBussiness.Controllers
 
             return encodeToken;
 
-        }
-        private void getFacID()
-        {
-            var facName = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().FactoryName;
-            var factory = _context.FactoryTable.Where(m => m.factoryName == facName);
-            if (factory.Count() > 0)
-            {
-                facID = factory.First().id;
-            }
         }
     }
 }

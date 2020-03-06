@@ -49,7 +49,7 @@ namespace AutomateBussiness.Models
 
         [Required]
         [Display(Name = "FactoryID")]
-        public int factoryID { get; set; }
+        public string factoryID { get; set; }
 
         [Required]
         [DataType(DataType.Password)]

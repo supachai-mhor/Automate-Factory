@@ -25,6 +25,7 @@ namespace AutomateBussiness.Controllers
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly AutomateBussinessContext _context;
         private readonly IConfiguration _config;
+        public string facID = "";
         public AccountController(UserManager<AccountViewModel> userManager,
             SignInManager<AccountViewModel> signInManager, IHubContext<ChatHub> hubContext, 
             AutomateBussinessContext context, IConfiguration config)
@@ -52,7 +53,10 @@ namespace AutomateBussiness.Controllers
                 {
                     var newFactory = new FactoryViewModel
                     {
-                        factoryName = model.FactoryName
+                        id= Guid.NewGuid().ToString() + Guid.NewGuid().ToString(),
+                        foundDate = DateTime.Now,
+                        factoryName = model.FactoryName,
+                        
                     };
                     _context.Add(newFactory);
                     await _context.SaveChangesAsync();
@@ -62,7 +66,7 @@ namespace AutomateBussiness.Controllers
                     {
                         UserName = model.Email,
                         Email = model.Email,
-                        FactoryName = model.FactoryName
+                        factoryID = newFactory.id
                     };
 
                     // Store user data in AspNetUsers database table
@@ -133,47 +137,63 @@ namespace AutomateBussiness.Controllers
             return View(model);
         }
 
-        [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-        [HttpGet]
-        [Route("admin/gettoken")]
-        public IEnumerable<string> GetData()
-        {
-            return new string[] { "value1", "value2" };
-        }
+        //[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+        //[HttpGet]
+        //[Route("admin/gettoken")]
+        //public IEnumerable<string> GetData()
+        //{
+        //    return new string[] { "value1", "value2" };
+        //}
 
-        [HttpGet]
-        [Route("admin/token")]
-        public string GetToken(string email)
+        //[HttpGet]
+        //[Route("admin/token")]
+        //public string GetToken(string email)
+        //{
+        //    var claims = new List<Claim>
+        //    {
+        //        new Claim(JwtRegisteredClaimNames.Sub, email),
+        //        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+        //    };
+
+        //    var key = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(_config["Jwt:Key"]));
+        //    var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        //    var token = new JwtSecurityToken(
+        //        issuer: _config["Jwt:Issuer"],
+        //        audience: _config["Jwt:Issuer"],
+        //        claims: claims,
+        //        expires: DateTime.UtcNow.AddDays(60),
+        //        signingCredentials: creds
+
+        //    );
+
+        //    return new JwtSecurityTokenHandler().WriteToken(token);
+        //}
+        private void getFacID()
         {
-            var claims = new List<Claim>
+            var facName = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().factoryID;
+            var factory = _context.FactoryTable.Where(m => m.id == facName);
+            if (factory.Count() > 0)
             {
-                new Claim(JwtRegisteredClaimNames.Sub, email),
-                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-            };
-
-            var key = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(_config["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            
-            var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Issuer"],
-                claims: claims,
-                expires: DateTime.UtcNow.AddDays(60),
-                signingCredentials: creds
-
-            );
-
-            return new JwtSecurityTokenHandler().WriteToken(token);
+                facID = factory.First().id;
+            }
         }
         private string BuildToken(LoginViewModel user)
         {
-           
+            getFacID();
             var key = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(_config["Jwt:Key"]));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var claims = new[]
             {
-                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                new Claim(JwtRegisteredClaimNames.Sub,user.Email),
+                new Claim(JwtRegisteredClaimNames.Email,user.Email),
+                new Claim(ClaimTypes.Role,"User"),
+                new Claim("FactoryID",facID),
+                new Claim("MachineID","Viewer")
+
+                //new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                //new Claim(JwtRegisteredClaimNames.Email, user.Email)
                 //new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
 

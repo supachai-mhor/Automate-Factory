@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AutomateBussiness.Migrations
 {
     [DbContext(typeof(AutomateBussinessContext))]
-    [Migration("20200217085720_addnewemp")]
-    partial class addnewemp
+    [Migration("20200306130820_newTrialVersionDB")]
+    partial class newTrialVersionDB
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -39,9 +39,6 @@ namespace AutomateBussiness.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("FactoryName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");
@@ -76,6 +73,9 @@ namespace AutomateBussiness.Migrations
                         .HasColumnType("nvarchar(256)")
                         .HasMaxLength(256);
 
+                    b.Property<string>("factoryID")
+                        .HasColumnType("nvarchar(max)");
+
                     b.HasKey("Id");
 
                     b.HasIndex("NormalizedEmail")
@@ -91,9 +91,8 @@ namespace AutomateBussiness.Migrations
 
             modelBuilder.Entity("AutomateBussiness.Models.ConferenceModels.ChatGroups", b =>
                 {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                    b.Property<string>("id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("createDate")
                         .HasColumnType("datetime2");
@@ -116,9 +115,8 @@ namespace AutomateBussiness.Migrations
 
             modelBuilder.Entity("AutomateBussiness.Models.ConferenceModels.ChatHistorys", b =>
                 {
-                    b.Property<decimal>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("decimal(20,0)");
+                    b.Property<string>("id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("message")
                         .IsRequired()
@@ -146,11 +144,10 @@ namespace AutomateBussiness.Migrations
                     b.ToTable("ChatHistorysTable");
                 });
 
-            modelBuilder.Entity("AutomateBussiness.Models.ConferenceModels.Relationships", b =>
+            modelBuilder.Entity("AutomateBussiness.Models.ConferenceModels.Relationship", b =>
                 {
-                    b.Property<long>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
+                    b.Property<string>("id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<bool>("isFavorites")
                         .HasColumnType("bit");
@@ -182,10 +179,8 @@ namespace AutomateBussiness.Migrations
 
             modelBuilder.Entity("AutomateBussiness.Models.FactoryViewModel", b =>
                 {
-                    b.Property<int>("id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("address")
                         .HasColumnType("nvarchar(max)");
@@ -248,8 +243,9 @@ namespace AutomateBussiness.Migrations
                     b.Property<int>("downtime")
                         .HasColumnType("int");
 
-                    b.Property<int>("factoryID")
-                        .HasColumnType("int");
+                    b.Property<string>("factoryID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("idletime")
                         .HasColumnType("int");
@@ -292,8 +288,9 @@ namespace AutomateBussiness.Migrations
                     b.Property<int>("errorType")
                         .HasColumnType("int");
 
-                    b.Property<int>("factoryID")
-                        .HasColumnType("int");
+                    b.Property<string>("factoryID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("informby")
                         .IsRequired()
@@ -332,11 +329,11 @@ namespace AutomateBussiness.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("factoryID")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("installed_date")
+                    b.Property<string>("factoryID")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("installed_date")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("line")
@@ -355,6 +352,10 @@ namespace AutomateBussiness.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("plant")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("process")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -411,6 +412,9 @@ namespace AutomateBussiness.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<int>("accessType")
+                        .HasColumnType("int");
+
                     b.Property<string>("address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -426,8 +430,9 @@ namespace AutomateBussiness.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("factoryID")
-                        .HasColumnType("int");
+                    b.Property<string>("factoryID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("initiative")
                         .HasColumnType("int");

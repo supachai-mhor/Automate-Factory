@@ -22,7 +22,7 @@ namespace AutomateBussiness.Controllers
         private readonly AutomateBussinessContext _context;
         public object Claimtype { get; private set; }
         private List<OrganizationViewModel> Organization { get; set; }
-        public int facID = 0;
+        public string facID = "";
         public OrganizationController(AutomateBussinessContext context,
             UserManager<AccountViewModel> userManager,
             SignInManager<AccountViewModel> signInManager)
@@ -34,8 +34,8 @@ namespace AutomateBussiness.Controllers
         }
         private  void getFacID()
         {
-            var facName = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().FactoryName;
-            var factory = _context.FactoryTable.Where(m => m.factoryName == facName);
+            var facName = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().factoryID;
+            var factory = _context.FactoryTable.Where(m => m.id == facName);
             if (factory.Count() > 0)
             {
                 facID = factory.First().id;
@@ -145,7 +145,7 @@ namespace AutomateBussiness.Controllers
                         UserName = Organization.email,
                         Email = Organization.email,
                         PhoneNumber = Organization.phone,
-                        FactoryName = factory.First().factoryName
+                        factoryID = factory.First().factoryName
                     };
 
                     // Store user data in AspNetUsers database table

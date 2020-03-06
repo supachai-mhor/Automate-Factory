@@ -31,7 +31,7 @@ namespace AutomateBussiness.Data
         public DbSet<MachineDailyViewModel> MachineDailyTable { get; set; }
         public DbSet<MachineErrorViewModel> MachineErrorTable { get; set; }
 
-        public DbSet<Relationships> RelationshipsTable { get; set; }
+        public DbSet<Relationship> RelationshipsTable { get; set; }
         public DbSet<ChatHistorys> ChatHistorysTable { get; set; }
         public DbSet<ChatGroups> ChatGroupsTable { get; set; }
 

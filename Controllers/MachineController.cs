@@ -19,7 +19,7 @@ namespace AutomateBussiness.Controllers
         private readonly SignInManager<AccountViewModel> signInManager;
         private readonly AutomateBussinessContext _context;
 
-        public int facID = 0;
+        public string facID = "";
         public MachineController(AutomateBussinessContext context,
             UserManager<AccountViewModel> userManager,
             SignInManager<AccountViewModel> signInManager)
@@ -31,8 +31,8 @@ namespace AutomateBussiness.Controllers
         }
         private void getFacID()
         {
-            var facName = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().FactoryName;
-            var factory = _context.FactoryTable.Where(m => m.factoryName == facName);
+            var facName = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().factoryID;
+            var factory = _context.FactoryTable.Where(m => m.id == facName);
             if (factory.Count() > 0)
             {
                 facID = factory.First().id;
@@ -93,7 +93,7 @@ namespace AutomateBussiness.Controllers
             {
                 getFacID();
                 machine.factoryID = facID;
-                machine.machineHashID = Guid.NewGuid().ToString();
+                machine.machineHashID = Guid.NewGuid().ToString() + Guid.NewGuid().ToString();
                 var findsupervisorEmail =  _context.OrganizationTable.Where(m => m.factoryID == facID && m.email==machine.supervisor);
                 if (findsupervisorEmail.Count() > 0)
                 {
@@ -140,7 +140,7 @@ namespace AutomateBussiness.Controllers
 
                 getFacID();
                 machine.factoryID = facID;
-                machine.machineHashID = Guid.NewGuid().ToString();
+                machine.machineHashID = Guid.NewGuid().ToString() + DateTime.Now.ToString();
                 var findsupervisorEmail = _context.OrganizationTable.Where(m => m.factoryID == facID && m.email == machine.supervisor);
                 if (findsupervisorEmail.Count() > 0)
                 {

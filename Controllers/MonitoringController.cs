@@ -64,13 +64,13 @@ namespace AutomateBussiness.Controllers
             ViewBag.Time = time;
             ViewBag.UpdateInterval = updateInterval;
 
-            var facName = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().FactoryName;
+            var facID = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().Id;
                 
             var user = new AccountViewModel
             {
                 UserName = User.Identity.Name,
                 Email = User.Identity.Name,
-                FactoryName = facName
+                factoryID = facID
             };
 
             var tokenString = BuildToken(user);
@@ -109,8 +109,8 @@ namespace AutomateBussiness.Controllers
                 new Claim(JwtRegisteredClaimNames.Sub,user.Email),
                 new Claim(JwtRegisteredClaimNames.Email,user.Email),
                 new Claim(ClaimTypes.Role,"User"),
-                new Claim("FactoryName",user.FactoryName),
-                new Claim("MachineName","Viewer")
+                new Claim("FactoryID",user.factoryID),
+                new Claim("MachineID","Viewer")
 
                 //new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };

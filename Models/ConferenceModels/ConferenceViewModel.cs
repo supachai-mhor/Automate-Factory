@@ -11,6 +11,7 @@ namespace AutomateBussiness.Models.ConferenceModels
         public IEnumerable<MachineViewModel> machines { get; set; }
         public IEnumerable<ChatHistorys> chatHistorys { get; set; }
         public IEnumerable<ChatGroups> chatGroups { get; set; }
-        public IEnumerable<Relationships> relationships { get; set; }
+        public IEnumerable<Relationship> relationships { get; set; }
+
     }
 }

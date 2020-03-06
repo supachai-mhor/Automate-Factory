@@ -16,7 +16,7 @@ namespace AutomateBussiness.Models
         //[Key]
         //[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 
-        public string FactoryName { get; set; }
+        public string factoryID { get; set; }
 
 
     }

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace AutomateBussiness.Migrations
 {
-    public partial class addnewemp : Migration
+    public partial class newTrialVersionDB : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -40,7 +40,7 @@ namespace AutomateBussiness.Migrations
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     AccessFailedCount = table.Column<int>(nullable: false),
-                    FactoryName = table.Column<string>(nullable: true)
+                    factoryID = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -51,7 +51,7 @@ namespace AutomateBussiness.Migrations
                 name: "ChatGroupsTable",
                 columns: table => new
                 {
-                    id = table.Column<long>(nullable: false),
+                    id = table.Column<string>(nullable: false),
                     groupID = table.Column<string>(nullable: false),
                     groupName = table.Column<string>(nullable: false),
                     groupImage = table.Column<string>(nullable: true),
@@ -66,7 +66,7 @@ namespace AutomateBussiness.Migrations
                 name: "ChatHistorysTable",
                 columns: table => new
                 {
-                    id = table.Column<decimal>(nullable: false),
+                    id = table.Column<string>(nullable: false),
                     messageDate = table.Column<DateTime>(nullable: false),
                     senderId = table.Column<string>(nullable: false),
                     receiverId = table.Column<string>(nullable: false),
@@ -83,8 +83,7 @@ namespace AutomateBussiness.Migrations
                 name: "FactoryTable",
                 columns: table => new
                 {
-                    id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    id = table.Column<string>(nullable: false),
                     factoryName = table.Column<string>(nullable: false),
                     founder = table.Column<string>(nullable: true),
                     foundDate = table.Column<DateTime>(nullable: false),
@@ -120,7 +119,7 @@ namespace AutomateBussiness.Migrations
                     downtime = table.Column<int>(nullable: false),
                     idletime = table.Column<int>(nullable: false),
                     breaktime = table.Column<int>(nullable: false),
-                    factoryID = table.Column<int>(nullable: false)
+                    factoryID = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -141,7 +140,7 @@ namespace AutomateBussiness.Migrations
                     solve = table.Column<int>(nullable: false),
                     informby = table.Column<string>(nullable: false),
                     solvedby = table.Column<string>(nullable: false),
-                    factoryID = table.Column<int>(nullable: false)
+                    factoryID = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -156,12 +155,13 @@ namespace AutomateBussiness.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     name = table.Column<string>(nullable: false),
                     plant = table.Column<string>(nullable: false),
+                    process = table.Column<string>(nullable: false),
                     line = table.Column<string>(nullable: false),
                     description = table.Column<string>(nullable: false),
                     vendor = table.Column<string>(nullable: false),
                     supervisor = table.Column<string>(nullable: false),
                     installed_date = table.Column<DateTime>(nullable: false),
-                    factoryID = table.Column<int>(nullable: false),
+                    factoryID = table.Column<string>(nullable: false),
                     machineImage = table.Column<string>(nullable: false),
                     machineHashID = table.Column<string>(nullable: true)
                 },
@@ -203,9 +203,10 @@ namespace AutomateBussiness.Migrations
                     work_quality = table.Column<int>(nullable: true),
                     initiative = table.Column<int>(nullable: true),
                     cooperative = table.Column<int>(nullable: true),
-                    factoryID = table.Column<int>(nullable: false),
+                    factoryID = table.Column<string>(nullable: false),
                     defaultPassword = table.Column<string>(nullable: false),
-                    nickName = table.Column<string>(nullable: true)
+                    nickName = table.Column<string>(nullable: true),
+                    accessType = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -216,7 +217,7 @@ namespace AutomateBussiness.Migrations
                 name: "RelationshipsTable",
                 columns: table => new
                 {
-                    id = table.Column<long>(nullable: false),
+                    id = table.Column<string>(nullable: false),
                     relationDate = table.Column<DateTime>(nullable: false),
                     requestId = table.Column<string>(nullable: false),
                     responedId = table.Column<string>(nullable: false),

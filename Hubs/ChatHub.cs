@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using AutomateBussiness.Models;
 using System.Security.Claims;
+using AutomateBussiness.Models.ConferenceModels;
 
 namespace AutomateBussiness.Hubs
 {
@@ -38,8 +39,8 @@ namespace AutomateBussiness.Hubs
         {
             public string id;
             public string email;
-            public string factoryName;
-            public string machineName;
+            public string factoryID;
+            public string machineID;
             public string role;
         }
         #region---Data Members---
@@ -51,35 +52,35 @@ namespace AutomateBussiness.Hubs
             // var facName = userManager.Users.Where(m => m.UserName == Context.UserIdentifier).First().FactoryName;
 
             var claims = Context.User.Claims;
-            var facName = claims.Where(c => c.Type == "FactoryName")
+            var facID = claims.Where(c => c.Type == "FactoryID")
                    .Select(c => c.Value).SingleOrDefault();
-            var mcName = claims.Where(c => c.Type == "MachineName")
+            var mcID = claims.Where(c => c.Type == "MachineID")
                    .Select(c => c.Value).SingleOrDefault();
             var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
                    .Select(c => c.Value).SingleOrDefault();
             var roleType= claims.Where(c => c.Type == ClaimTypes.Role)
                    .Select(c => c.Value).SingleOrDefault();
 
-            var factory = _context.FactoryTable.Where(m => m.factoryName == facName);
-            if (factory.Count() > 0 && mcName != null)
+            var factory = _context.FactoryTable.Where(m => m.factoryName == facID);
+            if (factory.Count() > 0 && mcID != null)
             {
-                await Groups.AddToGroupAsync(Context.ConnectionId, facName);
+                await Groups.AddToGroupAsync(Context.ConnectionId, facID);
                 var currentUser = new UserList
                 {
                     id = Context.ConnectionId,
                     email = emailAddress,
-                    factoryName = facName,
-                    machineName = mcName,
+                    factoryID = facID,
+                    machineID = mcID,
                     role = roleType
                 };
-                if(mcName != "Viewer")
+                if(mcID != "Viewer")
                 {
                     await Clients.Client(Context.ConnectionId).SendAsync("ServerRequestRealTime", true, 60);
-                    await Clients.Group(facName).SendAsync("ReceiveUserOnline", mcName);
+                    await Clients.Group(facID).SendAsync("ReceiveUserOnline", mcID);
                 }
                 else
                 {
-                    await Clients.Group(facName).SendAsync("ReceiveUserOnline", emailAddress);
+                    await Clients.Group(facID).SendAsync("ReceiveUserOnline", emailAddress);
                 }
 
                 
@@ -92,28 +93,28 @@ namespace AutomateBussiness.Hubs
         {
 
             var claims = Context.User.Claims;
-            var facName = claims.Where(c => c.Type == "FactoryName")
+            var facID = claims.Where(c => c.Type == "FactoryID")
                    .Select(c => c.Value).SingleOrDefault();
-            var mcName = claims.Where(c => c.Type == "MachineName")
+            var mcID = claims.Where(c => c.Type == "MachineID")
                    .Select(c => c.Value).SingleOrDefault();
             var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
                   .Select(c => c.Value).SingleOrDefault();
 
-            var factory = _context.FactoryTable.Where(m => m.factoryName == facName);
+            var factory = _context.FactoryTable.Where(m => m.factoryName == facID);
 
-            if (factory.Count() > 0 && mcName != null)
+            if (factory.Count() > 0 && mcID != null)
             {
-                if (mcName != "Viewer")
+                if (mcID != "Viewer")
                 {
-                    await Clients.Group(facName).SendAsync("ReceiveStatusData", -2, mcName);
-                    await Clients.Group(facName).SendAsync("ReceiveUserOffline", mcName);
+                    await Clients.Group(facID).SendAsync("ReceiveStatusData", -2, mcID);
+                    await Clients.Group(facID).SendAsync("ReceiveUserOffline", mcID);
                 }
                 else
                 {
-                     await Clients.Group(facName).SendAsync("ReceiveUserOffline", emailAddress);
+                     await Clients.Group(facID).SendAsync("ReceiveUserOffline", emailAddress);
                 }
                
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, facName);
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, facID);
                 var indexUser = listUserID.FindIndex(x => x.id == Context.ConnectionId);
                 listUserID.RemoveAt(indexUser);
             }
@@ -125,9 +126,9 @@ namespace AutomateBussiness.Hubs
         public async Task SendMessage(string user, string message)
         {
             var claims = Context.User.Claims;
-            var groupName = claims.Where(c => c.Type == "FactoryName")
+            var facID= claims.Where(c => c.Type == "FactoryID")
                    .Select(c => c.Value).SingleOrDefault();
-            if(groupName != null)
+            if(facID != null)
             {
                 var movie = await _context.Movie
                     .FirstOrDefaultAsync(m => m.Id == System.Convert.ToInt32(user));
@@ -136,8 +137,8 @@ namespace AutomateBussiness.Hubs
                 {
                     string json = JsonConvert.SerializeObject(movie);
                     //await Clients.All.SendAsync("ReceiveData", movie.Price, json);
-                    await Clients.Group(groupName).SendAsync("ReceiveData", movie.Price.ToString(), json);
-                    await Clients.Group(groupName).SendAsync("ReceiveMessage", decimal.ToDouble(movie.Price), json);
+                    await Clients.Group(facID).SendAsync("ReceiveData", movie.Price.ToString(), json);
+                    await Clients.Group(facID).SendAsync("ReceiveMessage", decimal.ToDouble(movie.Price), json);
                 }
             }
             
@@ -168,39 +169,182 @@ namespace AutomateBussiness.Hubs
         {
             var machineData = JsonConvert.DeserializeObject<MachineData>(data);
             var claims = Context.User.Claims;
-            var facName = claims.Where(c => c.Type == "FactoryName")
+            var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
-            var mcName = claims.Where(c => c.Type == "MachineName")
+            var mcID = claims.Where(c => c.Type == "MachineID")
                    .Select(c => c.Value).SingleOrDefault();
 
-            if (facName != null && mcName != null)
+            if (facID != null && mcID != null)
             {
-                await Clients.Group(facName).SendAsync("ReceiveRealTimeData", data);
-                if (mcName != "Viewer")
+                await Clients.Group(facID).SendAsync("ReceiveRealTimeData", data);
+                if (mcID != "Viewer")
                 {
-                    await Clients.Group(facName).SendAsync("ReceiveStatusData", machineData.machineState, mcName);
+                    await Clients.Group(facID).SendAsync("ReceiveStatusData", machineData.machineState, mcID);
                 }
                 
             }
 
         }
+        public async Task SendSearchMachine(string machinehashid,bool IsHashId)
+        {
+            var claims = Context.User.Claims;
+            var facID = claims.Where(c => c.Type == "FactoryID")
+                  .Select(c => c.Value).SingleOrDefault();
+           
+            if (facID != null)
+            {
+                if (IsHashId)
+                {
+                    var machine = await _context.MachineTable
+                        .FirstOrDefaultAsync(m => m.machineHashID == machinehashid && m.factoryID == facID);
+
+                    if (machine != null)
+                    {
+                        string json = JsonConvert.SerializeObject(machine);
+                        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveSearchMachine", json);
+                    }
+                    else
+                    {
+                        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveSearchMachine", "");
+                    }
+                }
+                else
+                {
+                    var machine = await _context.MachineTable
+                        .FirstOrDefaultAsync(m => m.name == machinehashid && m.factoryID == facID);
+
+                    if (machine != null)
+                    {
+                        string json = JsonConvert.SerializeObject(machine);
+                        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveSearchMachine", json);
+                    }
+                    else
+                    {
+                        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveSearchMachine", "");
+                    }
+                }
+                
+            }
+        }
+        public async Task SendAddRelationWithMachine(string machinehashid, bool IsHashId)
+        {
+            var claims = Context.User.Claims;
+            var facID = claims.Where(c => c.Type == "FactoryID")
+                  .Select(c => c.Value).SingleOrDefault();
+            var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
+                    .Select(c => c.Value).SingleOrDefault();
+            if (facID != null)
+            {
+                MachineViewModel machine = null;
+
+                if (IsHashId)
+                {
+                    machine = await _context.MachineTable
+                        .FirstOrDefaultAsync(m => m.machineHashID == machinehashid && m.factoryID == facID);
+                }
+                else
+                {
+                    machine = await _context.MachineTable
+                        .FirstOrDefaultAsync(m => m.name == machinehashid && m.factoryID == facID);
+                }
+
+
+                if (machine != null)
+                {
+                    var findIsHasRelation =  _context.RelationshipsTable
+                       .Where(m => m.relationType == RelationType.machines
+                       && (m.requestId == machine.machineHashID || m.responedId == machine.machineHashID));
+                       
+                    if (findIsHasRelation.Count()>0)
+                    {
+                        var findUserRelatedwithMachine = findIsHasRelation.Where(m => m.requestId == emailAddress || m.responedId == emailAddress);
+                        if (findUserRelatedwithMachine.Count() > 0)
+                        {
+                            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRelationResult", "has");
+                        }
+                        else
+                        {
+                           var newRelation = new Relationship
+                           {
+                               id = Guid.NewGuid().ToString() + Guid.NewGuid().ToString(),
+                               relationDate = DateTime.Now,
+                                requestId= emailAddress,
+                                responedId = machine.machineHashID,
+                                requestById = emailAddress,
+                                relationType =RelationType.machines,
+                                relationStatus = RelationStatus.accepted,
+                                isFavorites = true
+                           };
+                            _context.Add(newRelation);
+                           await _context.SaveChangesAsync();
+
+                           string json = JsonConvert.SerializeObject(machine);
+                           await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRelationResult", json);
+                        }
+                    }
+                    else
+                    {
+                        var newRelation = new Relationship
+                        {
+                            id = Guid.NewGuid().ToString()+ Guid.NewGuid().ToString(),
+                            relationDate = DateTime.Now,
+                            requestId = emailAddress,
+                            responedId = machine.machineHashID,
+                            requestById = emailAddress,
+                            relationType = RelationType.machines,
+                            relationStatus = RelationStatus.accepted,
+                            isFavorites = true
+                        };
+                        try
+                        {
+                            _context.Add(newRelation);
+                            await _context.SaveChangesAsync();
+                        }
+                        catch(Exception ex)
+                        {
+
+                        }
+                       
+
+                        string json = JsonConvert.SerializeObject(machine);
+                        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRelationResult", json);
+                    }
+
+                }
+                else
+                {
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRelationResult", "error");
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRelationResult", "error");
+                }
+
+            }
+        }
 
         public async Task SendGetOnlineAllUser()
         {
             var claims = Context.User.Claims;
-            var facName = claims.Where(c => c.Type == "FactoryName")
+            var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
 
-            if (facName != null)
+
+            if (facID != null)
             {
-                var indexUser = listUserID.Where(x => x.factoryName == facName);
+                var indexUser = listUserID.Where(x => x.factoryID == facID);
                 if (indexUser.Count() > 0)
                 {
                     foreach (var element in indexUser)
                     {
                         if (element.role == "Machine")
                         {
-                            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveUserOnline", element.machineName);
+                            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveUserOnline", element.machineID);
+
+                            //var machineName = await _context.MachineTable.FirstOrDefaultAsync(c => c.machineHashID == element.machineID
+                            //                        && c.factoryID == facID);
+
+                            //if (machineName != null)
+                            //{
+                                
+                            //}  
                         }
                         else
                         {
@@ -214,27 +358,27 @@ namespace AutomateBussiness.Hubs
         public async Task SendMachineError(string timeError, string errorMsg, string desc)
         {
             var claims = Context.User.Claims;
-            var facName = claims.Where(c => c.Type == "FactoryName")
+            var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
-            var mcName = claims.Where(c => c.Type == "MachineName")
+            var mcID = claims.Where(c => c.Type == "MachineID")
                    .Select(c => c.Value).SingleOrDefault();
 
-            if (facName != null && mcName != null)
+            if (facID != null && mcID != null)
             {
-                if(desc!="") await Clients.Group(facName).SendAsync("ReceiveRealTimeErrorData", timeError + " >> " + errorMsg + "(" + desc + ")", mcName);
-                else await Clients.Group(facName).SendAsync("ReceiveRealTimeErrorData", timeError + " >> " + errorMsg, mcName);
+                if(desc!="") await Clients.Group(facID).SendAsync("ReceiveRealTimeErrorData", timeError + " >> " + errorMsg + "(" + desc + ")", mcID);
+                else await Clients.Group(facID).SendAsync("ReceiveRealTimeErrorData", timeError + " >> " + errorMsg, mcID);
             }
 
         }
-        public async Task SendMessageToMachine(string msg, string time,string machineName)
+        public async Task SendMessageToMachine(string msg, string time,string machineID)
         {
             var claims = Context.User.Claims;
-            var facName = claims.Where(c => c.Type == "FactoryName")
+            var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
 
-            if (facName != null)
+            if (facID != null)
             {
-                var indexUser = listUserID.FindIndex(x => x.factoryName == facName && x.machineName == machineName && x.role == "Machine");
+                var indexUser = listUserID.FindIndex(x => x.factoryID == facID && x.machineID == machineID && x.role == "Machine");
                 if (indexUser != -1)
                 {
                     await Clients.Client(listUserID[indexUser].id).SendAsync("ReceiveMessagFromSupervisor", msg);
@@ -242,7 +386,7 @@ namespace AutomateBussiness.Hubs
                 else
                 {
                     //Save then Send to User when online
-                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessageConference", machineName, "I'm offine now !!");
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessageConference", machineID, "I'm offine now !!");
                 }
             }
 
@@ -250,17 +394,17 @@ namespace AutomateBussiness.Hubs
         public async Task SendMessageToSupervisor(string msg, string time, string supEmail)
         {
             var claims = Context.User.Claims;
-            var facName = claims.Where(c => c.Type == "FactoryName")
+            var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
-            var mcName = claims.Where(c => c.Type == "MachineName")
+            var mcID = claims.Where(c => c.Type == "MachineID")
                    .Select(c => c.Value).SingleOrDefault();
 
-            if (facName != null)
+            if (facID != null)
             {
-                var indexUser = listUserID.FindIndex(x => x.factoryName == facName && x.email == supEmail && x.role == "User");
+                var indexUser = listUserID.FindIndex(x => x.factoryID == facID && x.email == supEmail && x.role == "User");
                 if (indexUser != -1)
                 {
-                    await Clients.Client(listUserID[indexUser].id).SendAsync("ReceiveMessageConference", mcName, msg);
+                    await Clients.Client(listUserID[indexUser].id).SendAsync("ReceiveMessageConference", mcID, msg);
                 }
                 else
                 {
@@ -270,21 +414,21 @@ namespace AutomateBussiness.Hubs
             }
 
         }
-        public async Task TrigerRealTimeMachine(string machineName, string factoryName, bool action,int everyTimes=60)
+        public async Task TrigerRealTimeMachine(string machineID, string factoryID, bool action,int everyTimes=60)
         {
 
-            var indexUser = listUserID.FindIndex(x => x.factoryName == factoryName && x.machineName == machineName);
+            var indexUser = listUserID.FindIndex(x => x.factoryID == factoryID && x.machineID == machineID);
             if (indexUser != -1)
             {
                 await Clients.Client(listUserID[indexUser].id).SendAsync("ServerRequestRealTime", action, everyTimes);
                 
-                if(!action) await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2, machineName);
-                else await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -1, machineName);
+                if(!action) await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2, machineID);
+                else await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -1, machineID);
 
             }
             else
             {
-                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2, machineName);
+                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2, machineID);
             }
         }
 
