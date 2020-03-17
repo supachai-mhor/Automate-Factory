@@ -126,7 +126,7 @@ function OnReceiveRelationResult(result) {
     }
     else {
         var myMachine = JSON.parse(result);
-        if (myMachine != undefined) {
+        if (myMachine != null) {
             // search result
             var getDIV_AddMachineContact = document.getElementById("contactListIdMachine");
             const liData = document.createElement('li');

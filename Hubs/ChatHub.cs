@@ -314,7 +314,6 @@ namespace AutomateBussiness.Hubs
                 else
                 {
                     await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRelationResult", "error");
-                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRelationResult", "error");
                 }
 
             }
@@ -354,7 +353,30 @@ namespace AutomateBussiness.Hubs
                 }
             }
         }
+        public async Task SendGetMachineContactsList()
+        {
+            var claims = Context.User.Claims;
+            var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
+                   .Select(c => c.Value).SingleOrDefault();
 
+            // find chat Relationships
+            IEnumerable<Relationship> _relationships = _context.RelationshipsTable.Where(r => r.requestId == emailAddress || r.responedId == emailAddress);
+
+            //get all my machines
+            var genreMachineId = from r in _relationships
+                                 where r.relationType == RelationType.machines
+                                 select r.responedId;
+
+            // find all my contacts machines
+            IEnumerable<MachineViewModel> _machines = null;
+            if (genreMachineId.Count() > 0)
+            {
+                _machines = _context.MachineTable.Where(g => genreMachineId.Contains(g.machineHashID)).ToList();
+            }
+            string json = JsonConvert.SerializeObject(_machines);
+            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveAddMachineToContactsList", json);
+
+        }
         public async Task SendMachineError(string timeError, string errorMsg, string desc)
         {
             var claims = Context.User.Claims;

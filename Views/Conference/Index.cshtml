@@ -6,19 +6,12 @@
     //var chatWithName = "Khalid";
     //var imgProfile = "https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg";
     var totalMessage = 1900;
-
+    
 
 }
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>
 
-@*<input value="@ViewBag.token" id="tokenData" hidden />*@
-<script>
-
-
-
-
-</script>
 <script src="~/js/Conference/AddMachine.js"></script>
 <script>
 
@@ -32,8 +25,8 @@
         //    $('.action_menu').toggle();
         //});
 
-        showChatListPage();
-
+        hideChatMessagePage();
+        hideAddMachinePage();
     });
 
     var loginToken = "@ViewBag.token";
@@ -48,15 +41,39 @@
     connection.on("ReceiveUserOffline", (user) => OnReceiveUserOffline(user));
     connection.on("ReceiveSearchMachine", (machine) => OnReceiveSearchMachine(machine));
     connection.on("ReceiveRelationResult", (result) => OnReceiveRelationResult(result));
+    connection.on("ReceiveAddMachineToContactsList", (machines) => OnReceiveAddMachineToContactsList(machines));
 
     connection.start().then(function () {
 
+        getMachineContactsList();
         getOnlineAllUser();
+        
 
     }).catch(function (err) {
         return console.error(err.toString());
     });
 
+    function OnReceiveAddMachineToContactsList(machines) {
+
+    console.log(machines)
+    var myMachine = JSON.parse(machines);
+    if (myMachine != null) {
+        for (i = 0; i < myMachine.length; i++) {
+            // search result
+            var getDIV_AddMachineContact = document.getElementById("contactListIdMachine");
+            const liData = document.createElement('li');
+            liData.innerHTML = '<div class="d-flex bd-highlight">' +
+                    '<div class="img_cont"><img src="' + myMachine[i].machineImage + '" class="rounded-circle user_img"></div>' +
+                '<div class="user_info"><span>' + myMachine[i].name + '</span></div>' +
+                '</div>';
+
+            getDIV_AddMachineContact.appendChild(liData);
+            document.getElementById("SearchAddMachine").value = "";
+        }
+
+    }
+
+}
     function OnReceiveUserOnline(user) {
 
         var allMessageList = document.getElementById("contactListId");
@@ -183,23 +200,48 @@
             connection.invoke("SendGetOnlineAllUser").catch(function (err) {
                 return console.error(err.toString());
             });
-        }
-    function showMessagePage() {
-        //var divToHide = $('div#ChatListPage');
-        var divToShow = $('div#ChatMessagePage');
+    } 
+    function getMachineContactsList() {
 
-        //divToHide.hide();
+            connection.invoke("SendGetMachineContactsList").catch(function (err) {
+                return console.error(err.toString());
+            });
+        }
+    function showChatMessagePage() {
+
+        hideAddMachinePage();
+
+        var divToShow = $('div#ChatMessagePage');
         divToShow.show();
 
     }
     function showChatListPage() {
-        var divToHide = $('div#ChatMessagePage');
-        //var divToShow = $('div#ChatListPage');
 
-        //divToShow.show();
+        hideAddMachinePage();
+        hideChatMessagePage();
+
+        var divToShow = $('div#ChatListPage');
+        divToShow.show();
+
+    }
+    function showAddMachinePage() {
+
+        hideChatMessagePage();
+
+        var divToShow = $('div#AddMachinePage');
+        divToShow.show();
+
+    }
+    function hideChatMessagePage() {
+        var divToHide = $('div#ChatMessagePage');
         divToHide.hide();
         currentChatWithName = "";
     }
+    function hideAddMachinePage() {
+        var divToHide = $('div#AddMachinePage');
+        divToHide.hide();
+    }
+    
     function getEventTarget(e) {
         e = e || window.event;
         return e.target || e.srcElement;
@@ -217,8 +259,7 @@
         //}
 
         ClearMessage();
-
-        showMessagePage();
+        showChatMessagePage();
 
         var target = getEventTarget(event);
         var indexLi = target.parentElement.closest("li");
@@ -514,17 +555,6 @@
                             </div>
                         </div>
 
-                        <!--Groups-->
-                        <div class="card-header">
-                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseGroupsChats">
-                                Groups
-                            </a>
-                        </div>
-                        <div id="collapseGroupsChats" class="collapse" data-parent="#ChatsCard">
-                            <div class="card-body">
-                            </div>
-                        </div>
-
                         <!--Contacts-->
                         <div class="card-header">
                             <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseFriendsChats">
@@ -536,27 +566,40 @@
                             </div>
                         </div>
 
-                        <!--Customers-->
+                        <!--Groups-->
                         <div class="card-header">
-                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseCustomersChats">
-                                Customers
+                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseGroupsChats">
+                                Groups
                             </a>
                         </div>
-                        <div id="collapseCustomersChats" class="collapse" data-parent="#ChatsCard">
+                        <div id="collapseGroupsChats" class="collapse" data-parent="#ChatsCard">
                             <div class="card-body">
                             </div>
                         </div>
 
-                        <!--Vendors-->
-                        <div class="card-header">
-                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseVendorsChats">
-                                Vendors
-                            </a>
-                        </div>
-                        <div id="collapseVendorsChats" class="collapse" data-parent="#ChatsCard">
-                            <div class="card-body">
+
+
+                        <!--Customers-->
+                        @*<div class="card-header">
+                                <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseCustomersChats">
+                                    Customers
+                                </a>
                             </div>
-                        </div>
+                            <div id="collapseCustomersChats" class="collapse" data-parent="#ChatsCard">
+                                <div class="card-body">
+                                </div>
+                            </div>*@
+
+                        <!--Vendors-->
+                        @*<div class="card-header">
+                                <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseVendorsChats">
+                                    Vendors
+                                </a>
+                            </div>
+                            <div id="collapseVendorsChats" class="collapse" data-parent="#ChatsCard">
+                                <div class="card-body">
+                                </div>
+                            </div>*@
 
                     </div>
 
@@ -588,59 +631,63 @@
                                 </div>
                             </div>
                         </div>
-                            <!--Machine-->
-                            <div class="card-header">
-                                <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseMachinesContacts">
-                                    Machines
-                                    <span class="fas fa-plus" style="position:absolute; right:55px;" data-toggle="tooltip" data-placement="right" title="Add Machine"></span>
-                                </a>
+                        <!--Machine-->
+                        <div class="card-header">
+                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseMachinesContacts">
+                                Machines
+                                <span onclick="showAddMachinePage()" class="fas fa-plus" style="position:absolute; right:55px;" data-toggle="tooltip" data-placement="right" title="Add Machine"></span>
+                            </a>
 
-                            </div>
-                            <div id="collapseMachinesContacts" class="collapse contacts_body" data-parent="#contactsCard">
-                                <div class="card-body">
-                                    <ul class="contacts" id="contactListIdMachine" @*onclick="onclickUlContact(event)*@>
-                                        @*<li>
-                        <div class="d-flex bd-highlight">
-                            <div class="img_cont">
-                                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
-                                <span class="online_icon offline"></span>
-                            </div>
-                            <div class="user_info">
-                                <span>ME-2001-2993</span>
-                                <p>ME-2001-2993 is offline</p>
+                        </div>
+                        <div id="collapseMachinesContacts" class="collapse contacts_body" data-parent="#contactsCard">
+                            <div class="card-body">
+                                <ul class="contacts" id="contactListIdMachine" @*onclick="onclickUlContact(event)*@>
+
+                                    @*<li>
+                                            <div class="d-flex bd-highlight">
+                                                <div class="img_cont">
+                                                    <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                                                    <span class="online_icon offline"></span>
+                                                </div>
+                                                <div class="user_info">
+                                                    <span>ME-2001-2993</span>
+                                                    <p>ME-2001-2993 is offline</p>
+                                                </div>
+                                            </div>
+                                        </li>*@
+
+                                </ul>
                             </div>
                         </div>
-                    </li>*@
-                                    </ul>
-                                </div>
-                            </div>
 
-                            <!--Groups-->
-                            <div class="card-header">
-                                <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseGroupsContacts">
-                                    Groups
-                                    <span class="fas fa-users" style="position:absolute; right:50px;" data-toggle="tooltip" data-placement="right" title="Add Group"></span>
-                                </a>
+                        <!--Contacts-->
+                        <div class="card-header">
+                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseFriendsContacts">
+                                Friends
+                                <span class="fas fa-user-plus" style="position:absolute; right:50px;" data-toggle="tooltip" data-placement="right" title="Add Friend"></span>
+                            </a>
+                        </div>
+                        <div id="collapseFriendsContacts" class="collapse" data-parent="#contactsCard">
+                            <div class="card-body">
                             </div>
-                            <div id="collapseGroupsContacts" class="collapse" data-parent="#contactsCard">
-                                <div class="card-body">
-                                </div>
-                            </div>
+                        </div>
 
-                            <!--Contacts-->
-                            <div class="card-header">
-                                <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseFriendsContacts">
-                                    Friends
-                                    <span class="fas fa-user-plus" style="position:absolute; right:50px;" data-toggle="tooltip" data-placement="right" title="Add Friend"></span>
-                                </a>
+                        <!--Groups-->
+                        <div class="card-header">
+                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseGroupsContacts">
+                                Groups
+                                <span class="fas fa-users" style="position:absolute; right:50px;" data-toggle="tooltip" data-placement="right" title="Add Group"></span>
+                            </a>
+                        </div>
+                        <div id="collapseGroupsContacts" class="collapse" data-parent="#contactsCard">
+                            <div class="card-body">
                             </div>
-                            <div id="collapseFriendsContacts" class="collapse" data-parent="#contactsCard">
-                                <div class="card-body">
-                                </div>
-                            </div>
+                        </div>
 
-                            <!--Customers-->
-                            <div class="card-header">
+
+
+                        <!--Customers-->
+                        @*<div class="card-header">
                                 <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseCustomersContacts">
                                     Customers
                                     <span class="fas fa-user-plus" style="position:absolute; right:50px;" data-toggle="tooltip" data-placement="right" title="Add Customer"></span>
@@ -649,10 +696,10 @@
                             <div id="collapseCustomersContacts" class="collapse" data-parent="#contactsCard">
                                 <div class="card-body">
                                 </div>
-                            </div>
+                            </div>*@
 
-                            <!--Vendors-->
-                            <div class="card-header">
+                        <!--Vendors-->
+                        @*<div class="card-header">
                                 <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseVendorsContacts">
                                     Vendors
                                     <span class="fas fa-user-plus" style="position:absolute; right:50px;" data-toggle="tooltip" data-placement="right" title="Add Vendor"></span>
@@ -661,9 +708,9 @@
                             <div id="collapseVendorsContacts" class="collapse" data-parent="#contactsCard">
                                 <div class="card-body">
                                 </div>
-                            </div>
+                            </div>*@
 
-                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -840,7 +887,7 @@
                                      onlineChatMessageStatus
                                     <span class="online_icon" id="onlineChatMessageStatus"></span>
                                 </div>*@
-                            <div class="user_info" >
+                            <div class="user_info">
                                 <!-- nameChatWithMessage -->
                                 <span style="font-size:1.25em;">ADD MACHINE </span>
                             </div>
@@ -871,31 +918,31 @@
                         </div>
                     </div>
                     @*<div class="card-header msg_head">
-                        <div class="user_info">
-                           
-                        </div>
-                    </div>*@
+                            <div class="user_info">
 
-                        <div id="AddMachineResult" class="d-flex bd-highlight" style="padding-left: 2em;">
+                            </div>
+                        </div>*@
 
-                            @*<div class="img_cont">
-                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="img-thumbnail user_img">
-            </div>
-            <div class="user_info">
-                <span>MachineName</span>
-                <input type="button" class="btn btn-success" value="ADD" style="right:20px;position:absolute;" onclick="AddRelationWithMachine()" />
+                    <div id="AddMachineResult" class="d-flex bd-highlight" style="padding-left: 2em;">
 
-            </div>*@
-                        </div>
+                        @*<div class="img_cont">
+                                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="img-thumbnail user_img">
+                            </div>
+                            <div class="user_info">
+                                <span>MachineName</span>
+                                <input type="button" class="btn btn-success" value="ADD" style="right:20px;position:absolute;" onclick="AddRelationWithMachine()" />
 
-                        <div id="AddMachineResultDetail" style="padding-left: 1em;color:white; padding-top:2em; font-size:small;">
-
-                        </div>
+                            </div>*@
                     </div>
+
+                    <div id="AddMachineResultDetail" style="padding-left: 1em;color:white; padding-top:2em; font-size:small;">
+
+                    </div>
+                </div>
 
             </div>
         </div>
     </div>
-
+</div>
 
 

@@ -126,9 +126,12 @@ namespace AutomateBussiness.Controllers
                     //var userId = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().Id;
                     //var ident = await userManager.GetAuthenticationTokenAsync(User.Identity, "Test", "access_token");
                     var tokenString = BuildToken(model);
-                    Console.WriteLine(tokenString);
-                    await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login success on : {DateTime.Now}");
-                    return RedirectToAction("Dashboard", "home");          
+                    if (tokenString != null)
+                    {
+                        Console.WriteLine(tokenString);
+                        await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login success on : {DateTime.Now}");
+                        return RedirectToAction("Dashboard", "home");
+                    }          
                 }
                 await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login fail on : {DateTime.Now}");
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
@@ -169,45 +172,47 @@ namespace AutomateBussiness.Controllers
 
         //    return new JwtSecurityTokenHandler().WriteToken(token);
         //}
-        private void getFacID()
+  
+        private string BuildToken(LoginViewModel user)
         {
-            var facName = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().factoryID;
+            var facName = userManager.Users.Where(m => m.UserName == user.Email).First().factoryID;
             var factory = _context.FactoryTable.Where(m => m.id == facName);
             if (factory.Count() > 0)
             {
                 facID = factory.First().id;
+                var key = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(_config["Jwt:Key"]));
+                var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+                var claims = new[]
+                {
+                    new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
+                    new Claim(JwtRegisteredClaimNames.Sub,user.Email),
+                    new Claim(JwtRegisteredClaimNames.Email,user.Email),
+                    new Claim(ClaimTypes.Role,"User"),
+                    new Claim("FactoryID",facID),
+                    new Claim("MachineID","Viewer")
+
+                    //new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                    //new Claim(JwtRegisteredClaimNames.Email, user.Email)
+                    //new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
+                };
+
+                var token = new JwtSecurityToken(
+                    issuer :"https://localhost:44377/",
+                    audience : "https://localhost:44377/",
+                    claims,
+                    notBefore : DateTime.UtcNow,
+                    expires : DateTime.UtcNow.AddDays(60),
+                    signingCredentials : creds);
+
+                var encodeToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+                return encodeToken;
             }
-        }
-        private string BuildToken(LoginViewModel user)
-        {
-            getFacID();
-            var key = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(_config["Jwt:Key"]));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var claims = new[]
+            else
             {
-                new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString()),
-                new Claim(JwtRegisteredClaimNames.Sub,user.Email),
-                new Claim(JwtRegisteredClaimNames.Email,user.Email),
-                new Claim(ClaimTypes.Role,"User"),
-                new Claim("FactoryID",facID),
-                new Claim("MachineID","Viewer")
-
-                //new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                //new Claim(JwtRegisteredClaimNames.Email, user.Email)
-                //new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
-            };
-
-            var token = new JwtSecurityToken(
-                issuer :"https://localhost:44377/",
-                audience : "https://localhost:44377/",
-                claims,
-                notBefore : DateTime.UtcNow,
-                expires : DateTime.UtcNow.AddDays(60),
-                signingCredentials : creds);
-
-            var encodeToken = new JwtSecurityTokenHandler().WriteToken(token);
-
-            return encodeToken;
+                return null;
+            }
+            
                         
             //var key = new SymmetricSecurityKey(Encoding.UTF32.GetBytes(_config["Jwt:Key"]));
             //var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

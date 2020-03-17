@@ -78,7 +78,7 @@ namespace AutomateBussiness.Controllers
             OrganizationViewModel _user = _context.OrganizationTable.Where(r => r.email == user.Email).First();
 
             // find chat Relationships
-            IEnumerable<Relationship> _relationships = _context.RelationshipsTable.Where(r => r.requestId == user.Id || r.responedId == user.Id);
+            IEnumerable<Relationship> _relationships = _context.RelationshipsTable.Where(r => r.requestId == user.Email || r.responedId == user.Email);
 
             //get all my groups
             var genreGroupId = from r in _relationships where r.relationType == RelationType.groups
@@ -86,7 +86,7 @@ namespace AutomateBussiness.Controllers
 
             // find my contacts groups
             IEnumerable<ChatGroups> _chatGroups=null;
-            if (genreGroupId != null)
+            if (genreGroupId.Count() >0)
             {
                 _chatGroups = _context.ChatGroupsTable.Where(g => genreGroupId.Contains(g.groupID)).ToList();
             }
@@ -98,7 +98,7 @@ namespace AutomateBussiness.Controllers
 
             // find all my contacts machines
             IEnumerable<MachineViewModel> _machine = null;
-            if (genreMachineId != null)
+            if (genreMachineId.Count() > 0)
             {
                 _machine = _context.MachineTable.Where(g => genreMachineId.Contains(g.machineHashID)).ToList();
             }
@@ -117,7 +117,7 @@ namespace AutomateBussiness.Controllers
                 chatHistorys = _charHistory,
                 relationships = _relationships
             };
-
+            ViewBag.machines = _machine;
             return View(model);
         }
 
@@ -133,7 +133,7 @@ namespace AutomateBussiness.Controllers
                 new Claim(JwtRegisteredClaimNames.Email,user.Email),
                 new Claim(ClaimTypes.Role,"User"),
                 new Claim("FactoryID",user.factoryID),
-                new Claim("MachineName","Viewer")
+                new Claim("MachineID","Viewer")
 
                 //new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
