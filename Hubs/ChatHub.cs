@@ -41,6 +41,7 @@ namespace AutomateBussiness.Hubs
             public string email;
             public string factoryID;
             public string machineID;
+            public string machineName;
             public string role;
         }
         #region---Data Members---
@@ -56,12 +57,17 @@ namespace AutomateBussiness.Hubs
                    .Select(c => c.Value).SingleOrDefault();
             var mcID = claims.Where(c => c.Type == "MachineID")
                    .Select(c => c.Value).SingleOrDefault();
+            var mcName = claims.Where(c => c.Type == "MachineName")
+                   .Select(c => c.Value).SingleOrDefault();
             var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
                    .Select(c => c.Value).SingleOrDefault();
             var roleType= claims.Where(c => c.Type == ClaimTypes.Role)
                    .Select(c => c.Value).SingleOrDefault();
 
             var factory = _context.FactoryTable.Where(m => m.factoryName == facID);
+            var accountDetail = _context.OrganizationTable
+                    .SingleOrDefault(m => m.email == emailAddress && m.factoryID == facID);
+
             if (factory.Count() > 0 && mcID != null)
             {
                 await Groups.AddToGroupAsync(Context.ConnectionId, facID);
@@ -71,15 +77,17 @@ namespace AutomateBussiness.Hubs
                     email = emailAddress,
                     factoryID = facID,
                     machineID = mcID,
+                    machineName = mcName,
                     role = roleType
                 };
                 if(mcID != "Viewer")
                 {
                     await Clients.Client(Context.ConnectionId).SendAsync("ServerRequestRealTime", true, 60);
-                    await Clients.Group(facID).SendAsync("ReceiveUserOnline", mcID);
+                    await Clients.Group(facID).SendAsync("ReceiveUserOnline", mcName);
                 }
                 else
                 {
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveUserImage", accountDetail.photo);
                     await Clients.Group(facID).SendAsync("ReceiveUserOnline", emailAddress);
                 }
 
@@ -97,17 +105,19 @@ namespace AutomateBussiness.Hubs
                    .Select(c => c.Value).SingleOrDefault();
             var mcID = claims.Where(c => c.Type == "MachineID")
                    .Select(c => c.Value).SingleOrDefault();
+            var mcName = claims.Where(c => c.Type == "MachineName")
+                    .Select(c => c.Value).SingleOrDefault();
             var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
                   .Select(c => c.Value).SingleOrDefault();
 
             var factory = _context.FactoryTable.Where(m => m.factoryName == facID);
 
-            if (factory.Count() > 0 && mcID != null)
+            if (factory.Count() > 0 && mcName != null)
             {
-                if (mcID != "Viewer")
+                if (mcName != "Viewer")
                 {
-                    await Clients.Group(facID).SendAsync("ReceiveStatusData", -2, mcID);
-                    await Clients.Group(facID).SendAsync("ReceiveUserOffline", mcID);
+                    await Clients.Group(facID).SendAsync("ReceiveStatusData", -2, mcName);
+                    await Clients.Group(facID).SendAsync("ReceiveUserOffline", mcName);
                 }
                 else
                 {
@@ -171,15 +181,15 @@ namespace AutomateBussiness.Hubs
             var claims = Context.User.Claims;
             var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
-            var mcID = claims.Where(c => c.Type == "MachineID")
+            var mcName = claims.Where(c => c.Type == "MachineName")
                    .Select(c => c.Value).SingleOrDefault();
 
-            if (facID != null && mcID != null)
+            if (facID != null && mcName != null)
             {
                 await Clients.Group(facID).SendAsync("ReceiveRealTimeData", data);
-                if (mcID != "Viewer")
+                if (mcName != "Viewer")
                 {
-                    await Clients.Group(facID).SendAsync("ReceiveStatusData", machineData.machineState, mcID);
+                    await Clients.Group(facID).SendAsync("ReceiveStatusData", machineData.machineState, mcName);
                 }
                 
             }
@@ -318,7 +328,6 @@ namespace AutomateBussiness.Hubs
 
             }
         }
-
         public async Task SendGetOnlineAllUser()
         {
             var claims = Context.User.Claims;
@@ -335,7 +344,7 @@ namespace AutomateBussiness.Hubs
                     {
                         if (element.role == "Machine")
                         {
-                            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveUserOnline", element.machineID);
+                            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveUserOnline", element.machineName);
 
                             //var machineName = await _context.MachineTable.FirstOrDefaultAsync(c => c.machineHashID == element.machineID
                             //                        && c.factoryID == facID);
@@ -382,75 +391,140 @@ namespace AutomateBussiness.Hubs
             var claims = Context.User.Claims;
             var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
-            var mcID = claims.Where(c => c.Type == "MachineID")
+            var mcName = claims.Where(c => c.Type == "MachineName")
                    .Select(c => c.Value).SingleOrDefault();
 
-            if (facID != null && mcID != null)
+            if (facID != null && mcName != null)
             {
-                if(desc!="") await Clients.Group(facID).SendAsync("ReceiveRealTimeErrorData", timeError + " >> " + errorMsg + "(" + desc + ")", mcID);
-                else await Clients.Group(facID).SendAsync("ReceiveRealTimeErrorData", timeError + " >> " + errorMsg, mcID);
+                if(desc!="") await Clients.Group(facID).SendAsync("ReceiveRealTimeErrorData", timeError + " >> " + errorMsg + "(" + desc + ")", mcName);
+                else await Clients.Group(facID).SendAsync("ReceiveRealTimeErrorData", timeError + " >> " + errorMsg, mcName);
             }
 
         }
-        public async Task SendMessageToMachine(string msg, string time,string machineID)
+        public async Task SendMessageToMachine(string msg,string machineName)
         {
             var claims = Context.User.Claims;
             var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
+            var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
+                  .Select(c => c.Value).SingleOrDefault();
+            var machine = await _context.MachineTable
+                  .FirstOrDefaultAsync(m => m.name == machineName && m.factoryID == facID);
 
             if (facID != null)
             {
-                var indexUser = listUserID.FindIndex(x => x.factoryID == facID && x.machineID == machineID && x.role == "Machine");
+                var newChat = new ChatHistorys
+                {
+                    id = Guid.NewGuid().ToString() + Guid.NewGuid().ToString(),
+                    messageDate = DateTime.Now,
+                    senderId = emailAddress,
+                    receiverId = machine.machineHashID,
+                    message = msg,
+                    messageType = MessageType.text,
+                    senderMessageStatus = MessageStatus.read,
+                    receiverMessageStatus = MessageStatus.unread,
+                };
+
+                var indexUser = listUserID.FindIndex(x => x.factoryID == facID && x.machineName == machineName && x.role == "Machine");
+
                 if (indexUser != -1)
                 {
+                    newChat.receiverMessageStatus = MessageStatus.read;
                     await Clients.Client(listUserID[indexUser].id).SendAsync("ReceiveMessagFromSupervisor", msg);
                 }
                 else
                 {
                     //Save then Send to User when online
-                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessageConference", machineID, "I'm offine now !!");
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessageConference", machineName, "I'm offine now !!", machine.machineImage);
+                }
+
+                _context.Add(newChat);
+                await _context.SaveChangesAsync();
+            }
+
+        }
+        public async Task SendLoadMessageByMachine(string machineName)
+        {
+            var claims = Context.User.Claims;
+            var facID = claims.Where(c => c.Type == "FactoryID")
+                  .Select(c => c.Value).SingleOrDefault();
+            var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
+                  .Select(c => c.Value).SingleOrDefault();
+            var machine = await _context.MachineTable
+                  .FirstOrDefaultAsync(m => m.name == machineName && m.factoryID == facID);
+
+            if (facID != null && machine != null )
+            {
+                var chatHistory = _context.ChatHistorysTable
+                    .Where(m => (m.senderId == emailAddress && m.receiverId == machine.machineHashID) || (m.senderId == machine.machineHashID && m.receiverId == emailAddress)).OrderBy(m=> m.messageDate);
+
+                if (chatHistory.Count() > 0)
+                {
+                    //Send last chat history
+                    string json = JsonConvert.SerializeObject(chatHistory);
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveLoadMessageConference", json, emailAddress);
                 }
             }
 
         }
-        public async Task SendMessageToSupervisor(string msg, string time, string supEmail)
+        public async Task SendMessageToSupervisor(string msg, string supEmail)
         {
             var claims = Context.User.Claims;
             var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
             var mcID = claims.Where(c => c.Type == "MachineID")
-                   .Select(c => c.Value).SingleOrDefault();
+                  .Select(c => c.Value).SingleOrDefault();
+            var machine = await _context.MachineTable
+                  .FirstOrDefaultAsync(m => m.machineHashID == mcID && m.factoryID == facID);
 
             if (facID != null)
             {
+                var newChat = new ChatHistorys
+                {
+                    id = Guid.NewGuid().ToString() + Guid.NewGuid().ToString(),
+                    messageDate = DateTime.Now,
+                    senderId = mcID,
+                    receiverId = supEmail,
+                    message = msg,
+                    messageType = MessageType.text,
+                    senderMessageStatus = MessageStatus.read,
+                    receiverMessageStatus = MessageStatus.unread,
+                };
+
                 var indexUser = listUserID.FindIndex(x => x.factoryID == facID && x.email == supEmail && x.role == "User");
                 if (indexUser != -1)
                 {
-                    await Clients.Client(listUserID[indexUser].id).SendAsync("ReceiveMessageConference", mcID, msg);
+                    newChat.receiverMessageStatus = MessageStatus.read;
+                    await Clients.Client(listUserID[indexUser].id).SendAsync("ReceiveMessageConference", machine.name, msg,machine.machineImage);
                 }
                 else
                 {
                     //Save then Send to User when online
                     await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessagFromSupervisor", "I'm offline now !!");
                 }
+                _context.Add(newChat);
+                await _context.SaveChangesAsync();
             }
 
         }
-        public async Task TrigerRealTimeMachine(string machineID, string factoryID, bool action,int everyTimes=60)
+        public async Task TrigerRealTimeMachine(string machineName, bool action,int everyTimes=60)
         {
+            var claims = Context.User.Claims;
+            var facID = claims.Where(c => c.Type == "FactoryID")
+                  .Select(c => c.Value).SingleOrDefault();
 
-            var indexUser = listUserID.FindIndex(x => x.factoryID == factoryID && x.machineID == machineID);
+            var indexUser = listUserID.FindIndex(x => x.factoryID == facID && x.machineName == machineName);
             if (indexUser != -1)
             {
                 await Clients.Client(listUserID[indexUser].id).SendAsync("ServerRequestRealTime", action, everyTimes);
                 
-                if(!action) await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2, machineID);
-                else await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -1, machineID);
+                if(!action) await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2, machineName);
+                else await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -1, machineName);
 
             }
             else
             {
-                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2, machineID);
+                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveStatusData", -2, machineName);
             }
         }
 

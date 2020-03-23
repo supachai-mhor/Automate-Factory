@@ -140,14 +140,13 @@ connection.start().then(function () {
 
 document.getElementById("startRealtime").addEventListener("click", function (event) {
 	startsRealTimeFlag = true;
-    var company = document.getElementById("companyName").innerHTML.toString();
 	var machine = document.getElementById("machineName").value;
 	var selectTriggerTime = document.getElementById("SelectTiggerTimes").value;
 	dataFromClient = [];
 	//document.getElementById("JobNumber").innerHTML = '';
 	//document.getElementById("Operator").innerHTML = '';
 	//document.getElementById("Supervisor").innerHTML = '';
-	connection.invoke("TrigerRealTimeMachine", machine, company, true, parseInt(selectTriggerTime)).catch(function (err) {
+	connection.invoke("TrigerRealTimeMachine", machine, true, parseInt(selectTriggerTime)).catch(function (err) {
         return console.error(err.toString());
     });
     event.preventDefault();

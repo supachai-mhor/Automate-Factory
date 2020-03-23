@@ -1,12 +1,10 @@
-﻿@model AutomateBussiness.Models.ConferenceModels.ConferenceViewModel
+﻿@*@model AutomateBussiness.Models.ConferenceModels.ConferenceViewModel*@
 @{
     ViewData["Title"] = "Index";
     Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
 
     //var chatWithName = "Khalid";
     //var imgProfile = "https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg";
-    var totalMessage = 1900;
-    
 
 }
 
@@ -15,415 +13,665 @@
 <script src="~/js/Conference/AddMachine.js"></script>
 <script>
 
-    var currentChatWithName = "";
+var currentChatWithName = "";
 
-    document.getElementById("HeaderTopic").innerHTML = "Conference";
+document.getElementById("HeaderTopic").innerHTML = "Message";
 
-    $(document).ready(function () {
+$(document).ready(function () {
 
-        //$('#action_menu_btn').click(function () {
-        //    $('.action_menu').toggle();
-        //});
-
-        hideChatMessagePage();
-        hideAddMachinePage();
+    $('#action_menu_btn').click(function () {
+        $('.action_menu').toggle();
     });
+
+    hideChatMessagePage();
+    hideAddMachinePage();
+});
 
     var loginToken = "@ViewBag.token";
 
-    var connection = new signalR.HubConnectionBuilder()
-        .withUrl("/chatHub", { accessTokenFactory: () => loginToken })
-        .withAutomaticReconnect()
-        .build();
+var myImg = "https://ptetutorials.com/images/user-profile.png";
 
-    connection.on("ReceiveMessageConference", (user, data) => OnReceiveMessageConference(user, data));
-    connection.on("ReceiveUserOnline", (user) => OnReceiveUserOnline(user));
-    connection.on("ReceiveUserOffline", (user) => OnReceiveUserOffline(user));
-    connection.on("ReceiveSearchMachine", (machine) => OnReceiveSearchMachine(machine));
-    connection.on("ReceiveRelationResult", (result) => OnReceiveRelationResult(result));
-    connection.on("ReceiveAddMachineToContactsList", (machines) => OnReceiveAddMachineToContactsList(machines));
+var connection = new signalR.HubConnectionBuilder()
+    .withUrl("/chatHub", { accessTokenFactory: () => loginToken })
+    .withAutomaticReconnect()
+    .build();
 
-    connection.start().then(function () {
+connection.on("ReceiveUserImage", (img) => OnReceiveUserImage(img));
+connection.on("ReceiveUserOnline", (user) => OnReceiveUserOnline(user));
+connection.on("ReceiveUserOffline", (user) => OnReceiveUserOffline(user));
+connection.on("ReceiveSearchMachine", (machine) => OnReceiveSearchMachine(machine));
+connection.on("ReceiveRelationResult", (result) => OnReceiveRelationResult(result));
+connection.on("ReceiveAddMachineToContactsList", (machines) => OnReceiveAddMachineToContactsList(machines));
+connection.on("ReceiveMessageConference", (user, data, mcImg) => OnReceiveMessageConference(user, data, mcImg));
+connection.on("ReceiveLoadMessageConference", (data,email) => OnReceiveLoadMessageConference(data,email));
+
+connection.start().then(function () {
 
         getMachineContactsList();
         getOnlineAllUser();
-        
+
 
     }).catch(function (err) {
-        return console.error(err.toString());
-    });
+    return console.error(err.toString());
+});
+function OnReceiveUserImage(img) {
+    if (img != "" && img !=null) {
+        myImg = img
+    } 
+}
+function OnReceiveUserOnline(user) {
 
-    function OnReceiveAddMachineToContactsList(machines) {
+    var allMessageList = document.getElementById("contactListId");
+    const liList = allMessageList.querySelectorAll('li');
 
-    console.log(machines)
-    var myMachine = JSON.parse(machines);
-    if (myMachine != null) {
-        for (i = 0; i < myMachine.length; i++) {
+    for (var i = 0, iLen = liList.length; i < iLen; i++) {
+        var getUserInfo = liList[i].getElementsByClassName("user_info");
+        var getUserNameList = getUserInfo[0].getElementsByTagName("span");
+        var getUserName = getUserNameList[0].innerHTML;
+
+        if (user == getUserName) {
+            var getImgConstList = liList[i].getElementsByClassName("img_cont");
+            var getOnlineClass = getImgConstList[0].querySelector('span');
+            //var setOnlineText = getUserInfo[0].getElementsByTagName("p");
+            //setOnlineText[0].innerHTML = user + " is online";
+            getOnlineClass.className = "online_icon";
+
+            var getNameCurrentChat = document.getElementById("nameChatWithMessage").innerHTML;
+            if (getNameCurrentChat == 'Chat with ' + user) {
+                document.getElementById("onlineChatMessageStatus").className = "online_icon";
+            }
+        }
+    }
+
+}
+function OnReceiveUserOffline(user) {
+    var allMessageList = document.getElementById("contactListId");
+    const liList = allMessageList.querySelectorAll('li');
+
+    for (var i = 0, iLen = liList.length; i < iLen; i++) {
+        var getUserInfo = liList[i].getElementsByClassName("user_info");
+        var getUserNameList = getUserInfo[0].getElementsByTagName("span");
+        var getUserName = getUserNameList[0].innerHTML;
+
+        if (user == getUserName) {
+            var getImgConstList = liList[i].getElementsByClassName("img_cont");
+            var getOnlineClass = getImgConstList[0].querySelector('span');
+            //var setOnlineText = getUserInfo[0].getElementsByTagName("p");
+            //setOnlineText[0].innerHTML = user + " is offline";
+            getOnlineClass.className = "online_icon offline";
+
+            var getNameCurrentChat = document.getElementById("nameChatWithMessage").innerHTML;
+            if (getNameCurrentChat == 'Chat with ' + user) {
+                document.getElementById("onlineChatMessageStatus").className = "online_icon offline";
+            }
+        }
+    }
+    }
+function OnReceiveSearchMachine(machine) {
+
+    if (machine == "") {
+        // search result
+        var getDIV_AddMachineResult = document.getElementById("AddMachineResult");
+        while (getDIV_AddMachineResult.firstChild) {
+            getDIV_AddMachineResult.removeChild(getDIV_AddMachineResult.lastChild);
+        }
+        //search result detail
+        var getDIV_AddMachineResultDetail = document.getElementById("AddMachineResultDetail");
+        while (getDIV_AddMachineResultDetail.firstChild) {
+            getDIV_AddMachineResultDetail.removeChild(getDIV_AddMachineResultDetail.lastChild);
+        }
+
+        const divInfo = document.createElement('div');
+        divInfo.className = 'user_info';
+        divInfo.innerHTML = '<span>  NOT FOUND MACHINE </span>';
+        getDIV_AddMachineResult.appendChild(divInfo);
+    }
+    else {
+        var myMachine = JSON.parse(machine);
+        if (myMachine != undefined) {
+
             // search result
-            var getDIV_AddMachineContact = document.getElementById("contactListIdMachine");
+            var getDIV_AddMachineResult = document.getElementById("AddMachineResult");
+            while (getDIV_AddMachineResult.firstChild) {
+                getDIV_AddMachineResult.removeChild(getDIV_AddMachineResult.lastChild);
+            }
+            const divImage = document.createElement('div');
+            divImage.className = 'img_cont';
+            divImage.innerHTML = '<img src="' + myMachine.machineImage + '" class="img-thumbnail user_img">';
+            const divInfo = document.createElement('div');
+            divInfo.className = 'user_info';
+            divInfo.innerHTML = '<span>' + myMachine.name + '</span>' +
+                '<input type="button" class="btn btn-success" value="ADD" style="right:20px;position:absolute;" onclick="AddRelationWithMachine()" />';
+
+            getDIV_AddMachineResult.appendChild(divImage);
+            getDIV_AddMachineResult.appendChild(divInfo);
+
+            //search result detail
+            var getDIV_AddMachineResultDetail = document.getElementById("AddMachineResultDetail");
+            while (getDIV_AddMachineResultDetail.firstChild) {
+                getDIV_AddMachineResultDetail.removeChild(getDIV_AddMachineResultDetail.lastChild);
+            }
+            const divDetail = document.createElement('div');
+            divDetail.innerHTML = '<dl class="card-link row col-sm-12">' +
+
+                '<dt class="col-sm-4">Plant:</dt><dd class="col-sm-8">' + myMachine.plant + '</dd>' +
+                '<dt class="col-sm-4">Process:</dt><dd class="col-sm-8">' + myMachine.process + '</dd>' +
+                '<dt class="col-sm-4">Line:</dt><dd class="col-sm-8">' + myMachine.line + '</dd>' +
+                '<dt class="col-sm-4">Vendor:</dt><dd class="col-sm-8">' + myMachine.vendor + '</dd>' +
+                '<dt class="col-sm-4">Supervisor:</dt><dd class="col-sm-8">' + myMachine.supervisor + '</dd>' +
+                '<dt class="col-sm-4">Installed Date:</dt><dd class="col-sm-8">' + myMachine.installed_date + '</dd>' +
+                '<dt class="col-sm-4">Description:</dt><dd class="col-sm-8">' + myMachine.description + '</dd>' +
+                '</dl>';
+
+            getDIV_AddMachineResultDetail.appendChild(divDetail);
+
+        }
+    }
+   
+}
+function OnReceiveRelationResult(result) {
+
+    if (result == "error") {
+        // search result
+        var getDIV_AddMachineResult = document.getElementById("AddMachineResult");
+        while (getDIV_AddMachineResult.firstChild) {
+            getDIV_AddMachineResult.removeChild(getDIV_AddMachineResult.lastChild);
+        }
+        //search result detail
+        var getDIV_AddMachineResultDetail = document.getElementById("AddMachineResultDetail");
+        while (getDIV_AddMachineResultDetail.firstChild) {
+            getDIV_AddMachineResultDetail.removeChild(getDIV_AddMachineResultDetail.lastChild);
+        }
+
+        const divInfo = document.createElement('div');
+        divInfo.className = 'user_info';
+        divInfo.innerHTML = '<span>  Can not add this machine </span>';
+        getDIV_AddMachineResult.appendChild(divInfo);
+    }
+    else if (result == "has") {
+        
+        // search result
+        var getDIV_AddMachineResult = document.getElementById("AddMachineResult");
+        while (getDIV_AddMachineResult.firstChild) {
+            getDIV_AddMachineResult.removeChild(getDIV_AddMachineResult.lastChild);
+        }
+        //search result detail
+        var getDIV_AddMachineResultDetail = document.getElementById("AddMachineResultDetail");
+        while (getDIV_AddMachineResultDetail.firstChild) {
+            getDIV_AddMachineResultDetail.removeChild(getDIV_AddMachineResultDetail.lastChild);
+        }
+
+        const divInfo = document.createElement('div');
+        divInfo.className = 'user_info';
+        divInfo.innerHTML = '<span>  Already has in your Contacts  </span>';
+        getDIV_AddMachineResult.appendChild(divInfo);
+    }
+    else {
+        var myMachine = JSON.parse(result);
+        if (myMachine != null) {
+            // search result
+            var getDIV_AddMachineContact = document.getElementById("contactListId");
             const liData = document.createElement('li');
             liData.innerHTML = '<div class="d-flex bd-highlight">' +
-                    '<div class="img_cont"><img src="' + myMachine[i].machineImage + '" class="rounded-circle user_img"></div>' +
-                '<div class="user_info"><span>' + myMachine[i].name + '</span></div>' +
+                '<div class="img_cont"><img src="' + myMachine.machineImage + '" class="rounded-circle user_img"><span class="online_icon offline"></span></div>' +
+                '<div class="user_info"><span>' + myMachine.name + '</span></div>' +
                 '</div>';
 
             getDIV_AddMachineContact.appendChild(liData);
             document.getElementById("SearchAddMachine").value = "";
         }
-
+        
     }
+    }
+function OnReceiveAddMachineToContactsList(machines) {
 
+    var myMachine = JSON.parse(machines);
+    if (myMachine != null) {
+        for (i = 0; i < myMachine.length; i++) {
+            // search result
+            var getDIV_AddMachineContact = document.getElementById("contactListId");
+            const liData = document.createElement('li');
+            liData.innerHTML = '<div class="d-flex bd-highlight">' +
+                    '<div class="img_cont"><img src="' + myMachine[i].machineImage + '" class="rounded-circle user_img"><span class="online_icon offline"></span></div>' +
+                '<div class="user_info"><span>' + myMachine[i].name + '</span></div>' +
+                '</div>';
+
+            getDIV_AddMachineContact.appendChild(liData);
+            document.getElementById("SearchAddMachine").value = "";
+            getOnlineAllUser();
+        }
+    }
 }
-    function OnReceiveUserOnline(user) {
+function OnReceiveMessageConference(user, data,mcImg) {
+
+    //console.log(user + ":" + data);
+    //console.log(currentChatWithName);
+    if (currentChatWithName == user) {
+        ReceivedMessage(data, mcImg);
+    }
+    else {
+
+
+        AddBadgesSpan(1);
+
 
         var allMessageList = document.getElementById("contactListId");
         const liList = allMessageList.querySelectorAll('li');
 
-        for (var i = 0, iLen = liList.length; i < iLen; i++) {
+
+        for (var i = 0, iLen = 1; i < iLen; i++) {
+
             var getUserInfo = liList[i].getElementsByClassName("user_info");
             var getUserNameList = getUserInfo[0].getElementsByTagName("span");
             var getUserName = getUserNameList[0].innerHTML;
 
             if (user == getUserName) {
-                var getImgConstList = liList[i].getElementsByClassName("img_cont");
-                var getOnlineClass = getImgConstList[0].querySelector('span');
-                var setOnlineText = getUserInfo[0].getElementsByTagName("p");
-                setOnlineText[0].innerHTML = user + " is online";
-                getOnlineClass.className = "online_icon";
 
-                var getNameCurrentChat = document.getElementById("nameChatWithMessage").innerHTML;
-                if (getNameCurrentChat == 'Chat with ' + user) {
-                     document.getElementById("onlineChatMessageStatus").className = "online_icon";
+                var getCurrentSpan = getUserInfo[0].getElementsByClassName("badge");
+
+                if (getCurrentSpan.length > 0) {
+                    var countcurrent = Number(getCurrentSpan[0].innerHTML) +1 ;
+                    getCurrentSpan[0].innerHTML = countcurrent;
                 }
-            }
-		}
-
-    }
-    function AddBadgesSpan(count) {
-
-        var conferenceMenu = document.getElementById("ConferenceMenu");
-        var getCurrentSpan = conferenceMenu.getElementsByClassName("badge");
-
-        if (getCurrentSpan.length > 0) {
-            count += Number(getCurrentSpan[0].innerHTML);
-            getCurrentSpan[0].innerHTML = count;
-        }
-        else {
-
-            var newSpan = document.createElement("SPAN");
-            newSpan.className = "badge badge-danger";
-            newSpan.innerHTML = count;
-            conferenceMenu.appendChild(newSpan)
-        }
-    }
-    function OnReceiveUserOffline(user) {
-                var allMessageList = document.getElementById("contactListId");
-        const liList = allMessageList.querySelectorAll('li');
-
-        for (var i = 0, iLen = liList.length; i < iLen; i++) {
-            var getUserInfo = liList[i].getElementsByClassName("user_info");
-            var getUserNameList = getUserInfo[0].getElementsByTagName("span");
-            var getUserName = getUserNameList[0].innerHTML;
-
-            if (user == getUserName) {
-                var getImgConstList = liList[i].getElementsByClassName("img_cont");
-                var getOnlineClass = getImgConstList[0].querySelector('span');
-                var setOnlineText = getUserInfo[0].getElementsByTagName("p");
-                setOnlineText[0].innerHTML = user + " is offline";
-                getOnlineClass.className = "online_icon offline";
-
-                var getNameCurrentChat = document.getElementById("nameChatWithMessage").innerHTML;
-                if (getNameCurrentChat == 'Chat with ' + user) {
-                     document.getElementById("onlineChatMessageStatus").className = "online_icon offline";
+                else {
+                    var newSpan = document.createElement("SPAN");
+                    newSpan.className = "badge badge-danger";
+                    newSpan.style = "right:30px; position:absolute;"
+                    newSpan.innerHTML = 1;
+                    var getBefore = getUserInfo[0].getElementsByTagName("p");
+                    getUserInfo[0].insertBefore(newSpan, getBefore[0]);
                 }
             }
 		}
     }
-    function OnReceiveMessageConference(user, data) {
-        console.log(user + ":" + data);
-        if (currentChatWithName == user) {
-            ReceivedMessage(data, "");
-        }
-        else {
+    }
+function OnReceiveLoadMessageConference(data,email) {
 
+    //console.log(data);
+    var messageData = JSON.parse(data);
 
-            AddBadgesSpan(1);
+    if (messageData != null) {
 
+        var mcImg = document.getElementById("imgProfileChatMessage").getAttribute('src');
+        
 
-            var allMessageList = document.getElementById("contactListId");
-            const liList = allMessageList.querySelectorAll('li');
+        for (i = 0; i < messageData.length; i++) {
 
+            // search result
+            var options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
+            var optionsTimes = { hour: 'numeric', minute: 'numeric', hour12: true };
 
-            for (var i = 0, iLen = 1; i < iLen; i++) {
+            var getDate = new Date(messageData[i].messageDate);
+            var dataDate = getDate.toLocaleString('en-US', options);
 
-                var getUserInfo = liList[i].getElementsByClassName("user_info");
-                var getUserNameList = getUserInfo[0].getElementsByTagName("span");
-                var getUserName = getUserNameList[0].innerHTML;
+            var todayDate = new Date();
+            var nowTodayDate = todayDate.toLocaleString('en-US', options);
+            if (nowTodayDate == dataDate) {
+                dataDate = "Today";
+            }
 
-                if (user == getUserName) {
+            CheckLastTimeFotmatMessage(dataDate);
 
-                    var getCurrentSpan = getUserInfo[0].getElementsByClassName("badge");
+            var allMessageList = document.getElementById("divMessageList");
 
-                    if (getCurrentSpan.length > 0) {
-                        var countcurrent = Number(getCurrentSpan[0].innerHTML) +1 ;
-                        getCurrentSpan[0].innerHTML = countcurrent;
+            if (messageData[i].senderId == email) {
+                // send by me
+             
+                var text = messageData[i].message;
+                if (text != "") {
+
+                    text = text.replace(/\n/g, "<br>");
+                    const div = document.createElement('div');
+
+                    var nowTime = getDate.toLocaleString('en-US', optionsTimes);
+
+                    div.className = 'd-flex justify-content-end mb-4';
+
+                    if (text.length > 30) {
+                        div.innerHTML = '<div class="msg_cotainer_send" style="width: 50%;" >' + text + '<span class="msg_time_send">' + nowTime + '</span></div>' +
+                            '<div class="img_cont_msg"><img src="' + myImg + '" class="rounded-circle user_img_msg"></div>';
+
                     }
                     else {
-                        var newSpan = document.createElement("SPAN");
-                        newSpan.className = "badge badge-danger";
-                        newSpan.innerHTML = 1;
-                        var getBefore = getUserInfo[0].getElementsByTagName("p");
-                        getUserInfo[0].insertBefore(newSpan, getBefore[0]);
+                        div.innerHTML = '<div class="msg_cotainer_send" >' + text + '<span class="msg_time_send">' + nowTime + '</span></div>' +
+                            '<div class="img_cont_msg"><img src="' + myImg + '" class="rounded-circle user_img_msg"></div>';
                     }
+
+                    allMessageList.appendChild(div);
+
                 }
-		    }
+            }
+            else {
+
+                 // send by machine
+
+                var text = messageData[i].message;
+                if (text != "") {
+                    
+                    const div = document.createElement('div');
+                    var nowTime = getDate.toLocaleString('en-US', optionsTimes);
+
+                    div.className = 'd-flex justify-content-start mb-4';
+
+                    if (text.length > 30) {
+
+                        div.innerHTML = '<div class="img_cont_msg"><img src="' + mcImg + '" class="rounded-circle user_img_msg"></div>' +
+                            '<div class="msg_cotainer" style="width: 50%;">' + text + '<span class="msg_time">' + nowTime + '</span></div>';
+                    }
+                    else {
+                        div.innerHTML = '<div class="img_cont_msg"><img src="' + mcImg + '" class="rounded-circle user_img_msg"></div>' +
+                            '<div class="msg_cotainer" >' + text + '<span class="msg_time">' + nowTime + '</span></div>';
+                    }
+
+                    allMessageList.appendChild(div);
+                }
+            }
+
         }
     }
 
-    function sentMessageToHub() {
+}
+function CheckLastTimeFotmatMessage(time) {
 
-        var text = document.getElementById("SendTextArea").value;
-        if (text != "") {
+    var allMessageList = document.getElementById("divMessageList");
+    var queryCurrentDate = allMessageList.getElementsByClassName('msg_time_header');
+    if (queryCurrentDate.length > 0) {
+        if (queryCurrentDate[queryCurrentDate.length - 1].innerText != time) {
 
-            SendMessage();
+            const div = document.createElement('div');
+            div.className = 'd-flex justify-content-center';
+            div.innerHTML = '<div class="msg_time_header"><span> ' + time + ' </span></div>';
+            allMessageList.appendChild(div);
 
-            var d = new Date();
-            var nowTime = d.toLocaleString();
-
-            connection.invoke("SendMessageToMachine", text, nowTime, currentChatWithName).catch(function (err) {
-                return console.error(err.toString());
-            });
         }
+
+    } else {
+        const div = document.createElement('div');
+        div.className = 'd-flex justify-content-center';
+        div.innerHTML = '<div class="msg_time_header"><span> ' + time + ' </span></div>';
+        allMessageList.appendChild(div);
     }
-    function getOnlineAllUser() {
+}
 
-            connection.invoke("SendGetOnlineAllUser").catch(function (err) {
-                return console.error(err.toString());
-            });
-    } 
-    function getMachineContactsList() {
+function ReceivedMessage(text, img) {
 
-            connection.invoke("SendGetMachineContactsList").catch(function (err) {
-                return console.error(err.toString());
-            });
+    WriteTodayMessage();
+
+    if (text != "") {
+        var allMessageList = document.getElementById("divMessageList");
+
+        const div = document.createElement('div');
+        var d = new Date();
+        var nowTime = d.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+
+        div.className = 'd-flex justify-content-start mb-4';
+
+        if (text.length > 30) {
+
+            div.innerHTML = '<div class="img_cont_msg"><img src="' + img + '" class="rounded-circle user_img_msg"></div>' +
+                '<div class="msg_cotainer" style="width: 50%;">' + text + '<span class="msg_time">' + nowTime + '</span></div>';
         }
-    function showChatMessagePage() {
+        else {
+            div.innerHTML = '<div class="img_cont_msg"><img src="' + img + '" class="rounded-circle user_img_msg"></div>' +
+                '<div class="msg_cotainer" >' + text + '<span class="msg_time">' + nowTime + '</span></div>';
+        }
 
-        hideAddMachinePage();
-
-        var divToShow = $('div#ChatMessagePage');
-        divToShow.show();
-
+        allMessageList.appendChild(div);
     }
-    function showChatListPage() {
-
-        hideAddMachinePage();
-        hideChatMessagePage();
-
-        var divToShow = $('div#ChatListPage');
-        divToShow.show();
-
+}
+function SearchMachine() {
+    if (document.getElementById("SearchRadioAddMachineHashID").checked) {
+        connection.invoke("SendSearchMachine", document.getElementById("SearchAddMachine").value,true).catch(function (err) {
+        return console.error(err.toString());
+        });
     }
-    function showAddMachinePage() {
-
-        hideChatMessagePage();
-
-        var divToShow = $('div#AddMachinePage');
-        divToShow.show();
-
+    else {
+        connection.invoke("SendSearchMachine", document.getElementById("SearchAddMachine").value,false).catch(function (err) {
+            return console.error(err.toString());
+        });
     }
-    function hideChatMessagePage() {
-        var divToHide = $('div#ChatMessagePage');
-        divToHide.hide();
-        currentChatWithName = "";
+   
+}
+function AddRelationWithMachine() {
+    if (document.getElementById("SearchRadioAddMachineHashID").checked) {
+        connection.invoke("SendAddRelationWithMachine", document.getElementById("SearchAddMachine").value, true).catch(function (err) {
+            return console.error(err.toString());
+        });
     }
-    function hideAddMachinePage() {
-        var divToHide = $('div#AddMachinePage');
-        divToHide.hide();
+    else {
+        connection.invoke("SendAddRelationWithMachine", document.getElementById("SearchAddMachine").value, false).catch(function (err) {
+            return console.error(err.toString());
+        });
+    }
+
+}   
+function getOnlineAllUser() {
+
+        connection.invoke("SendGetOnlineAllUser").catch(function (err) {
+            return console.error(err.toString());
+        });
+}
+function getMachineContactsList() {
+
+        connection.invoke("SendGetMachineContactsList").catch(function (err) {
+            return console.error(err.toString());
+        });
+    }
+
+
+function SentMessageToHub() {
+
+    var text = document.getElementById("SendTextArea").value;
+    if (text != "") {
+
+        SendMessage();
+        var removeActiveId = document.getElementById("contactListId");
+        var queryActive = removeActiveId.getElementsByClassName('active');
+
+        connection.invoke("SendMessageToMachine", text, queryActive[0].innerText).catch(function (err) {
+            return console.error(err.toString());
+        });
+    }
+    }
+function SendMessage() {
+
+    WriteTodayMessage();
+
+    var allMessageList = document.getElementById("divMessageList");
+
+    var text = document.getElementById("SendTextArea").value;
+    if (text != "") {
+
+        text = text.replace(/\n/g, "<br>");
+        const div = document.createElement('div');
+        var d = new Date();
+        var nowTime = d.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+        div.className = 'd-flex justify-content-end mb-4';
+
+        if (text.length > 30) {
+            div.innerHTML = '<div class="msg_cotainer_send" style="width: 50%;" >' + text + '<span class="msg_time_send">' + nowTime + '</span></div>' +
+                '<div class="img_cont_msg"><img src="' + myImg + '" class="rounded-circle user_img_msg"></div>';
+
+        }
+        else {
+            div.innerHTML = '<div class="msg_cotainer_send" >' + text + '<span class="msg_time_send">' + nowTime + '</span></div>' +
+                '<div class="img_cont_msg"><img src="' + myImg + '" class="rounded-circle user_img_msg"></div>';
+        }
+
+        allMessageList.appendChild(div);
+        document.getElementById("SendTextArea").value = "";
+    }
+}
+
+function LoadMessage(machineName) {
+    connection.invoke("SendLoadMessageByMachine", machineName).catch(function (err) {
+    return console.error(err.toString());
+});
+    }
+
+function WriteTodayMessage() {
+
+    var allMessageList = document.getElementById("divMessageList");
+
+    var queryCurrentDate = allMessageList.getElementsByClassName('msg_time_header');
+    if (queryCurrentDate.length > 0) {
+        if (queryCurrentDate[queryCurrentDate.length - 1].innerText != "Today") {
+            const div = document.createElement('div');
+            div.className = 'd-flex justify-content-center';
+            div.innerHTML = '<div class="msg_time_header"><span> Today </span></div>';
+            allMessageList.appendChild(div);
+        }
+    } else {
+        const div = document.createElement('div');
+        div.className = 'd-flex justify-content-center';
+        div.innerHTML = '<div class="msg_time_header"><span> Today </span></div>';
+        allMessageList.appendChild(div);
     }
     
-    function getEventTarget(e) {
-        e = e || window.event;
-        return e.target || e.srcElement;
+}
+function ClearMessage() {
+
+    var allMessageList = document.getElementById("divMessageList");
+    var getClearDisplay = document.getElementById("clearMessageDisplay");
+    getClearDisplay.style = "display:none;";
+    //e.firstElementChild can be used.
+    var child = allMessageList.lastElementChild;
+    while (child) {
+        allMessageList.removeChild(child);
+        child = allMessageList.lastElementChild;
     }
+}
+function showChatMessagePage() {
 
-    function onclickUlContact(event) {
+    hideAddMachinePage();
 
-        //var allMessageList = document.getElementById("divMessageList");
+    var divToShow = $('div#ChatMessagePage');
+    divToShow.show();
 
-        ////e.firstElementChild can be used.
-        //var child = allMessageList.lastElementChild;
-        //while (child) {
-        //    allMessageList.removeChild(child);
-        //    child = allMessageList.lastElementChild;
-        //}
+}
+function showChatListPage() {
 
-        ClearMessage();
-        showChatMessagePage();
+    hideAddMachinePage();
+    hideChatMessagePage();
 
-        var target = getEventTarget(event);
-        var indexLi = target.parentElement.closest("li");
-        if (indexLi != null) {
+    var divToShow = $('div#ChatListPage');
+    divToShow.show();
 
-            //remove and add active list
-            var removeActiveId = document.getElementById("contactListId");
-            var queryActive = removeActiveId.getElementsByClassName('active');
-            if (queryActive.length > 0) {
-                queryActive[0].classList.remove('active');
-            }
-            indexLi.classList.add('active');
+}
+function showAddMachinePage() {
+
+    hideChatMessagePage();
+
+    var divToShow = $('div#AddMachinePage');
+    divToShow.show();
+
+}
+function hideChatMessagePage() {
+    var divToHide = $('div#ChatMessagePage');
+    divToHide.hide();
+    currentChatWithName = "";
+}
+function hideAddMachinePage() {
+    var divToHide = $('div#AddMachinePage');
+    divToHide.hide();
+}
+
+function getEventTarget(e) {
+    e = e || window.event;
+    return e.target || e.srcElement;
+}
+function onclickUlContact(event) {
+
+    ClearMessage();
+   
+    showChatMessagePage();
+
+    var target = getEventTarget(event);
+    var indexLi = target.parentElement.closest("li");
+    if (indexLi != null) {
+
+        //remove and add active list
+        var removeActiveId = document.getElementById("contactListId");
+        var queryActive = removeActiveId.getElementsByClassName('active');
+        if (queryActive.length > 0) {
+            queryActive[0].classList.remove('active');
+        }
+        indexLi.classList.add('active');
 
 
-            // remove badge
-            var getImgConstList = indexLi.getElementsByClassName("img_cont");
-            var getCurrentSpan = indexLi.getElementsByClassName("badge");
+        // remove badge
+        var getImgConstList = indexLi.getElementsByClassName("img_cont");
+        var getCurrentSpan = indexLi.getElementsByClassName("badge");
 
-            if (getCurrentSpan.length > 0) {
+        if (getCurrentSpan.length > 0) {
 
-                var deleteCountAll = Number(getCurrentSpan[0].innerHTML);
+            var deleteCountAll = Number(getCurrentSpan[0].innerHTML);
 
-                var conferenceMenu = document.getElementById("ConferenceMenu");
-                var getCurrentSpanAll = conferenceMenu.getElementsByClassName("badge");
+            var conferenceMenu = document.getElementById("ConferenceMenu");
+            var getCurrentSpanAll = conferenceMenu.getElementsByClassName("badge");
 
-                if (getCurrentSpanAll.length > 0) {
+            if (getCurrentSpanAll.length > 0) {
 
-                    var countCurrentAllBadge = Number(getCurrentSpanAll[0].innerHTML);
-                    countCurrentAllBadge -= deleteCountAll;
+                var countCurrentAllBadge = Number(getCurrentSpanAll[0].innerHTML);
+                countCurrentAllBadge -= deleteCountAll;
 
-                    if (countCurrentAllBadge == 0) {
-                         getCurrentSpanAll[0].parentElement.removeChild(getCurrentSpanAll[0]);
-                    }
-                    else {
-                        getCurrentSpanAll[0].innerHTML = countCurrentAllBadge;
-                    }
-
+                if (countCurrentAllBadge == 0) {
+                        getCurrentSpanAll[0].parentElement.removeChild(getCurrentSpanAll[0]);
                 }
-                getCurrentSpan[0].parentElement.removeChild(getCurrentSpan[0]);
+                else {
+                    getCurrentSpanAll[0].innerHTML = countCurrentAllBadge;
+                }
+
             }
-
-
-            //console.log(getImgConstList);
-
-            const img = getImgConstList[0].querySelector('img');
-            var imgpath = img.getAttribute('src');
-            //console.log(imgpath);
-
-            var getOnlineClass = getImgConstList[0].querySelector('span');
-            var classOnlineName = getOnlineClass.className ;
-            //console.log(classOnlineName);
-
-            var getUserInfo = indexLi.getElementsByClassName("user_info");
-            var getUserNameList = getUserInfo[0].getElementsByTagName("span");
-            var getUserName = getUserNameList[0].innerHTML;
-            //console.log(getUserName);
-
-            document.getElementById("nameChatWithMessage").innerHTML = 'Chat with ' + getUserName;
-            document.getElementById("imgProfileChatMessage").setAttribute('src', imgpath);
-            document.getElementById("onlineChatMessageStatus").className = classOnlineName;
-            document.getElementById("totalMessageChat").innerHTML = @totalMessage + ' Messages';
-
-            currentChatWithName = getUserName;
-
+            getCurrentSpan[0].parentElement.removeChild(getCurrentSpan[0]);
         }
 
+
+        //console.log(getImgConstList);
+
+        const img = getImgConstList[0].querySelector('img');
+        var imgpath = img.getAttribute('src');
+        //console.log(imgpath);
+
+        var getOnlineClass = getImgConstList[0].querySelector('span');
+        var classOnlineName = getOnlineClass.className ;
+        //console.log(classOnlineName);
+
+        var getUserInfo = indexLi.getElementsByClassName("user_info");
+        var getUserNameList = getUserInfo[0].getElementsByTagName("span");
+        var getUserName = getUserNameList[0].innerHTML;
+        //console.log(getUserName);
+
+        document.getElementById("nameChatWithMessage").innerHTML = 'Chat with ' + getUserName;
+        document.getElementById("imgProfileChatMessage").setAttribute('src', imgpath);
+        document.getElementById("onlineChatMessageStatus").className = classOnlineName;
+        @*document.getElementById("totalMessageChat").innerHTML = @totalMessage + ' Messages';*@
+
+        currentChatWithName = getUserName;
+        LoadMessage(getUserName);
     }
 
+}
+function AddBadgesSpan(count) {
+
+    var conferenceMenu = document.getElementById("ConferenceMenu");
+    var getCurrentSpan = conferenceMenu.getElementsByClassName("badge");
+
+    if (getCurrentSpan.length > 0) {
+        count += Number(getCurrentSpan[0].innerHTML);
+        getCurrentSpan[0].innerHTML = count;
+    }
+    else {
+
+        var newSpan = document.createElement("SPAN");
+        newSpan.className = "badge badge-danger";
+        newSpan.innerHTML = count;
+        conferenceMenu.appendChild(newSpan)
+    }
+    }
 </script>
 
 <script>
-
-    function ReceivedMessage(text, img) {
-
-        //text = "okgffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff";
-
-        img = "https://ptetutorials.com/images/user-profile.png";
-
-        if (text != "") {
-            var allMessageList = document.getElementById("divMessageList");
-
-            const div = document.createElement('div');
-            var d = new Date();
-            var nowTime = d.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-
-            div.className = 'd-flex justify-content-start mb-4';
-
-            if (text.length > 30) {
-
-                div.innerHTML = '<div class="img_cont_msg"><img src="' + img + '" class="rounded-circle user_img_msg"></div>' +
-                    '<div class="msg_cotainer" style="width: 50%;">' + text + '<span class="msg_time">' + nowTime + ' | Today</span></div>';
-            }
-            else {
-                div.innerHTML = '<div class="img_cont_msg"><img src="' + img + '" class="rounded-circle user_img_msg"></div>' +
-                    '<div class="msg_cotainer" >' + text + '<span class="msg_time">' + nowTime + ' | Today</span></div>';
-            }
-
-            allMessageList.appendChild(div);
-        }
-
-    }
-
-    function SendMessage() {
-
-
-        var img = "https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg";
-        var allMessageList = document.getElementById("divMessageList");
-
-        var text = document.getElementById("SendTextArea").value;
-        if (text != "") {
-
-            text = text.replace(/\n/g, "<br>");
-            const div = document.createElement('div');
-            var d = new Date();
-            var nowTime = d.toLocaleString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
-            div.className = 'd-flex justify-content-end mb-4';
-
-            if (text.length > 30) {
-                div.innerHTML = '<div class="msg_cotainer_send" style="width: 50%;" >' + text + '<span class="msg_time_send">' + nowTime + ' | Today</span></div>' +
-                    '<div class="img_cont_msg"><img src="' + img + '" class="rounded-circle user_img_msg"></div>';
-
-            }
-            else {
-                div.innerHTML = '<div class="msg_cotainer_send" >' + text + '<span class="msg_time_send">' + nowTime + ' | Today</span></div>' +
-                    '<div class="img_cont_msg"><img src="' + img + '" class="rounded-circle user_img_msg"></div>';
-            }
-
-            allMessageList.appendChild(div);
-            document.getElementById("SendTextArea").value = "";
-        }
-    }
-
-    function ClearMessage() {
-        var allMessageList = document.getElementById("divMessageList");
-
-        //e.firstElementChild can be used.
-        var child = allMessageList.lastElementChild;
-        while (child) {
-            allMessageList.removeChild(child);
-            child = allMessageList.lastElementChild;
-        }
-    }
-
-    // function explode(str, maxLength) {
-    //    var buff = "";
-    //    var numOfLines = Math.floor(str.length/maxLength);
-    //    for(var i = 0; i<numOfLines+1; i++) {
-    //        buff += str.substr(i*maxLength, maxLength); if(i !== numOfLines) { buff += "\n"; }
-    //    }
-    //    return buff;
-    //}
-
-
-    //    <div class="d-flex justify-content-start mb-4">
-    //    <div class="img_cont_msg">
-    //        <img src="https://ptetutorials.com/images/user-profile.png" class="rounded-circle user_img_msg">
-    //    </div>
-    //    <div class="received_msg">
-    //        <p>NG</p>
-    //        <span class="time_date"> 11:01 AM    |    Yesterday</span>
-    //    </div>
-    //</div>
-
-
 
 
 </script>
@@ -432,46 +680,12 @@
 
     <div class="row h-100">
 
-        <ul class="nav nav-tabs flex-column  nav-pills  col-md-1 ">
-            <li class="nav-item" id="ChatManuList" onclick="showChatListPage()">
-                <a class="nav-link active" data-toggle="pill" href="#TabChat">
-                    <span data-feather="shopping-cart"></span>
-                    Chat
-                </a>
-            </li>
-            <li class="nav-item" id="ChatManuProfile" onclick="showChatListPage()">
-                <a class="nav-link" data-toggle="pill" href="#TabProfile">
-                    <span data-feather="home"></span>
-                    Profile
-                </a>
-            </li>
-            <li class="nav-item" id="ChatManuContacts" onclick="showChatListPage()">
-                <a class="nav-link" data-toggle="pill" href="#TabContacts">
-                    <span data-feather="file"></span>
-                    Contacts
-                </a>
-            </li>
-            @*<li class="nav-item" id="ChatManuGroup" onclick="showChatListPage()">
-                    <a class="nav-link" data-toggle="pill" href="#TabGroups">
-                        <span data-feather="users"></span>
-                        Groups
-                    </a>
-                </li>*@
-            <li class="nav-item" id="ChatManuSetting" onclick="showChatListPage()">
-                <a class="nav-link" data-toggle="pill" href="#TabSetting">
-                    <span data-feather="users"></span>
-                    Setting
-                </a>
-            </li>
-
-        </ul>
-
         <!-- Tab panes -->
-        <div class="tab-content col-md-4" id="ChatListPage">
+        <div class="col-sm-5" id="ChatListPage">
 
             <div class="tab-pane container active" id="TabChat" style="background:none">
                 <div>
-                    <div class="card" id="ChatsCard">
+                    <div class="card chat" id="ChatsCard">
                         <!--Search-->
                         <div class="card-header">
                             <div class="input-group">
@@ -484,256 +698,28 @@
 
                         <!--Machine-->
                         <div class="card-header">
-                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseMachinesChats">
+                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseMachinesChats" aria-expanded="true">
                                 Machines
+                                <span onclick="showAddMachinePage()" class="fas fa-user-plus" style="position:absolute; right:30px;" data-toggle="tooltip" data-placement="right" title="Add Machine"></span>
                             </a>
                         </div>
-                        <div id="collapseMachinesChats" class="collapse contacts_body" data-parent="#ChatsCard">
+                        <div id="collapseMachinesChats" class="collapse show contacts_body" data-parent="#ChatsCard">
                             <div class="card-body">
                                 <ul class="contacts" id="contactListId" onclick="onclickUlContact(event)">
-                                    <li>
-                                        <div class="d-flex bd-highlight">
-                                            <div class="img_cont">
-                                                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
-                                                <span class="online_icon offline"></span>
-                                            </div>
-                                            <div class="user_info">
-                                                <span>ME-2001-2993</span>
-                                                <p>ME-2001-2993 is offline</p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="d-flex bd-highlight">
-                                            <div class="img_cont">
-                                                <img src="https://2.bp.blogspot.com/-8ytYF7cfPkQ/WkPe1-rtrcI/AAAAAAAAGqU/FGfTDVgkcIwmOTtjLka51vineFBExJuSACLcBGAs/s320/31.jpg" class="rounded-circle user_img">
-                                                <span class="online_icon offline"></span>
-                                            </div>
-                                            <div class="user_info">
-                                                <span>Taherah Big</span>
-                                                <p>Taherah left 7 mins ago</p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="d-flex bd-highlight">
-                                            <div class="img_cont">
-                                                <img src="https://i.pinimg.com/originals/ac/b9/90/acb990190ca1ddbb9b20db303375bb58.jpg" class="rounded-circle user_img">
-                                                <span class="online_icon offline"></span>
-                                            </div>
-                                            <div class="user_info">
-                                                <span>Sami Rafi</span>
-                                                <p>Sami is online</p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="d-flex bd-highlight">
-                                            <div class="img_cont">
-                                                <img src="https://2.bp.blogspot.com/-8ytYF7cfPkQ/WkPe1-rtrcI/AAAAAAAAGqU/FGfTDVgkcIwmOTtjLka51vineFBExJuSACLcBGAs/s320/31.jpg" class="rounded-circle user_img">
-                                                <span class="online_icon offline"></span>
-                                            </div>
-                                            <div class="user_info">
-                                                <span>Nargis Hawa</span>
-                                                <p>Nargis left 30 mins ago</p>
-                                            </div>
-                                        </div>
-                                    </li>
-                                    <li>
-                                        <div class="d-flex bd-highlight">
-                                            <div class="img_cont">
-                                                <img src="https://static.turbosquid.com/Preview/001214/650/2V/boy-cartoon-3D-model_D.jpg" class="rounded-circle user_img">
-                                                <span class="online_icon offline"></span>
-                                            </div>
-                                            <div class="user_info">
-                                                <span>Rashid Samim</span>
-                                                <p>Rashid left 50 mins ago</p>
-                                            </div>
-                                        </div>
-                                    </li>
+
                                 </ul>
                             </div>
                         </div>
-
-                        <!--Contacts-->
-                        <div class="card-header">
-                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseFriendsChats">
-                                Friends
-                            </a>
-                        </div>
-                        <div id="collapseFriendsChats" class="collapse" data-parent="#ChatsCard">
-                            <div class="card-body">
-                            </div>
-                        </div>
-
-                        <!--Groups-->
-                        <div class="card-header">
-                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseGroupsChats">
-                                Groups
-                            </a>
-                        </div>
-                        <div id="collapseGroupsChats" class="collapse" data-parent="#ChatsCard">
-                            <div class="card-body">
-                            </div>
-                        </div>
-
-
-
-                        <!--Customers-->
-                        @*<div class="card-header">
-                                <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseCustomersChats">
-                                    Customers
-                                </a>
-                            </div>
-                            <div id="collapseCustomersChats" class="collapse" data-parent="#ChatsCard">
-                                <div class="card-body">
-                                </div>
-                            </div>*@
-
-                        <!--Vendors-->
-                        @*<div class="card-header">
-                                <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseVendorsChats">
-                                    Vendors
-                                </a>
-                            </div>
-                            <div id="collapseVendorsChats" class="collapse" data-parent="#ChatsCard">
-                                <div class="card-body">
-                                </div>
-                            </div>*@
-
                     </div>
 
                     <div class="card-footer"></div>
                 </div>
             </div>
 
-            <div class="tab-pane container fade" id="TabProfile" style="background:none">
-                <div>
-                    <div class="card">
-                        <div class="card-footer"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="tab-pane container fade" id="TabContacts" style="background:none">
-                <div>
-                    <div class="card" id="contactsCard">
-                        <!--Search-->
-
-                        <div class="card-header msg_head">
-                            <div class="user_info">
-
-                                <div class="input-group">
-                                    <input type="text" placeholder="Search..." name="" class="form-control search">
-                                    <div class="input-group-prepend">
-                                        <span class="input-group-text search_btn"><i class="fas fa-search"></i></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!--Machine-->
-                        <div class="card-header">
-                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseMachinesContacts">
-                                Machines
-                                <span onclick="showAddMachinePage()" class="fas fa-plus" style="position:absolute; right:55px;" data-toggle="tooltip" data-placement="right" title="Add Machine"></span>
-                            </a>
-
-                        </div>
-                        <div id="collapseMachinesContacts" class="collapse contacts_body" data-parent="#contactsCard">
-                            <div class="card-body">
-                                <ul class="contacts" id="contactListIdMachine" @*onclick="onclickUlContact(event)*@>
-
-                                    @*<li>
-                                            <div class="d-flex bd-highlight">
-                                                <div class="img_cont">
-                                                    <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
-                                                    <span class="online_icon offline"></span>
-                                                </div>
-                                                <div class="user_info">
-                                                    <span>ME-2001-2993</span>
-                                                    <p>ME-2001-2993 is offline</p>
-                                                </div>
-                                            </div>
-                                        </li>*@
-
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!--Contacts-->
-                        <div class="card-header">
-                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseFriendsContacts">
-                                Friends
-                                <span class="fas fa-user-plus" style="position:absolute; right:50px;" data-toggle="tooltip" data-placement="right" title="Add Friend"></span>
-                            </a>
-                        </div>
-                        <div id="collapseFriendsContacts" class="collapse" data-parent="#contactsCard">
-                            <div class="card-body">
-                            </div>
-                        </div>
-
-                        <!--Groups-->
-                        <div class="card-header">
-                            <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseGroupsContacts">
-                                Groups
-                                <span class="fas fa-users" style="position:absolute; right:50px;" data-toggle="tooltip" data-placement="right" title="Add Group"></span>
-                            </a>
-                        </div>
-                        <div id="collapseGroupsContacts" class="collapse" data-parent="#contactsCard">
-                            <div class="card-body">
-                            </div>
-                        </div>
-
-
-
-                        <!--Customers-->
-                        @*<div class="card-header">
-                                <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseCustomersContacts">
-                                    Customers
-                                    <span class="fas fa-user-plus" style="position:absolute; right:50px;" data-toggle="tooltip" data-placement="right" title="Add Customer"></span>
-                                </a>
-                            </div>
-                            <div id="collapseCustomersContacts" class="collapse" data-parent="#contactsCard">
-                                <div class="card-body">
-                                </div>
-                            </div>*@
-
-                        <!--Vendors-->
-                        @*<div class="card-header">
-                                <a class="card-link" style="color: white;" data-toggle="collapse" href="#collapseVendorsContacts">
-                                    Vendors
-                                    <span class="fas fa-user-plus" style="position:absolute; right:50px;" data-toggle="tooltip" data-placement="right" title="Add Vendor"></span>
-                                </a>
-                            </div>
-                            <div id="collapseVendorsContacts" class="collapse" data-parent="#contactsCard">
-                                <div class="card-body">
-                                </div>
-                            </div>*@
-
-                    </div>
-                </div>
-            </div>
-
-            @*<div class="tab-pane container fade" id="TabGroups" style="background:none">
-                    <div>
-                        <div class="card contacts_card">
-                            <div class="card-footer"></div>
-                        </div>
-                    </div>
-                </div>*@
-
-            <div class="tab-pane container fade" id="TabSetting" style="background:none">
-                <div>
-                    <div class="card contacts_card">
-                        <div class="card-footer"></div>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
         <div class="col-md-7" id="ChatMessagePage">
-            <div class="card">
+            <div class="card chat">
 
                 <div class="card-header msg_head">
 
@@ -748,7 +734,7 @@
                             <!-- nameChatWithMessage -->
                             <span id="nameChatWithMessage">Chat with </span>
                             <!-- totalMessageChat -->
-                            <p id="totalMessageChat">1767 Messages</p>
+                            @*<p id="totalMessageChat">1767 Messages</p>*@
                         </div>
                         @*<div class="video_cam">
                                 <span><i class="fas fa-video"></i></span>
@@ -756,12 +742,12 @@
                             </div>*@
                     </div>
                     <span id="action_menu_btn"><i class="fas fa-ellipsis-v"></i></span>
-                    <div class="action_menu">
+                    <div id="clearMessageDisplay" class="action_menu">
                         <ul>
-                            <li><i class="fas fa-user-circle"></i> View profile</li>
-                            <li><i class="fas fa-users"></i> Add to close Contacts</li>
+                            <li onclick="ClearMessage()"><i class="fas fa-trash"></i> Clear</li>
+                            @*<li><i class="fas fa-users"></i> Add to close Contacts</li>
                             <li><i class="fas fa-plus"></i> Add to group</li>
-                            <li><i class="fas fa-ban"></i> Block</li>
+                            <li><i class="fas fa-ban"></i> Block</li>*@
                         </ul>
                     </div>
                 </div>
@@ -866,7 +852,7 @@
                             <span class="input-group-text attach_btn"><i class="fas fa-paperclip"></i></span>
                         </div>
                         <textarea id="SendTextArea" name="" class="form-control type_msg" placeholder="Type your message..." style="white-space:pre-wrap"></textarea>
-                        <div class="input-group-append" id="btnSendMessage" onclick="sentMessageToHub()">
+                        <div class="input-group-append" id="btnSendMessage" onclick="SentMessageToHub()">
                             <span class="input-group-text send_btn"><i class="fas fa-location-arrow"></i></span>
                         </div>
                     </div>
@@ -877,7 +863,7 @@
 
         <div class="col-md-5" id="AddMachinePage">
             <div>
-                <div class="card">
+                <div class="card chat">
                     <div class="card-header msg_head">
 
                         <div class="d-flex bd-highlight">
@@ -917,11 +903,7 @@
                             </div>
                         </div>
                     </div>
-                    @*<div class="card-header msg_head">
-                            <div class="user_info">
 
-                            </div>
-                        </div>*@
 
                     <div id="AddMachineResult" class="d-flex bd-highlight" style="padding-left: 2em;">
 
@@ -942,7 +924,67 @@
 
             </div>
         </div>
+
     </div>
 </div>
 
-
+@*<li>
+        <div class="d-flex bd-highlight">
+            <div class="img_cont">
+                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" class="rounded-circle user_img">
+                <span class="online_icon offline"></span>
+            </div>
+            <div class="user_info">
+                <span>ME-2001-2993</span>
+                <p>ME-2001-2993 is offline</p>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="d-flex bd-highlight">
+            <div class="img_cont">
+                <img src="https://2.bp.blogspot.com/-8ytYF7cfPkQ/WkPe1-rtrcI/AAAAAAAAGqU/FGfTDVgkcIwmOTtjLka51vineFBExJuSACLcBGAs/s320/31.jpg" class="rounded-circle user_img">
+                <span class="online_icon offline"></span>
+            </div>
+            <div class="user_info">
+                <span>Taherah Big</span>
+                <p>Taherah left 7 mins ago</p>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="d-flex bd-highlight">
+            <div class="img_cont">
+                <img src="https://i.pinimg.com/originals/ac/b9/90/acb990190ca1ddbb9b20db303375bb58.jpg" class="rounded-circle user_img">
+                <span class="online_icon offline"></span>
+            </div>
+            <div class="user_info">
+                <span>Sami Rafi</span>
+                <p>Sami is online</p>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="d-flex bd-highlight">
+            <div class="img_cont">
+                <img src="https://2.bp.blogspot.com/-8ytYF7cfPkQ/WkPe1-rtrcI/AAAAAAAAGqU/FGfTDVgkcIwmOTtjLka51vineFBExJuSACLcBGAs/s320/31.jpg" class="rounded-circle user_img">
+                <span class="online_icon offline"></span>
+            </div>
+            <div class="user_info">
+                <span>Nargis Hawa</span>
+                <p>Nargis left 30 mins ago</p>
+            </div>
+        </div>
+    </li>
+    <li>
+        <div class="d-flex bd-highlight">
+            <div class="img_cont">
+                <img src="https://static.turbosquid.com/Preview/001214/650/2V/boy-cartoon-3D-model_D.jpg" class="rounded-circle user_img">
+                <span class="online_icon offline"></span>
+            </div>
+            <div class="user_info">
+                <span>Rashid Samim</span>
+                <p>Rashid left 50 mins ago</p>
+            </div>
+        </div>
+    </li>*@

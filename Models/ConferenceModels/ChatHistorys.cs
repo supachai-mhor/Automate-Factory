@@ -18,7 +18,8 @@ namespace AutomateBussiness.Models.ConferenceModels
     public enum MessageStatus
     {
         unread,
-        read
+        read,
+        delete
     }
     public class ChatHistorys
     {
@@ -41,7 +42,9 @@ namespace AutomateBussiness.Models.ConferenceModels
         public MessageType messageType { get; set; }
 
         [Required]
-        public MessageStatus messageStatus { get; set; }
+        public MessageStatus senderMessageStatus { get; set; }
 
+        [Required]
+        public MessageStatus receiverMessageStatus { get; set; }
     }
 }

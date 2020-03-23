@@ -41,6 +41,7 @@ namespace AutomateBussiness.Controllers
         {
             var facID= userManager.Users.Where(m => m.UserName == User.Identity.Name).First().factoryID;
 
+
             var user = new AccountViewModel
             {
                 UserName = User.Identity.Name,
@@ -50,7 +51,7 @@ namespace AutomateBussiness.Controllers
 
             var tokenString =  await BuildToken(user);
             ViewBag.token = tokenString;
-
+            
             //IQueryable<string> genreQuery = from m in _context.Movie
             //                                orderby m.Genre
             //                                select m.Genre;
@@ -74,51 +75,52 @@ namespace AutomateBussiness.Controllers
             //    Movies = await movies.ToListAsync()
             //};
 
-            // find current user
-            OrganizationViewModel _user = _context.OrganizationTable.Where(r => r.email == user.Email).First();
+            //// find current user
+            //OrganizationViewModel _user = _context.OrganizationTable.Where(r => r.email == user.Email).First();
 
-            // find chat Relationships
-            IEnumerable<Relationship> _relationships = _context.RelationshipsTable.Where(r => r.requestId == user.Email || r.responedId == user.Email);
+            //// find chat Relationships
+            //IEnumerable<Relationship> _relationships = _context.RelationshipsTable.Where(r => r.requestId == user.Email || r.responedId == user.Email);
 
-            //get all my groups
-            var genreGroupId = from r in _relationships where r.relationType == RelationType.groups
-                                            select r.responedId;
+            ////get all my groups
+            //var genreGroupId = from r in _relationships where r.relationType == RelationType.groups
+            //                                select r.responedId;
 
-            // find my contacts groups
-            IEnumerable<ChatGroups> _chatGroups=null;
-            if (genreGroupId.Count() >0)
-            {
-                _chatGroups = _context.ChatGroupsTable.Where(g => genreGroupId.Contains(g.groupID)).ToList();
-            }
+            //// find my contacts groups
+            //IEnumerable<ChatGroups> _chatGroups=null;
+            //if (genreGroupId.Count() >0)
+            //{
+            //    _chatGroups = _context.ChatGroupsTable.Where(g => genreGroupId.Contains(g.groupID)).ToList();
+            //}
 
-            //get all my machines
-            var genreMachineId = from r in _relationships
-                               where r.relationType == RelationType.machines
-                               select r.responedId;
+            ////get all my machines
+            //var genreMachineId = from r in _relationships
+            //                   where r.relationType == RelationType.machines
+            //                   select r.responedId;
 
-            // find all my contacts machines
-            IEnumerable<MachineViewModel> _machine = null;
-            if (genreMachineId.Count() > 0)
-            {
-                _machine = _context.MachineTable.Where(g => genreMachineId.Contains(g.machineHashID)).ToList();
-            }
+            //// find all my contacts machines
+            //IEnumerable<MachineViewModel> _machine = null;
+            //if (genreMachineId.Count() > 0)
+            //{
+            //    _machine = _context.MachineTable.Where(g => genreMachineId.Contains(g.machineHashID)).ToList();
+            //}
 
 
-            // find chat History
-            IEnumerable<ChatHistorys> _charHistory = _context.ChatHistorysTable.Where(r => r.senderId == user.Id || r.receiverId == user.Id);
+            //// find chat History
+            //IEnumerable<ChatHistorys> _charHistory = _context.ChatHistorysTable.Where(r => r.senderId == user.Id || r.receiverId == user.Id);
 
-            _relationships = _relationships.Where(r => r.relationType != RelationType.machines && r.relationType != RelationType.groups);
+            //_relationships = _relationships.Where(r => r.relationType != RelationType.machines && r.relationType != RelationType.groups);
 
-            var model = new ConferenceViewModel
-            {
-                user = _user,
-                machines = _machine,
-                chatGroups = _chatGroups,
-                chatHistorys = _charHistory,
-                relationships = _relationships
-            };
-            ViewBag.machines = _machine;
-            return View(model);
+            //var model = new ConferenceViewModel
+            //{
+            //    user = _user,
+            //    machines = _machine,
+            //    chatGroups = _chatGroups,
+            //    chatHistorys = _charHistory,
+            //    relationships = _relationships
+            //};
+            //ViewBag.machines = _machine;
+
+            return View();
         }
 
         private async Task<string> BuildToken(AccountViewModel user)
@@ -133,7 +135,8 @@ namespace AutomateBussiness.Controllers
                 new Claim(JwtRegisteredClaimNames.Email,user.Email),
                 new Claim(ClaimTypes.Role,"User"),
                 new Claim("FactoryID",user.factoryID),
-                new Claim("MachineID","Viewer")
+                new Claim("MachineID","Viewer"),
+                new Claim("MachineName","Viewer")
 
                 //new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };

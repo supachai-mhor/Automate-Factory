@@ -3,7 +3,7 @@
 @{
 	ViewData["Title"] = "Monitoring";
 	Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
-
+	var ListMachineModel = ViewBag.ListMachineModel;
 }
 
 <script>
@@ -210,7 +210,9 @@
 <div class="row">
 	<h5 class="col-">Machine:</h5>
 
-	<input class="col-sm-2" type="text" value="ME-2001-2993" id="machineName" />
+	<select id="machineName" asp-items="ListMachineModel" class="col-sm-2"></select>
+
+	@*<input class="col-sm-2" type="text" value="Packing 01" id="machineName" />*@
 
 	<select id="SelectTiggerTimes" class="col-sm-2">
 		<option value="30" selected>every 30 sec</option>
@@ -319,9 +321,7 @@
 	</div>*@
 
 
-
-
-<div class="row">
+@*<div class="row">
 	<div class="col-6">
 		<ul id="messagesList"></ul>
 	</div>
@@ -333,7 +333,7 @@
 		<div class="col-4"><input type="text" id="userInput" /></div>
 	</div>
 </div>
-<div id="chartContainer" style="height: 370px; width: 100%;"></div>
+<div id="chartContainer" style="height: 370px; width: 100%;"></div>*@
 
 
 <script src="~/js/signalr/dist/browser/signalr.js"></script>

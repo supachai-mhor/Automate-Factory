@@ -239,7 +239,8 @@
             }
 
         .contacts .active {
-            background-color: rgba(0,0,0,0.3);
+            background-color: rgba(255,0,255,0.3);
+            border-radius: 10px;
         }
 
         .user_img {
@@ -261,8 +262,8 @@
         }
 
         .img_cont_msg {
-            height: 30px;
-            width: 30px;
+            height: 50px;
+            width: 50px;
         }
 
         .online_icon {
@@ -313,11 +314,18 @@
             margin-bottom: auto;
             margin-left: 10px;
             border-radius: 25px;
-            background-color: #82ccdd;
+            background-color: #78e08f;
             padding: 10px;
             position: relative;
         }
-
+                .msg_time {
+            position: absolute;
+            left: 0;
+            bottom: -15px;
+            color: rgba(255,255,255,0.7);
+            font-size: 10px;
+            white-space: nowrap;
+        }
         .msg_cotainer_send {
             margin-top: auto;
             margin-bottom: auto;
@@ -328,20 +336,20 @@
             position: relative;
         }
 
-        .msg_time {
-            position: absolute;
-            left: 0;
-            bottom: -15px;
-            color: rgba(255,255,255,0.5);
-            font-size: 10px;
+        .msg_time_header {
+            color: rgba(255,255,255,0.7);
+            background-color: rgba(100,100,100,0.2);
+            font-size: 12px;
+            border-radius: 20px;
             white-space: nowrap;
+            padding: 10px;
         }
 
         .msg_time_send {
             position: absolute;
             right: 0;
             bottom: -15px;
-            color: rgba(255,255,255,0.5);
+            color: rgba(255,255,255,0.7);
             font-size: 10px;
             white-space: nowrap;
         }
@@ -592,7 +600,7 @@
                         <li class="nav-item">
                             <a id="ConferenceMenu" class="nav-link" asp-controller="Conference" asp-action="Index">
                                 <span data-feather="file-text"></span>
-                                Conference
+                                Messages
                             </a>
                         </li>
                         <li class="nav-item">

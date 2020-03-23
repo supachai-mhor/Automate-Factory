@@ -15,6 +15,8 @@ using AutomateBussiness.Data;
 using Microsoft.AspNetCore.SignalR;
 using AutomateBussiness.Hubs;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace AutomateBussiness.Controllers
 {
@@ -39,33 +41,43 @@ namespace AutomateBussiness.Controllers
 
         [Authorize]
         //[Route("chat")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            Random random = new Random();
-            List<DataPoint> dataPoints1 = new List<DataPoint>();
-            List<DataPoint> dataPoints2 = new List<DataPoint>();
+            //Random random = new Random();
+            //List<DataPoint> dataPoints1 = new List<DataPoint>();
+            //List<DataPoint> dataPoints2 = new List<DataPoint>();
 
-            int updateInterval = 500;
+            //int updateInterval = 500;
 
             // initial value
-            double yValue1 = 0;
-            double yValue2 = 0;
-            double time;
+            //double yValue1 = 0;
+            //double yValue2 = 0;
+            //double time;
 
-            DateTime dateNow = DateTime.Now;
-            DateTime date = new DateTime(dateNow.Year, dateNow.Month, dateNow.Day, 9, 30, 00);
-            time = ((DateTimeOffset)date).ToUnixTimeSeconds() * 1000;
-            addData(50);
+            //DateTime dateNow = DateTime.Now;
+            //DateTime date = new DateTime(dateNow.Year, dateNow.Month, dateNow.Day, 9, 30, 00);
+            //time = ((DateTimeOffset)date).ToUnixTimeSeconds() * 1000;
+            //addData(50);
 
-            ViewBag.DataPoints1 = JsonConvert.SerializeObject(dataPoints1);
-            ViewBag.DataPoints2 = JsonConvert.SerializeObject(dataPoints2);
-            ViewBag.YValue1 = yValue1;
-            ViewBag.YValue2 = yValue2;
-            ViewBag.Time = time;
-            ViewBag.UpdateInterval = updateInterval;
+            //ViewBag.DataPoints1 = JsonConvert.SerializeObject(dataPoints1);
+            //ViewBag.DataPoints2 = JsonConvert.SerializeObject(dataPoints2);
+            //ViewBag.YValue1 = yValue1;
+            //ViewBag.YValue2 = yValue2;
+            //ViewBag.Time = time;
+            //ViewBag.UpdateInterval = updateInterval;
 
-            var facID = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().Id;
-                
+            var facID = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().factoryID;
+
+            // Use LINQ to get list of genres.
+            IQueryable<string> ListMachine = from m in _context.MachineTable
+                                           where m.factoryID == facID
+                                           orderby m.id
+                                           select m.name;
+
+            var ListMachineModel = new SelectList(await ListMachine.Distinct().ToListAsync());
+            ViewBag.ListMachineModel = ListMachineModel;
+
+
             var user = new AccountViewModel
             {
                 UserName = User.Identity.Name,
@@ -78,24 +90,24 @@ namespace AutomateBussiness.Controllers
 
             return View();
 
-            void addData(int count)
-            {
-                double deltaY1, deltaY2;
-                for (int i = 0; i < count; i++)
-                {
-                    time += updateInterval;
-                    deltaY1 = .5 + random.NextDouble() * (-.5 - .5);
-                    deltaY2 = .5 + random.NextDouble() * (-.5 - .5);
+            //void addData(int count)
+            //{
+            //    double deltaY1, deltaY2;
+            //    for (int i = 0; i < count; i++)
+            //    {
+            //        time += updateInterval;
+            //        deltaY1 = .5 + random.NextDouble() * (-.5 - .5);
+            //        deltaY2 = .5 + random.NextDouble() * (-.5 - .5);
 
-                    // adding random value and rounding it to two digits.
-                    yValue1 = Math.Round((yValue1 + deltaY1) * 100) / 100;
-                    yValue2 = Math.Round((yValue2 + deltaY2) * 100) / 100;
+            //        // adding random value and rounding it to two digits.
+            //        yValue1 = Math.Round((yValue1 + deltaY1) * 100) / 100;
+            //        yValue2 = Math.Round((yValue2 + deltaY2) * 100) / 100;
 
-                    // pushing the new values
-                    dataPoints1.Add(new DataPoint(time, yValue1));
-                    dataPoints2.Add(new DataPoint(time, yValue2));
-                }
-            }
+            //        // pushing the new values
+            //        dataPoints1.Add(new DataPoint(time, yValue1));
+            //        dataPoints2.Add(new DataPoint(time, yValue2));
+            //    }
+            //}
         }
 
         private string BuildToken(AccountViewModel user)
@@ -110,7 +122,8 @@ namespace AutomateBussiness.Controllers
                 new Claim(JwtRegisteredClaimNames.Email,user.Email),
                 new Claim(ClaimTypes.Role,"User"),
                 new Claim("FactoryID",user.factoryID),
-                new Claim("MachineID","Viewer")
+                new Claim("MachineID","Viewer"),
+                new Claim("MachineName","Viewer")
 
                 //new Claim(JwtRegisteredClaimNames.Jti,Guid.NewGuid().ToString())
             };
