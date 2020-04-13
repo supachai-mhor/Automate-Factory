@@ -132,7 +132,10 @@ namespace AutomateBussiness.Hubs
             await base.OnDisconnectedAsync(exception);
         }
 
-
+        public async Task SendRTCMessage(string message)
+        {
+            await Clients.All.SendAsync("ReceiveRTCMessage", message);
+        }
         public async Task SendMessage(string user, string message)
         {
             var claims = Context.User.Claims;
@@ -443,7 +446,42 @@ namespace AutomateBussiness.Hubs
             }
 
         }
-        public async Task SendLoadMessageByMachine(string machineName)
+        public async Task SendClearMessageByUser(string machineName)
+        {
+            var claims = Context.User.Claims;
+            var facID = claims.Where(c => c.Type == "FactoryID")
+                  .Select(c => c.Value).SingleOrDefault();
+            var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
+                  .Select(c => c.Value).SingleOrDefault();
+            var machine = await _context.MachineTable
+                  .FirstOrDefaultAsync(m => m.name == machineName && m.factoryID == facID);
+
+            if (facID != null && machine != null)
+            {
+                var chatHistory = _context.ChatHistorysTable
+                    .Where(m => (((m.senderId == emailAddress && m.receiverId == machine.machineHashID && m.senderMessageStatus != MessageStatus.delete)
+                    || (m.senderId == machine.machineHashID && m.receiverId == emailAddress && m.receiverMessageStatus != MessageStatus.delete))));
+
+                if (chatHistory.Count() > 0)
+                {
+                    foreach(ChatHistorys lsChat in chatHistory)
+                    {
+                        if(lsChat.senderId == emailAddress)
+                        {
+                            lsChat.senderMessageStatus = MessageStatus.delete;
+                        }
+                        if(lsChat.receiverId == emailAddress)
+                        {
+                            lsChat.receiverMessageStatus = MessageStatus.delete;
+                        }
+                        
+                    }
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+        }
+        public async Task SendLoadMessageByUser(string machineName)
         {
             var claims = Context.User.Claims;
             var facID = claims.Where(c => c.Type == "FactoryID")
@@ -456,13 +494,74 @@ namespace AutomateBussiness.Hubs
             if (facID != null && machine != null )
             {
                 var chatHistory = _context.ChatHistorysTable
-                    .Where(m => (m.senderId == emailAddress && m.receiverId == machine.machineHashID) || (m.senderId == machine.machineHashID && m.receiverId == emailAddress)).OrderBy(m=> m.messageDate);
+                   .Where(m => (((m.senderId == emailAddress && m.receiverId == machine.machineHashID && m.senderMessageStatus != MessageStatus.delete)
+                    || (m.senderId == machine.machineHashID && m.receiverId == emailAddress && m.receiverMessageStatus != MessageStatus.delete))))
+                   .OrderBy(m=> m.messageDate);
 
                 if (chatHistory.Count() > 0)
                 {
                     //Send last chat history
                     string json = JsonConvert.SerializeObject(chatHistory);
-                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveLoadMessageConference", json, emailAddress);
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveLoadMessageToUser", json, emailAddress);
+                }
+            }
+
+        }
+
+        // machine function
+        public async Task SendClearMessageByMachine(string supEmail)
+        {
+            var claims = Context.User.Claims;
+            var facID = claims.Where(c => c.Type == "FactoryID")
+                  .Select(c => c.Value).SingleOrDefault();
+            var mcID = claims.Where(c => c.Type == "MachineID")
+                  .Select(c => c.Value).SingleOrDefault();
+
+            if (facID != null && mcID != null)
+            {
+                var chatHistory = _context.ChatHistorysTable
+                    .Where(m => (((m.senderId == supEmail && m.receiverId == mcID && m.receiverMessageStatus != MessageStatus.delete)
+                    || (m.senderId == mcID && m.receiverId == supEmail && m.senderMessageStatus != MessageStatus.delete))));
+
+                if (chatHistory.Count() > 0)
+                {
+                    foreach (ChatHistorys lsChat in chatHistory)
+                    {
+                        if (lsChat.senderId == mcID)
+                        {
+                            lsChat.senderMessageStatus = MessageStatus.delete;
+                        }
+                        if (lsChat.receiverId == mcID)
+                        {
+                            lsChat.receiverMessageStatus = MessageStatus.delete;
+                        }
+
+                    }
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+        }
+        public async Task SendLoadMessageByMachine(string supEmail)
+        {
+            var claims = Context.User.Claims;
+            var facID = claims.Where(c => c.Type == "FactoryID")
+                  .Select(c => c.Value).SingleOrDefault();
+            var mcID = claims.Where(c => c.Type == "MachineID")
+                  .Select(c => c.Value).SingleOrDefault();
+
+            if (facID != null && mcID != null)
+            {
+                var chatHistory = _context.ChatHistorysTable
+                   .Where(m => (((m.senderId == supEmail && m.receiverId == mcID && m.receiverMessageStatus != MessageStatus.delete)
+                    || (m.senderId == mcID && m.receiverId == supEmail && m.senderMessageStatus != MessageStatus.delete))))
+                   .OrderBy(m => m.messageDate);
+
+                if (chatHistory.Count() > 0)
+                {
+                    //Send last chat history
+                    string json = JsonConvert.SerializeObject(chatHistory);
+                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveLoadMessageToMachine", json);
                 }
             }
 

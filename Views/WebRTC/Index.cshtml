@@ -1,0 +1,131 @@
+﻿@{
+    ViewData["Title"] = "Video Conference";
+    Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
+}
+<script>
+    document.getElementById("HeaderTopic").innerHTML = "Video Conference";
+</script>
+
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="WebRTC code samples">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta itemprop="description" content="Client-side WebRTC code samples">
+    <meta itemprop="image" content="../../../images/webrtc-icon-192x192.png">
+    <meta itemprop="name" content="WebRTC code samples">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <base target="_blank">
+
+    <title>Select audio and video sources</title>
+
+    <link rel="icon" sizes="192x192" href="../../../images/webrtc-icon-192x192.png">
+    <link href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">
+    @*<link rel="stylesheet" href="../../../css/main.css">*@
+
+    <style>
+        button {
+          margin: 0 20px 0 0;
+          width: 83px;
+        }
+
+        button#hangupButton {
+            margin: 0;
+        }
+
+        video {
+          --width: 45%;
+          width: var(--width);
+          height: calc(var(--width) * 0.75);
+          margin: 0 0 20px 0;
+          vertical-align: top;
+        }
+
+        video#localVideo {
+          margin: 0 20px 20px 0;
+        }
+
+        div.box {
+          margin: 1em;
+        }
+
+        @@media screen and (max-width: 400px) {
+          button {
+            width: 83px;
+            margin: 0 11px 10px 0;
+          }
+
+          video {
+            height: 90px;
+            margin: 0 0 10px 0;
+            width: calc(50% - 7px);
+          }
+          video#localVideo {
+            margin: 0 10px 20px 0;
+          }
+
+        }
+
+    </style>
+
+</head>
+
+<input type="hidden" value="@ViewBag.token" id="tokenData" />
+
+@*<input class="btn-primary col-sm-2" type="button" id="startRealtime" value="Start" />
+<input class="btn-primary col-sm-2" type="button" id="stopRealtime" value="Stop" />*@
+
+<script src="~/js/signalr/dist/browser/signalr.js"></script>
+<script src="~/js/WebRTC/webRTC.js" async></script>
+
+<body>
+
+    <div id="container">
+
+        <div class="select">
+            <label for="audioSource">Audio input source: </label><select id="audioSource"></select>
+        </div>
+
+        <div class="select">
+            <label for="audioOutput">Audio output destination: </label><select id="audioOutput"></select>
+        </div>
+
+        <div class="select">
+            <label for="videoSource">Video source: </label><select id="videoSource"></select>
+        </div>
+
+        @*<video id="video" playsinline autoplay></video>*@
+        <div></div>
+
+        <video id="localVideo" playsinline autoplay muted></video>
+        <video id="remoteVideo" playsinline autoplay></video>
+        @*<video id="video3" playsinline autoplay></video>*@
+
+        <div class="box">
+            <button id="startButton">Start</button>
+            <button id="callButton">Call</button>
+            <button id="upgradeButton">Turn on video</button>
+            <button id="hangupButton">Hang Up</button>
+        </div>
+
+        <div class="box">
+            <span>SDP Semantics:</span>
+            <select id="sdpSemantics">
+                <option selected value="">Default</option>
+                <option value="unified-plan">Unified Plan</option>
+                <option value="plan-b">Plan B</option>
+            </select>
+        </div>
+    </div>
+
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    @*<script src="js/main.js" async></script>*@
+    
+
+    @*<script src="../../../js/lib/ga.js"></script>*@
+
+
+</body>
