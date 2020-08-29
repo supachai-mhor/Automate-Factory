@@ -21,10 +21,10 @@ namespace AutomateBussiness.Controllers
     public class MoviesController : Controller
     {
         private readonly AutomateBussinessContext _context;
-        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<AutomateHub> _hubContext;
         public object Claimtype { get; private set; }
 
-        public MoviesController(AutomateBussinessContext context, IHubContext<ChatHub> hubContext)
+        public MoviesController(AutomateBussinessContext context, IHubContext<AutomateHub> hubContext)
         {
             _context = context;
             _hubContext = hubContext;
@@ -61,7 +61,7 @@ namespace AutomateBussiness.Controllers
             return View(movieGenreVM);
         }
 
-        [Authorize]
+        //[Authorize]
         [Route("api/[controller]")]
         public ActionResult<IEnumerable<string>> Get()
         {
@@ -99,7 +99,7 @@ namespace AutomateBussiness.Controllers
         }
 
         // GET: Movies/Create
-        [Authorize]
+        //[Authorize]
         public IActionResult Create()
         {
             return View();

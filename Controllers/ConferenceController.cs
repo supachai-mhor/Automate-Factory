@@ -23,12 +23,12 @@ namespace AutomateBussiness.Controllers
     {
         private readonly UserManager<AccountViewModel> userManager;
         private readonly SignInManager<AccountViewModel> signInManager;
-        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<AutomateHub> _hubContext;
         private readonly AutomateBussinessContext _context;
         private readonly IConfiguration _config;
         public int facID = 0;
         public ConferenceController(UserManager<AccountViewModel> userManager,
-            SignInManager<AccountViewModel> signInManager, IHubContext<ChatHub> hubContext,
+            SignInManager<AccountViewModel> signInManager, IHubContext<AutomateHub> hubContext,
             AutomateBussinessContext context, IConfiguration config)
         {
             this.userManager = userManager;

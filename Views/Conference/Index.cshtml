@@ -32,7 +32,7 @@ $(document).ready(function () {
 var myImg = "https://ptetutorials.com/images/user-profile.png";
 
 var connection = new signalR.HubConnectionBuilder()
-    .withUrl("/chatHub", { accessTokenFactory: () => loginToken })
+    .withUrl("/AutomateHub", { accessTokenFactory: () => loginToken })
     .withAutomaticReconnect()
     .build();
 

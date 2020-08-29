@@ -3,7 +3,7 @@
     ViewData["Title"] = "Dashboard";
     Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
 }
-@*<script>
-    document.getElementById("companyName").innerHTML = "Oganization";
-</script>*@
+    <script>
+    document.getElementById("companyName").innerHTML = "@ViewBag.factoryName";
+    </script>
 

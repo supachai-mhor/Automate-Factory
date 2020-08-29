@@ -22,13 +22,13 @@ namespace AutomateBussiness.Hubs
 
     //[Authorize(Roles ="Machine")]
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    public class ChatHub:Hub
+    public class AutomateHub:Hub
     {
         private readonly UserManager<AccountViewModel> userManager;
         private readonly SignInManager<AccountViewModel> signInManager;
         private readonly AutomateBussinessContext _context;
 
-        public ChatHub(AutomateBussinessContext context, UserManager<AccountViewModel> userManager,
+        public AutomateHub(AutomateBussinessContext context, UserManager<AccountViewModel> userManager,
             SignInManager<AccountViewModel> signInManager)
         {
             this.userManager = userManager;

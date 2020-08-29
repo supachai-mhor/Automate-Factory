@@ -1,7 +1,11 @@
 {
   "iisSettings": {
-    "windowsAuthentication": false,
+    "windowsAuthentication": true,
     "anonymousAuthentication": true,
+    "iis": {
+      "applicationUrl": "http://localhost/AutomateBussiness",
+      "sslPort": 0
+    },
     "iisExpress": {
       "applicationUrl": "http://localhost:5632",
       "sslPort": 44377
@@ -16,7 +20,7 @@
       }
     },
     "AutomateBussiness": {
-      "commandName": "Project",
+      "commandName": "IIS",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

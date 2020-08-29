@@ -24,11 +24,11 @@ namespace AutomateBussiness.Controllers
     {
         private readonly UserManager<AccountViewModel> userManager;
         private readonly SignInManager<AccountViewModel> signInManager;
-        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<AutomateHub> _hubContext;
         private readonly AutomateBussinessContext _context;
         private readonly IConfiguration _config;
         public WebRTCController(UserManager<AccountViewModel> userManager,
-    SignInManager<AccountViewModel> signInManager, IHubContext<ChatHub> hubContext,
+    SignInManager<AccountViewModel> signInManager, IHubContext<AutomateHub> hubContext,
     AutomateBussinessContext context, IConfiguration config)
         {
             this.userManager = userManager;
@@ -41,7 +41,7 @@ namespace AutomateBussiness.Controllers
         public async Task<IActionResult> Index()
         {
 
-            var facID = userManager.Users.Where(m => m.UserName == User.Identity.Name).First().factoryID;
+            var facID =  userManager.Users.Where(m => m.UserName == User.Identity.Name).First().factoryID;
             var user = new AccountViewModel
             {
                 UserName = User.Identity.Name,
@@ -52,6 +52,11 @@ namespace AutomateBussiness.Controllers
             var tokenString = BuildToken(user);
             ViewBag.token = tokenString;
 
+            return View();
+        }
+        [Authorize]
+        public IActionResult MachineRTC()
+        {
             return View();
         }
         private string BuildToken(AccountViewModel user)

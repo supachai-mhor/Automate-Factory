@@ -64,16 +64,16 @@
 		window.onload = function () {
 
 		// initial value
-		var yValue1 = @Html.Raw(ViewBag.YValue1);
+		@*var yValue1 = @Html.Raw(ViewBag.YValue1);
 		var yValue2 = @Html.Raw(ViewBag.YValue2);
 		var time = new Date(@Html.Raw(ViewBag.Time));
 		var updateInterval = @Html.Raw(ViewBag.UpdateInterval);
 
 
 		var dataPoints1 = @Html.Raw(ViewBag.DataPoints1);
-		var dataPoints2 = @Html.Raw(ViewBag.DataPoints2);
+		var dataPoints2 = @Html.Raw(ViewBag.DataPoints2);*@
 
-		var chart = new CanvasJS.Chart("chartContainer", {
+		@*var chart = new CanvasJS.Chart("chartContainer", {
 			zoomEnabled: true,
 			title: {
 				text: "Reading From Two Sensor"
@@ -178,7 +178,7 @@
 			}
 
 			chart.render();
-            }
+            }*@
 
 
         //setInterval(function () {

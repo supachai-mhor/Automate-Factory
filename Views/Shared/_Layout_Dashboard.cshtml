@@ -506,26 +506,29 @@
 
 
     <nav class="navbar navbar-dark fixed-top bg-dark flex-md-nowrap p-0 shadow">
-        <a class="navbar-brand col-sm-4 col-md-3 mr-0 text-nowrap" href="#" id="companyName">@UserManager.FindByNameAsync(User.Identity.Name).Result.factoryID</a>
+        <a class="navbar-brand col-sm-4 col-md-3 mr-0 text-nowrap" href="#" id="companyName">@*@UserManager.FindByNameAsync(User.Identity.Name).Result.*@</a>
         <input class="form-control form-control-dark w-100" type="text" placeholder="Search" aria-label="Search">
         @if (SignInManager.IsSignedIn(User))
         {
-            <a class="nav-link bg-info text-nowrap">
+            <a class="nav-link bg-info text-nowrap" id="UserName">
                 @User.Identity.Name
-            </a>
+        </a>
         }
-        <ul class="navbar-nav px-3">
-            <li class="nav-item text-nowrap">
-                <form method="post" asp-controller="account" asp-action="logout">
-                    <button type="submit" style="width:auto"
-                            class="btn btn-link py-0 bg-warning">
-                        Logout
-                    </button>
-                </form>
-            </li>
-        </ul>
 
-    </nav>
+
+
+            <ul class="navbar-nav px-3">
+                <li class="nav-item text-nowrap">
+                    <form method="post" asp-controller="account" asp-action="logout">
+                        <button type="submit" style="width:auto"
+                                class="btn btn-link py-0 bg-warning">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+            </ul>
+
+        </nav>
 
     <div class="container-fluid">
         <div class="row">

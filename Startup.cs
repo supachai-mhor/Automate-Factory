@@ -24,7 +24,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication;
-
+using Microsoft.Azure.SignalR;
 namespace AutomateBussiness
 {
     public class Startup
@@ -95,7 +95,7 @@ namespace AutomateBussiness
                             // If the request is for our hub...
                             var path = context.HttpContext.Request.Path;
                             if (!string.IsNullOrEmpty(accessToken) &&
-                                (path.StartsWithSegments("/ChatHub")))
+                                (path.StartsWithSegments("/AutomateHub")))
                             {
                                 // Read the token out of the query string
                                 context.Token = accessToken;
@@ -139,9 +139,7 @@ namespace AutomateBussiness
                     options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                     options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
                 });
-            services.AddSignalR();
-
-
+            services.AddSignalR();//.AddAzureSignalR("Endpoint=https://automatesignalr.service.signalr.net;AccessKey=gf+uRQ4y1wlpaGqFYOBb71BjiJYP+Hu/JHBL+JociAk=;Version=1.0;");
             //.AddMessagePackProtocol(options =>
             //{
             //    options.FormatterResolvers = new List<MessagePack.IFormatterResolver>()
@@ -193,15 +191,21 @@ namespace AutomateBussiness
 
 
             app.UseAuthorization();
+            //app.UseAzureSignalR(buider =>
+            //  {
+            //      buider.MapHub<AutomateHub>("/AutomateHub");
+            //  });
+
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapHub<ChatHub>("/chatHub");
+                endpoints.MapHub<AutomateHub>("/AutomateHub");
+                //endpoints.MapAzureSignalR(this.GetType().FullName);
                 //endpoints.MapHub<StreamHub>("/streamHub");
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-
+           
         }
     }
 }

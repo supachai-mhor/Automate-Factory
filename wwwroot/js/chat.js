@@ -6,7 +6,7 @@ var dataFromClient = [];
 
 var loginToken = document.getElementById("tokenData").value;
 var connection = new signalR.HubConnectionBuilder()
-    .withUrl("/chatHub", { accessTokenFactory: () => this.loginToken })
+	.withUrl("/AutomateHub", { accessTokenFactory: () => this.loginToken })
     .withAutomaticReconnect()
     .build();
 

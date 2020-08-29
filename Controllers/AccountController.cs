@@ -22,12 +22,12 @@ namespace AutomateBussiness.Controllers
     {
         private readonly UserManager<AccountViewModel> userManager;
         private readonly SignInManager<AccountViewModel> signInManager;
-        private readonly IHubContext<ChatHub> _hubContext;
+        private readonly IHubContext<AutomateHub> _hubContext;
         private readonly AutomateBussinessContext _context;
         private readonly IConfiguration _config;
         public string facID = "";
         public AccountController(UserManager<AccountViewModel> userManager,
-            SignInManager<AccountViewModel> signInManager, IHubContext<ChatHub> hubContext, 
+            SignInManager<AccountViewModel> signInManager, IHubContext<AutomateHub> hubContext, 
             AutomateBussinessContext context, IConfiguration config)
         {
             this.userManager = userManager;
@@ -53,14 +53,13 @@ namespace AutomateBussiness.Controllers
                 {
                     var newFactory = new FactoryViewModel
                     {
-                        id= Guid.NewGuid().ToString() + Guid.NewGuid().ToString(),
+                        id = Guid.NewGuid().ToString() + Guid.NewGuid().ToString(),
                         foundDate = DateTime.Now,
                         factoryName = model.FactoryName,
-                        
+
                     };
-                    _context.Add(newFactory);
-                    await _context.SaveChangesAsync();
-                        
+
+
                     // Copy data from RegisterViewModel to IdentityUser
                     var user = new AccountViewModel
                     {
@@ -76,6 +75,9 @@ namespace AutomateBussiness.Controllers
                     // SignInManager and redirect to index action of HomeController
                     if (result.Succeeded)
                     {
+                        _context.Add(newFactory);
+                        await _context.SaveChangesAsync();
+
                         await signInManager.SignInAsync(user, isPersistent: false);
                         return RedirectToAction("index", "home");
                     }
@@ -128,12 +130,12 @@ namespace AutomateBussiness.Controllers
                     var tokenString = BuildToken(model);
                     if (tokenString != null)
                     {
-                        Console.WriteLine(tokenString);
-                        await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login success on : {DateTime.Now}");
+                        //Console.WriteLine(tokenString);
+                        //await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login success on : {DateTime.Now}");
                         return RedirectToAction("Dashboard", "home");
                     }          
                 }
-                await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login fail on : {DateTime.Now}");
+               // await _hubContext.Clients.Group("SignalR Users").SendAsync("ReceiveMessage", model.Email, $"-- Login fail on : {DateTime.Now}");
                 ModelState.AddModelError(string.Empty, "Invalid Login Attempt");
             }
 
