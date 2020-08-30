@@ -25,6 +25,10 @@ connection.on("ReceiveData", function (userMsg, msg) {
     //console.log("user: " + userMsg + " message: " + msg);
 });
 
+connection.on("ReceiveMessage", function (userMsg, msg) {
+	console.log("user: " + userMsg + " message: " + msg);
+});
+
 connection.on("ReceiveRealTimeData", data => OnReceiveRealTimeData(data));
 connection.on("ReceiveRealTimeErrorData", (data, mc) => OnReceiveRealTimeErrorData(data,mc));
 connection.on("ReceiveStatusData", (status,mc) => OnReceiveStatusData(status,mc));

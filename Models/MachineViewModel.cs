@@ -54,7 +54,7 @@ namespace AutomateBussiness.Models
         [Display(Name = "Installed Date")]
         public DateTime installed_date { get; set; }
 
-        [Required]
+        //[Required]
         [Display(Name = "FactoryID")]
         public string factoryID { get; set; }
 

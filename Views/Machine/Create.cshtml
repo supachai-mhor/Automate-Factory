@@ -1,10 +1,11 @@
-﻿@model AutomateBussiness.Models.MachineViewModel
+﻿@model MachineCreateViewModel
 @{
     ViewData["Title"] = "Machine";
     Layout = "~/Views/Shared/_Layout_Dashboard.cshtml";
     var ListPlantModel = ViewBag.ListPlantModel;
     var ListProcessModel = ViewBag.ListProcessModel;
     var ListLineModel = ViewBag.ListLineModel;
+    var factoryId = ViewBag.FactoryID;
 }
 <script>
     document.getElementById("HeaderTopic").innerHTML = "Machine";
@@ -15,7 +16,7 @@
 
 <div class="row">
     <div class="col-6">
-        <form asp-action="Create">
+        <form enctype="multipart/form-data" asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="name" class="control-label"></label>
@@ -72,9 +73,13 @@
             </div>
             <div class="form-group">
                 <label asp-for="machineImage" class="control-label"></label>
-                <input asp-for="machineImage" class="form-control" />
+                <div class="custom-file">
+                    <input asp-for="machineImage" class="form-control custom-file-input" />
+                    <label asp-for="machineImage" class="control-label custom-file-label">Select Machine Image</label>
+                </div>
                 <span asp-validation-for="machineImage" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -86,6 +91,14 @@
     <a asp-action="Index">Back</a>
 </div>
 <script>
+
+    $(document).ready(function () {
+        $('.custom-file-input').on("change", function () {
+            var fileName = $(this).val().split("\\").pop();
+            $(this).next('.custom-file-label').html(fileName);
+        });
+    });
+
 
     function addPlant() {
         var person = prompt("Please enter Plant name:", "Plant A");

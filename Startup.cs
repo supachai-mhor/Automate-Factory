@@ -191,10 +191,6 @@ namespace AutomateBussiness
 
 
             app.UseAuthorization();
-            //app.UseAzureSignalR(buider =>
-            //  {
-            //      buider.MapHub<AutomateHub>("/AutomateHub");
-            //  });
 
             app.UseEndpoints(endpoints =>
             {

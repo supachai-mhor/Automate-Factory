@@ -84,29 +84,8 @@ function OnReceiveUserOnline(user) {
     }
 
 }
-function OnReceiveUserOffline(user) {
-    var allMessageList = document.getElementById("contactListId");
-    const liList = allMessageList.querySelectorAll('li');
 
-    for (var i = 0, iLen = liList.length; i < iLen; i++) {
-        var getUserInfo = liList[i].getElementsByClassName("user_info");
-        var getUserNameList = getUserInfo[0].getElementsByTagName("span");
-        var getUserName = getUserNameList[0].innerHTML;
 
-        if (user == getUserName) {
-            var getImgConstList = liList[i].getElementsByClassName("img_cont");
-            var getOnlineClass = getImgConstList[0].querySelector('span');
-            //var setOnlineText = getUserInfo[0].getElementsByTagName("p");
-            //setOnlineText[0].innerHTML = user + " is offline";
-            getOnlineClass.className = "online_icon offline";
-
-            var getNameCurrentChat = document.getElementById("nameChatWithMessage").innerHTML;
-            if (getNameCurrentChat == 'Chat with ' + user) {
-                document.getElementById("onlineChatMessageStatus").className = "online_icon offline";
-            }
-        }
-    }
-    }
 function OnReceiveSearchMachine(machine) {
 
     if (machine == "") {
@@ -137,7 +116,7 @@ function OnReceiveSearchMachine(machine) {
             }
             const divImage = document.createElement('div');
             divImage.className = 'img_cont';
-            divImage.innerHTML = '<img src="' + myMachine.machineImage + '" class="img-thumbnail user_img">';
+            divImage.innerHTML = '<img src="Img/MC/' + myMachine.machineImage + '" class="img-thumbnail user_img">';
             const divInfo = document.createElement('div');
             divInfo.className = 'user_info';
             divInfo.innerHTML = '<span>' + myMachine.name + '</span>' +
@@ -213,7 +192,7 @@ function OnReceiveRelationResult(result) {
             var getDIV_AddMachineContact = document.getElementById("contactListId");
             const liData = document.createElement('li');
             liData.innerHTML = '<div class="d-flex bd-highlight">' +
-                '<div class="img_cont"><img src="' + myMachine.machineImage + '" class="rounded-circle user_img"><span class="online_icon offline"></span></div>' +
+                '<div class="img_cont"><img src="Img/MC/' + myMachine.machineImage + '" class="rounded-circle user_img"><span class="online_icon offline"></span></div>' +
                 '<div class="user_info"><span>' + myMachine.name + '</span></div>' +
                 '</div>';
 
@@ -232,13 +211,150 @@ function OnReceiveAddMachineToContactsList(machines) {
             var getDIV_AddMachineContact = document.getElementById("contactListId");
             const liData = document.createElement('li');
             liData.innerHTML = '<div class="d-flex bd-highlight">' +
-                    '<div class="img_cont"><img src="' + myMachine[i].machineImage + '" class="rounded-circle user_img"><span class="online_icon offline"></span></div>' +
+                    '<div class="img_cont"><img src="Img/MC/' + myMachine[i].machineImage + '" class="rounded-circle user_img"><span class="online_icon offline"></span></div>' +
                 '<div class="user_info"><span>' + myMachine[i].name + '</span></div>' +
                 '</div>';
 
             getDIV_AddMachineContact.appendChild(liData);
             document.getElementById("SearchAddMachine").value = "";
             getOnlineAllUser();
+        }
+    }
+
+    }
+function OnReceiveLoadMessageToUser(data, email) {
+
+    //console.log(data);
+    var messageData = JSON.parse(data);
+
+    if (messageData != null) {
+
+        var mcImg = document.getElementById("imgProfileChatMessage").getAttribute('src');
+
+
+        for (i = 0; i < messageData.length; i++) {
+
+            // search result
+            var options = { weekday: 'short', year: 'numeric', month: 'numeric', day: 'numeric' };
+            var optionsTimes = { hour: 'numeric', minute: 'numeric', hour12: true };
+
+            var getDate = new Date(messageData[i].messageDate);
+            var dataDate = getDate.toLocaleString('en-US', options);
+
+            var todayDate = new Date();
+            var nowTodayDate = todayDate.toLocaleString('en-US', options);
+            if (nowTodayDate == dataDate) {
+                dataDate = "Today";
+            }
+
+            CheckLastTimeFotmatMessage(dataDate);
+
+            var allMessageList = document.getElementById("divMessageList");
+
+            if (messageData[i].senderId == email) {
+                // send by me
+
+                var text = messageData[i].message;
+                if (text != "") {
+
+                    text = text.replace(/\n/g, "<br>");
+                    var splitText = text.split('<br>');
+                    if (splitText.length > 0) {
+                        for (t = 0; t < splitText.length; t++) {
+
+                            if (splitText[t].length > 30) {
+                                checkTextLength = true;
+                                break;
+                            }
+                        }
+                    }
+                    const div = document.createElement('div');
+
+                    var nowTime = getDate.toLocaleString('en-US', optionsTimes);
+
+                    div.className = 'd-flex justify-content-end mb-4';
+
+                    if (messageData[i].receiverMessageStatus == 1) {
+                        nowTime += " | Read";
+                    }
+
+                    if (text.length > 30 && checkTextLength == true) {
+                        div.innerHTML = '<div class="msg_cotainer_send" style="width: 50%;" >' + text + '<span class="msg_time_send">' + nowTime + '</span></div>' +
+                            '<div class="img_cont_msg"><img src="Img/Emp/' + myImg + '" class="rounded-circle user_img_msg"></div>';
+
+                    }
+                    else {
+                        div.innerHTML = '<div class="msg_cotainer_send" >' + text + '<span class="msg_time_send">' + nowTime + '</span></div>' +
+                            '<div class="img_cont_msg"><img src="Img/Emp/' + myImg + '" class="rounded-circle user_img_msg"></div>';
+                    }
+
+                    allMessageList.appendChild(div);
+
+                }
+            }
+            else {
+
+                // send by machine
+
+                var text = messageData[i].message;
+                var checkTextLength = false;
+                if (text != "") {
+
+                    text = text.replace(/\n/g, "<br>");
+                    var splitText = text.split('<br>');
+                    if (splitText.length > 0) {
+                        for (t = 0; t < splitText.length; t++) {
+
+                            if (splitText[t].length > 30) {
+                                checkTextLength = true;
+                                break;
+                            }
+                        }
+                    }
+                    const div = document.createElement('div');
+                    var nowTime = getDate.toLocaleString('en-US', optionsTimes);
+
+                    div.className = 'd-flex justify-content-start mb-4';
+
+                    if (text.length > 30 && checkTextLength == true) {
+
+                        div.innerHTML = '<div class="img_cont_msg"><img src="' + mcImg + '" class="rounded-circle user_img_msg"></div>' +
+                            '<div class="msg_cotainer" style="width: 50%;">' + text + '<span class="msg_time">' + nowTime + '</span></div>';
+                    }
+                    else {
+                        div.innerHTML = '<div class="img_cont_msg"><img src="' + mcImg + '" class="rounded-circle user_img_msg"></div>' +
+                            '<div class="msg_cotainer" >' + text + '<span class="msg_time">' + nowTime + '</span></div>';
+                    }
+
+                    allMessageList.appendChild(div);
+                }
+            }
+
+        }
+    }
+
+}
+
+function OnReceiveUserOffline(user) {
+    var allMessageList = document.getElementById("contactListId");
+    const liList = allMessageList.querySelectorAll('li');
+
+    for (var i = 0, iLen = liList.length; i < iLen; i++) {
+        var getUserInfo = liList[i].getElementsByClassName("user_info");
+        var getUserNameList = getUserInfo[0].getElementsByTagName("span");
+        var getUserName = getUserNameList[0].innerHTML;
+
+        if (user == getUserName) {
+            var getImgConstList = liList[i].getElementsByClassName("img_cont");
+            var getOnlineClass = getImgConstList[0].querySelector('span');
+            //var setOnlineText = getUserInfo[0].getElementsByTagName("p");
+            //setOnlineText[0].innerHTML = user + " is offline";
+            getOnlineClass.className = "online_icon offline";
+
+            var getNameCurrentChat = document.getElementById("nameChatWithMessage").innerHTML;
+            if (getNameCurrentChat == 'Chat with ' + user) {
+                document.getElementById("onlineChatMessageStatus").className = "online_icon offline";
+            }
         }
     }
 }
@@ -285,7 +401,6 @@ function OnReceiveMessageConference(user, data,mcImg) {
 		}
     }
     }
-
 function CheckLastTimeFotmatMessage(time) {
 
     var allMessageList = document.getElementById("divMessageList");
@@ -307,7 +422,6 @@ function CheckLastTimeFotmatMessage(time) {
         allMessageList.appendChild(div);
     }
 }
-
 function ReceivedMessage(text, img) {
 
     WriteTodayMessage();
@@ -334,11 +448,11 @@ function ReceivedMessage(text, img) {
 
         if (text.length > 30 && checkTextLength == true) {
 
-            div.innerHTML = '<div class="img_cont_msg"><img src="' + img + '" class="rounded-circle user_img_msg"></div>' +
+            div.innerHTML = '<div class="img_cont_msg"><img src="Img/MC/' + img + '" class="rounded-circle user_img_msg"></div>' +
                 '<div class="msg_cotainer" style="width: 50%;">' + text + '<span class="msg_time">' + nowTime + '</span></div>';
         }
         else {
-            div.innerHTML = '<div class="img_cont_msg"><img src="' + img + '" class="rounded-circle user_img_msg"></div>' +
+            div.innerHTML = '<div class="img_cont_msg"><img src="Img/MC/' + img + '" class="rounded-circle user_img_msg"></div>' +
                 '<div class="msg_cotainer" >' + text + '<span class="msg_time">' + nowTime + '</span></div>';
         }
 
@@ -416,12 +530,12 @@ function SendMessage() {
 
         if (text.length > 30) {
             div.innerHTML = '<div class="msg_cotainer_send" style="width: 50%;" >' + text + '<span class="msg_time_send">' + nowTime + '</span></div>' +
-                '<div class="img_cont_msg"><img src="' + myImg + '" class="rounded-circle user_img_msg"></div>';
+                '<div class="img_cont_msg"><img src="Img/Emp/' + myImg + '" class="rounded-circle user_img_msg"></div>';
 
         }
         else {
             div.innerHTML = '<div class="msg_cotainer_send" >' + text + '<span class="msg_time_send">' + nowTime + '</span></div>' +
-                '<div class="img_cont_msg"><img src="' + myImg + '" class="rounded-circle user_img_msg"></div>';
+                '<div class="img_cont_msg"><img src="Img/Emp/' + myImg + '" class="rounded-circle user_img_msg"></div>';
         }
 
         allMessageList.appendChild(div);

@@ -48,6 +48,7 @@ namespace AutomateBussiness.Hubs
         static List<UserList> listUserID = new List<UserList>();
         #endregion
 
+
         public override async Task OnConnectedAsync()
         {
             // var facName = userManager.Users.Where(m => m.UserName == Context.UserIdentifier).First().FactoryName;
@@ -64,9 +65,10 @@ namespace AutomateBussiness.Hubs
             var roleType= claims.Where(c => c.Type == ClaimTypes.Role)
                    .Select(c => c.Value).SingleOrDefault();
 
-            var factory = _context.FactoryTable.Where(m => m.factoryName == facID);
+            var factory = _context.FactoryTable.Where(m => m.id == facID);
             var accountDetail = _context.OrganizationTable
                     .SingleOrDefault(m => m.email == emailAddress && m.factoryID == facID);
+
 
             if (factory.Count() > 0 && mcID != null)
             {
@@ -80,18 +82,23 @@ namespace AutomateBussiness.Hubs
                     machineName = mcName,
                     role = roleType
                 };
-                if(mcID != "Viewer")
+
+                string json = JsonConvert.SerializeObject(currentUser);
+                await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", "Server", json);
+
+                if (mcID != "Viewer")
                 {
-                    await Clients.Client(Context.ConnectionId).SendAsync("ServerRequestRealTime", true, 60);
+                    await Clients.Client(Context.ConnectionId).SendAsync("ServerRequestRealTime", true, 120);
                     await Clients.Group(facID).SendAsync("ReceiveUserOnline", mcName);
                 }
                 else
                 {
-                    await Clients.Client(Context.ConnectionId).SendAsync("ReceiveUserImage", accountDetail.photo);
-                    await Clients.Group(facID).SendAsync("ReceiveUserOnline", emailAddress);
+                    if (accountDetail != null){
+                            await Clients.Client(Context.ConnectionId).SendAsync("ReceiveUserImage", accountDetail.photo);
+                            await Clients.Group(facID).SendAsync("ReceiveUserOnline", emailAddress);
+                    }
                 }
 
-                
                 listUserID.Add(currentUser);
             }
             await base.OnConnectedAsync();
@@ -103,27 +110,19 @@ namespace AutomateBussiness.Hubs
             var claims = Context.User.Claims;
             var facID = claims.Where(c => c.Type == "FactoryID")
                    .Select(c => c.Value).SingleOrDefault();
-            var mcID = claims.Where(c => c.Type == "MachineID")
-                   .Select(c => c.Value).SingleOrDefault();
             var mcName = claims.Where(c => c.Type == "MachineName")
                     .Select(c => c.Value).SingleOrDefault();
             var emailAddress = claims.Where(c => c.Type == ClaimTypes.Email)
                   .Select(c => c.Value).SingleOrDefault();
 
-            var factory = _context.FactoryTable.Where(m => m.factoryName == facID);
+            var factory = _context.FactoryTable.Where(m => m.id == facID);
 
             if (factory.Count() > 0 && mcName != null)
             {
-                if (mcName != "Viewer")
+                if (mcName == "Viewer")
                 {
-                    await Clients.Group(facID).SendAsync("ReceiveStatusData", -2, mcName);
-                    await Clients.Group(facID).SendAsync("ReceiveUserOffline", mcName);
+                    await Clients.Group(facID).SendAsync("ReceiveUserOffline", emailAddress);
                 }
-                else
-                {
-                     await Clients.Group(facID).SendAsync("ReceiveUserOffline", emailAddress);
-                }
-               
                 await Groups.RemoveFromGroupAsync(Context.ConnectionId, facID);
                 var indexUser = listUserID.FindIndex(x => x.id == Context.ConnectionId);
                 listUserID.RemoveAt(indexUser);
@@ -406,6 +405,9 @@ namespace AutomateBussiness.Hubs
         }
         public async Task SendMessageToMachine(string msg,string machineName)
         {
+   
+            machineName = machineName.Replace("\n", "").Replace("\r", "");
+
             var claims = Context.User.Claims;
             var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
@@ -448,6 +450,8 @@ namespace AutomateBussiness.Hubs
         }
         public async Task SendClearMessageByUser(string machineName)
         {
+            machineName = machineName.Replace("\n", "").Replace("\r", "");
+
             var claims = Context.User.Claims;
             var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
@@ -483,6 +487,8 @@ namespace AutomateBussiness.Hubs
         }
         public async Task SendLoadMessageByUser(string machineName)
         {
+            machineName = machineName.Replace("\n", "").Replace("\r", "");
+
             var claims = Context.User.Claims;
             var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();
@@ -509,6 +515,32 @@ namespace AutomateBussiness.Hubs
         }
 
         // machine function
+        public async Task DisconnectFromMachine(string supEmail)
+        {
+
+            var claims = Context.User.Claims;
+            var facID = claims.Where(c => c.Type == "FactoryID")
+                   .Select(c => c.Value).SingleOrDefault();
+            var mcID = claims.Where(c => c.Type == "MachineID")
+                   .Select(c => c.Value).SingleOrDefault();
+            var mcName = claims.Where(c => c.Type == "MachineName")
+                    .Select(c => c.Value).SingleOrDefault();
+
+            var factory = _context.FactoryTable.Where(m => m.id == facID);
+
+            if (factory.Count() > 0 && mcName != null)
+            {
+
+                 await Clients.Group(facID).SendAsync("ReceiveStatusData", -2, mcName);
+                 await Clients.Group(facID).SendAsync("ReceiveUserOffline", mcName);
+
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, facID);
+                var indexUser = listUserID.FindIndex(x => x.id == Context.ConnectionId);
+                if (indexUser != -1)
+                { listUserID.RemoveAt(indexUser); }
+            }
+
+        }
         public async Task SendClearMessageByMachine(string supEmail)
         {
             var claims = Context.User.Claims;
@@ -608,6 +640,7 @@ namespace AutomateBussiness.Hubs
         }
         public async Task TrigerRealTimeMachine(string machineName, bool action,int everyTimes=60)
         {
+            machineName = machineName.Replace("\n", "").Replace("\r", "");
             var claims = Context.User.Claims;
             var facID = claims.Where(c => c.Type == "FactoryID")
                   .Select(c => c.Value).SingleOrDefault();

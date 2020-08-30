@@ -67,7 +67,7 @@ function renderChart(orgList) {
 				label: {
 					style_fontSize: 10,
 					text: '<span style="font-size:11px;"><span style="align:center;"><span style="font-size:12px;"><b>%position</b></span><br/>' +
-						'<img width=50 height=50 align=center margin_bottom=4 margin_top=4 src=%photo><br/>' +
+						'<img width=50 height=50 align=center margin_bottom=4 margin_top=4 src=Img/Emp/%photo><br/>' +
 						'%name<br/><br/></span>' +
 						'%quality<br/>' +
 						'%initiative<br/>' +
@@ -153,7 +153,7 @@ function makePoints(data) {
 			}
 		};
 		if (result.parent == undefined) {
-			result.annotation_label_text = '<span style="align:center;font-size:13px;"><img width=70 height=70 align=center margin_bottom=4 src=%photo><br/><span style="font-size:14px;"><b>%position</b></span><br/>%name<br/></span>';
+			result.annotation_label_text = '<span style="align:center;font-size:13px;"><img width=70 height=70 align=center margin_bottom=4 src=Img/Emp/%photo><br/><span style="font-size:14px;"><b>%position</b></span><br/>%name<br/></span>';
 		}
 		return result;
 	}).points(data);

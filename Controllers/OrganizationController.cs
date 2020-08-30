@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutomateBussiness.Data;
 using AutomateBussiness.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -20,15 +21,18 @@ namespace AutomateBussiness.Controllers
         private readonly UserManager<AccountViewModel> userManager;
         private readonly SignInManager<AccountViewModel> signInManager;
         private readonly AutomateBussinessContext _context;
+        private readonly IWebHostEnvironment hostingEnvironment;
         public object Claimtype { get; private set; }
         private List<OrganizationViewModel> Organization { get; set; }
         public string facID = "";
         public OrganizationController(AutomateBussinessContext context,
             UserManager<AccountViewModel> userManager,
-            SignInManager<AccountViewModel> signInManager)
+            SignInManager<AccountViewModel> signInManager,
+            IWebHostEnvironment hostingEnvironment)
         {
             this.userManager = userManager;
             this.signInManager = signInManager;
+            this.hostingEnvironment = hostingEnvironment;
             _context = context;
 
         }
@@ -47,7 +51,7 @@ namespace AutomateBussiness.Controllers
             try
             {
                 getFacID();
-                var All_Organizations = from m in _context.OrganizationTable where m.factoryID== facID
+                var All_Organizations = from m in _context.OrganizationTable where m.factoryID == facID
                                         orderby m.parent
                                        select m;
                 //All_Organizations = All_Organizations.Where(x => x.factoryID == facID);
@@ -122,39 +126,75 @@ namespace AutomateBussiness.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("id,name,position,photo,phone,address,email,parent,work_quality,initiative,cooperative,defaultPassword,accessType")] OrganizationViewModel Organization)
+        public async Task<IActionResult> Create( OrganizationCreateViewModel organization)
         {
             if (ModelState.IsValid)
             {
-                getFacID();
-
-                if(Organization.parent != null)
-                {
-                    Organization.parent = await getParentID(Organization.parent);
-                }
-                Organization.factoryID = facID;
-
                 //add new user also
+                getFacID();
                 var factory = _context.FactoryTable.Where(m => m.id == facID);
                 if (factory.Count() == 1)
                 {
-                    
+
                     // Copy data from RegisterViewModel to IdentityUser
                     var user = new AccountViewModel
                     {
-                        UserName = Organization.email,
-                        Email = Organization.email,
-                        PhoneNumber = Organization.phone,
-                        factoryID = factory.First().factoryName
+                        UserName = organization.email,
+                        Email = organization.email,
+                        PhoneNumber = organization.phone,
+                        factoryID = factory.First().id
                     };
 
                     // Store user data in AspNetUsers database table
-                    var result = await userManager.CreateAsync(user, Organization.defaultPassword);
+                    var result = await userManager.CreateAsync(user, organization.defaultPassword);
 
                     // If user is successfully created, sign-in the user using
                     // SignInManager and redirect to index action of HomeController
-                    if (result.Succeeded) {
-                         _context.Add(Organization);
+                    if (result.Succeeded)
+                    {
+                        if (organization.parent != null)
+                        {
+                            organization.parent = await getParentID(organization.parent);
+                        }
+                        string uniqueFileName = null;
+                        // has selected an image to upload.
+                        if (organization.photo != null)
+                        {
+                            // The image must be uploaded to the images folder in wwwroot
+                            // To get the path of the wwwroot folder we are using the inject
+                            // HostingEnvironment service provided by ASP.NET Core
+                            string uploadsFolder = Path.Combine(hostingEnvironment.WebRootPath, "Img\\Emp");
+                            // To make sure the file name is unique we are appending a new
+                            // GUID value and and an underscore to the file name
+                            uniqueFileName = Guid.NewGuid().ToString() + "_" + organization.photo.FileName;
+                            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+                            // Use CopyTo() method provided by IFormFile interface to
+                            // copy the file to wwwroot/images folder
+                            organization.photo.CopyTo(new FileStream(filePath, FileMode.Create));
+                        }
+                        else
+                        {
+                            uniqueFileName = "noimg.png";
+                        }
+                        OrganizationViewModel newEmp = new OrganizationViewModel
+                        {
+                            name = organization.name,
+                            position = organization.position,
+                            photo = uniqueFileName,
+                            phone = organization.phone,
+                            address = organization.address,
+                            email = organization.email,
+                            parent = organization.parent,
+                            work_quality = organization.work_quality,
+                            initiative = organization.initiative,
+                            cooperative = organization.cooperative,
+                            factoryID = facID,
+                            defaultPassword = organization.defaultPassword,
+                            nickName = organization.nickName,
+                            accessType = organization.accessType
+                        };
+
+                        _context.OrganizationTable.Add(newEmp);
                         await _context.SaveChangesAsync();
                         return RedirectToAction(nameof(Index));
                     }
@@ -167,6 +207,7 @@ namespace AutomateBussiness.Controllers
                 {
                     ModelState.AddModelError(string.Empty, "Not found your company id");
                 }
+
             }
             return View(Organization);
         }

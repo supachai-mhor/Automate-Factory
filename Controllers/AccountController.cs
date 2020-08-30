@@ -53,12 +53,11 @@ namespace AutomateBussiness.Controllers
                 {
                     var newFactory = new FactoryViewModel
                     {
-                        id = Guid.NewGuid().ToString() + Guid.NewGuid().ToString(),
+                        id = Guid.NewGuid().ToString(),
                         foundDate = DateTime.Now,
                         factoryName = model.FactoryName,
 
                     };
-
 
                     // Copy data from RegisterViewModel to IdentityUser
                     var user = new AccountViewModel
@@ -92,10 +91,30 @@ namespace AutomateBussiness.Controllers
                 }
                 else
                 {
+                    // Copy data from RegisterViewModel to IdentityUser
+                    var user = new AccountViewModel
+                    {
+                        UserName = model.Email,
+                        Email = model.Email,
+                        factoryID = factory.FirstOrDefault().id
+                    };
 
-                    // If there are any errors, add them to the ModelState object
-                    // which will be displayed by the validation summary tag helper
-                    ModelState.AddModelError(string.Empty, "This business name already used.");
+                    // Store user data in AspNetUsers database table
+                    var result = await userManager.CreateAsync(user, model.Password);
+
+                    // If user is successfully created, sign-in the user using
+                    // SignInManager and redirect to index action of HomeController
+                    if (result.Succeeded)
+                    {
+                        await signInManager.SignInAsync(user, isPersistent: false);
+                        return RedirectToAction("index", "home");
+                    }
+                    foreach (var error in result.Errors)
+                    {
+                        // If there are any errors, add them to the ModelState object
+                        // which will be displayed by the validation summary tag helper
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
                 
             }
